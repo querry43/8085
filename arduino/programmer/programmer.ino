@@ -8,6 +8,13 @@ const uint8_t
 
 // wire AD0-7 to PORTC
 
+const PROGMEM  uint8_t program[]  = {
+  0, 0x3e, // MVI A, 0xC0
+  1, 0xc0,
+  2, 0x30, // SIM
+  3, 0x76, // HLT
+};
+
 void setup() {
   pinMode(RD_pin, OUTPUT);
   pinMode(WR_pin, OUTPUT);
@@ -29,7 +36,10 @@ void setup() {
 
 void loop() {
   clear_mem();
-  mem_test();
+  //mem_test();
+
+  write_program();
+  dump_mem();
 
   stop_hold();
   
@@ -87,6 +97,11 @@ void mem_test() {
   }
 
   dump_mem();
+}
+
+void write_program() {
+  for (uint8_t i = 0; i < sizeof(program); i += 2)
+    write_mem(program[i], program[i+1]);
 }
 
 void dump_mem() {
