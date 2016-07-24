@@ -1,18 +1,25 @@
+#include "asm.h"
+
 const uint8_t
   RD_pin = 11,
   WR_pin = 12,
   ALE_pin = 13,
   HOLD_pin = 2,
-  HLDA_pin = 3,
   RESET_pin = 4;
 
 // wire AD0-7 to PORTC
 
-const PROGMEM  uint8_t program[]  = {
-  0, 0x3e, // MVI A, 0xC0
-  1, 0xc0,
-  2, 0x30, // SIM
-  3, 0x76, // HLT
+const uint8_t program[]  = {
+  0x00, JMP,
+  0x01, 0,
+  0x02, 0xfc,
+
+
+  // SOUT and halt
+  0xfc, MVI_A,
+  0xfd, 0b11000000,
+  0xfe, SIM,
+  0xff, HLT,
 };
 
 void setup() {
@@ -25,7 +32,6 @@ void setup() {
   digitalWrite(ALE_pin, LOW);
 
   pinMode(HOLD_pin, OUTPUT);
-  pinMode(HLDA_pin, INPUT);
   pinMode(RESET_pin, OUTPUT);
 
   start_hold();
@@ -36,10 +42,12 @@ void setup() {
 
 void loop() {
   clear_mem();
-  //mem_test();
+  // mem_test(); for(;;);
 
   write_program();
   dump_mem();
+
+  set_ctl_high_imp();
 
   stop_hold();
   
@@ -53,6 +61,13 @@ void write_mem(uint8_t addr, unsigned char data) {
   digitalWrite(WR_pin, LOW);
   PORTC = data;
   digitalWrite(WR_pin, HIGH);
+
+/*
+  Serial.print("writing ");
+  Serial.print(data, HEX);
+  Serial.print(" to ");
+  Serial.println(addr, HEX);
+*/
 
   set_bus_output();
 }
@@ -100,8 +115,11 @@ void mem_test() {
 }
 
 void write_program() {
-  for (uint8_t i = 0; i < sizeof(program); i += 2)
-    write_mem(program[i], program[i+1]);
+  const uint8_t program_length = sizeof(program) / 2;
+  Serial.print("Writing program length ");
+  Serial.println(program_length);
+  for (uint8_t i = 0; i < program_length; i++)
+    write_mem(program[i*2], program[i*2+1]);
 }
 
 void dump_mem() {
@@ -132,5 +150,11 @@ void start_hold() {
 
 void stop_hold() {
   digitalWrite(HOLD_pin, LOW);
+}
+
+void set_ctl_high_imp() {
+  pinMode(RD_pin, INPUT);
+  pinMode(WR_pin, INPUT);
+  pinMode(ALE_pin, INPUT);
 }
 
