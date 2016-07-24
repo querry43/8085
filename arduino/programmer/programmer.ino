@@ -9,20 +9,25 @@ const uint8_t
 
 // wire AD0-7 to PORTC
 
-const uint8_t program[]  = {
+const uint8_t program[] = {
   0x00, JMP,
-  0x01, 0,
-  0x02, 0xfc,
+  0x01, 0x20,
+  0x02, 0x00,
 
+  0x10, MVI_A,
+  0x11, 0b01000000,
+  0x12, SIM,
+  0x13, HLT,
 
-  // SOUT and halt
-  0xfc, MVI_A,
-  0xfd, 0b11000000,
-  0xfe, SIM,
-  0xff, HLT,
+  0x20, MVI_A,
+  0x21, 0b11000000,
+  0x22, SIM,
+  0x23, HLT,
 };
 
 void setup() {
+  Serial.begin(9600);
+
   pinMode(RD_pin, OUTPUT);
   pinMode(WR_pin, OUTPUT);
   pinMode(ALE_pin, OUTPUT);
@@ -35,24 +40,20 @@ void setup() {
   pinMode(RESET_pin, OUTPUT);
 
   start_hold();
-  reset_cpu();
-  
-  Serial.begin(9600);
-}
 
-void loop() {
   clear_mem();
-  // mem_test(); for(;;);
+  // mem_test(); return;
 
   write_program();
   dump_mem();
 
   set_ctl_high_imp();
 
+  reset_cpu();
   stop_hold();
-  
-  for(;;);
 }
+
+void loop() { }
 
 void write_mem(uint8_t addr, unsigned char data) {
   set_bus_output();
@@ -123,16 +124,20 @@ void write_program() {
 }
 
 void dump_mem() {
-  char buf[16];
-  for (uint16_t i = 0; i < 256; i += 4) {
+  char buf[64];
+  for (uint16_t i = 0; i < 256; i += 8) {
     sprintf(
       buf,
-      "%02x: %02x %02x %02x %02x",
+      "%02x: %02x %02x %02x %02x    %02x %02x %02x %02x",
       i,
       read_mem(i),
       read_mem(i+1),
       read_mem(i+2),
-      read_mem(i+3)
+      read_mem(i+3),
+      read_mem(i+4),
+      read_mem(i+5),
+      read_mem(i+6),
+      read_mem(i+7)
     );
     Serial.println(buf);
   }
@@ -140,7 +145,7 @@ void dump_mem() {
 
 void reset_cpu() {
   digitalWrite(RESET_pin, LOW);
-  delay(100);
+  delay(500);
   digitalWrite(RESET_pin, HIGH);
 }
 
