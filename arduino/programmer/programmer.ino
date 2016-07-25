@@ -8,7 +8,6 @@ const uint8_t
   RD_pin = 10,
   WR_pin = 11,
   ALE_pin = 12,
-  HOLD_pin = 2,
   RESET_pin = 4,
   LED_pin = 13;
 
@@ -22,12 +21,14 @@ void setup() {
   pinMode(LED_pin, OUTPUT);
   digitalWrite(LED_pin, LOW);
 
-  pinMode(HOLD_pin, OUTPUT);
   pinMode(RESET_pin, OUTPUT);
 
-  reset_cpu();
-  start_hold();
-  delay(1000);
+  digitalWrite(RESET_pin, LOW);
+  delay(100);
+  digitalWrite(RESET_pin, HIGH);
+  delay(100);
+  digitalWrite(RESET_pin, LOW);
+  delay(100);
 
   pinMode(RD_pin, OUTPUT);
   pinMode(WR_pin, OUTPUT);
@@ -41,14 +42,13 @@ void setup() {
   // mem_test(); return;
 
   write_program();
-  dump_mem();
+  // dump_mem();
   verify_program();
 
   set_ctl_high_imp();
 
   digitalWrite(LED_pin, HIGH);
-  reset_cpu();
-  stop_hold();
+  digitalWrite(RESET_pin, HIGH);
 }
 
 void loop() { }
@@ -169,20 +169,11 @@ void reset_cpu() {
   digitalWrite(RESET_pin, HIGH);
 }
 
-void start_hold() {
-  digitalWrite(HOLD_pin, HIGH);
-}
-
-void stop_hold() {
-  digitalWrite(HOLD_pin, LOW);
-}
-
 void set_ctl_high_imp() {
   pinMode(RD_pin, INPUT);
   pinMode(WR_pin, INPUT);
   pinMode(ALE_pin, INPUT);
 
-  pinMode(HOLD_pin, INPUT);
   pinMode(RESET_pin, INPUT);
 }
 
