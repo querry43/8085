@@ -1,13 +1,19 @@
 #pragma once
 
 // instructions
+#define CALL 0xcd
+#define DCR_A 0x3d
+#define DCR_B 0x05
 #define HLT 0x76
 #define JMP 0xc3
+#define JNZ 0xc2
 #define MVI_A 0x3e
+#define MVI_B 0x06
 #define MVI_H 0x26
 #define MVI_L 0x2e
 #define MVI_M 0x36
 #define NOP 0x00
+#define RET 0xc9
 #define SIM 0x30
 
 // addresses

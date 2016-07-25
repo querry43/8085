@@ -1,4 +1,8 @@
 #include "asm.h"
+#include "blink.h"
+#include "light_on.h"
+#include "blink_timer.h"
+#include "output.h"
 
 const uint8_t
   RD_pin = 11,
@@ -9,21 +13,7 @@ const uint8_t
 
 // wire AD0-7 to PORTC
 
-const uint8_t program[] = {
-  0x00, JMP,
-  0x01, 0x20,
-  0x02, 0x00,
-
-  0x10, MVI_A,
-  0x11, 0b01000000,
-  0x12, SIM,
-  0x13, HLT,
-
-  0x20, MVI_A,
-  0x21, 0b11000000,
-  0x22, SIM,
-  0x23, HLT,
-};
+#define PROGRAM output_program
 
 void setup() {
   Serial.begin(9600);
@@ -116,11 +106,11 @@ void mem_test() {
 }
 
 void write_program() {
-  const uint8_t program_length = sizeof(program) / 2;
+  const uint8_t program_length = sizeof(PROGRAM) / 2;
   Serial.print("Writing program length ");
   Serial.println(program_length);
   for (uint8_t i = 0; i < program_length; i++)
-    write_mem(program[i*2], program[i*2+1]);
+    write_mem(PROGRAM[i*2], PROGRAM[i*2+1]);
 }
 
 void dump_mem() {
