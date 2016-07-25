@@ -5,11 +5,12 @@
 #include "output.h"
 
 const uint8_t
-  RD_pin = 11,
-  WR_pin = 12,
-  ALE_pin = 13,
+  RD_pin = 10,
+  WR_pin = 11,
+  ALE_pin = 12,
   HOLD_pin = 2,
-  RESET_pin = 4;
+  RESET_pin = 4,
+  LED_pin = 13;
 
 // wire AD0-7 to PORTC
 
@@ -17,6 +18,12 @@ const uint8_t
 
 void setup() {
   Serial.begin(9600);
+
+  pinMode(LED_pin, OUTPUT);
+  digitalWrite(LED_pin, LOW);
+
+  start_hold();
+  delay(1000);
 
   pinMode(RD_pin, OUTPUT);
   pinMode(WR_pin, OUTPUT);
@@ -29,8 +36,6 @@ void setup() {
   pinMode(HOLD_pin, OUTPUT);
   pinMode(RESET_pin, OUTPUT);
 
-  start_hold();
-
   clear_mem();
   // mem_test(); return;
 
@@ -39,6 +44,7 @@ void setup() {
 
   set_ctl_high_imp();
 
+  digitalWrite(LED_pin, HIGH);
   reset_cpu();
   stop_hold();
 }
@@ -151,5 +157,8 @@ void set_ctl_high_imp() {
   pinMode(RD_pin, INPUT);
   pinMode(WR_pin, INPUT);
   pinMode(ALE_pin, INPUT);
+
+  pinMode(HOLD_pin, INPUT);
+  pinMode(RESET_pin, INPUT);
 }
 
