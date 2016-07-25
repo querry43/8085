@@ -22,6 +22,10 @@ void setup() {
   pinMode(LED_pin, OUTPUT);
   digitalWrite(LED_pin, LOW);
 
+  pinMode(HOLD_pin, OUTPUT);
+  pinMode(RESET_pin, OUTPUT);
+
+  reset_cpu();
   start_hold();
   delay(1000);
 
@@ -33,14 +37,12 @@ void setup() {
   digitalWrite(WR_pin, HIGH);
   digitalWrite(ALE_pin, LOW);
 
-  pinMode(HOLD_pin, OUTPUT);
-  pinMode(RESET_pin, OUTPUT);
-
   clear_mem();
   // mem_test(); return;
 
   write_program();
   dump_mem();
+  verify_program();
 
   set_ctl_high_imp();
 
@@ -112,12 +114,34 @@ void mem_test() {
 }
 
 void write_program() {
-  const uint8_t program_length = sizeof(PROGRAM) / 2;
   Serial.print("Writing program length ");
-  Serial.println(program_length);
-  for (uint8_t i = 0; i < program_length; i++)
+  Serial.println(program_length());
+  for (uint8_t i = 0; i < program_length(); i++)
     write_mem(PROGRAM[i*2], PROGRAM[i*2+1]);
 }
+
+void verify_program() {
+  uint8_t prog_cksum = 0,
+    mem_cksum = 0;
+
+  for (uint8_t i = 0; i < program_length(); i++)
+    prog_cksum += PROGRAM[i*2+1];
+
+  for (uint16_t i = 0; i < 256; i++)
+      mem_cksum += read_mem(i);
+
+  if (prog_cksum != mem_cksum) {
+    Serial.println("PROGRAMMING FAILED, MISMATCHING CKSUM");
+    Serial.print("Got: ");
+    Serial.print(mem_cksum);
+    Serial.print(" Expected: ");
+    Serial.println(prog_cksum);
+  } else {
+    Serial.println("Programming OK");
+  }
+}
+
+uint8_t program_length() { return sizeof(PROGRAM) / 2; }
 
 void dump_mem() {
   char buf[64];
