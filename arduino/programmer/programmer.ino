@@ -1,7 +1,7 @@
 #include "asm.h"
 #include "blink.h"
 #include "light_on.h"
-#include "blink_timer.h"
+#include "timer.h"
 #include "output.h"
 
 const uint8_t
@@ -13,7 +13,7 @@ const uint8_t
 
 // wire AD0-7 to PORTC
 
-#define PROGRAM output_program
+#define PROGRAM blink_program
 
 void setup() {
   Serial.begin(9600);
