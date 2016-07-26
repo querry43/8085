@@ -9,6 +9,7 @@ const uint8_t
   WR_pin = 11,
   ALE_pin = 12,
   RESET_pin = 4,
+  HOLD_pin = 5,
   LED_pin = 13;
 
 // wire AD0-7 to PORTC
@@ -22,12 +23,9 @@ void setup() {
   digitalWrite(LED_pin, LOW);
 
   pinMode(RESET_pin, OUTPUT);
+  pinMode(HOLD_pin, OUTPUT);
 
-  digitalWrite(RESET_pin, LOW);
-  delay(100);
-  digitalWrite(RESET_pin, HIGH);
-  delay(100);
-  digitalWrite(RESET_pin, LOW);
+  start_hold();
   delay(100);
 
   pinMode(RD_pin, OUTPUT);
@@ -42,13 +40,17 @@ void setup() {
   // mem_test(); return;
 
   write_program();
-  // dump_mem();
+  dump_mem();
   verify_program();
+
+  reset_cpu();
+  reset_cpu();
 
   set_ctl_high_imp();
 
   digitalWrite(LED_pin, HIGH);
-  digitalWrite(RESET_pin, HIGH);
+
+  stop_hold();
 }
 
 void loop() { }
@@ -150,7 +152,7 @@ void dump_mem() {
       buf,
       "%02x: %02x %02x %02x %02x    %02x %02x %02x %02x",
       i,
-      read_mem(i),
+      read_mem(i+0),
       read_mem(i+1),
       read_mem(i+2),
       read_mem(i+3),
@@ -165,8 +167,17 @@ void dump_mem() {
 
 void reset_cpu() {
   digitalWrite(RESET_pin, LOW);
-  delay(500);
+  delay(100);
   digitalWrite(RESET_pin, HIGH);
+  delay(100);
+}
+
+void start_hold() {
+  digitalWrite(HOLD_pin, HIGH);
+}
+
+void stop_hold() {
+  digitalWrite(HOLD_pin, LOW);
 }
 
 void set_ctl_high_imp() {
@@ -175,5 +186,6 @@ void set_ctl_high_imp() {
   pinMode(ALE_pin, INPUT);
 
   pinMode(RESET_pin, INPUT);
+  pinMode(HOLD_pin, INPUT);
 }
 
