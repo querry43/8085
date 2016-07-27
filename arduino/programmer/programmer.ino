@@ -3,6 +3,7 @@
 #include "light_on.h"
 #include "timer.h"
 #include "output.h"
+#include "larson_scanner.h"
 
 const uint8_t
   RD_pin = 10,
@@ -14,7 +15,7 @@ const uint8_t
 
 // wire AD0-7 to PORTC
 
-#define PROGRAM blink_program
+#define PROGRAM larson_scanner_program
 
 void setup() {
   Serial.begin(9600);
@@ -130,7 +131,7 @@ void verify_program() {
     prog_cksum += PROGRAM[i*2+1];
 
   for (uint16_t i = 0; i < 256; i++)
-      mem_cksum += read_mem(i);
+    mem_cksum += read_mem(i);
 
   if (prog_cksum != mem_cksum) {
     Serial.println("PROGRAMMING FAILED, MISMATCHING CKSUM");
