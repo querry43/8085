@@ -28,5 +28,10 @@
 #define RST_6_5 0x34
 #define RST_7_5 0x3c
 
+// one document suggests we reserve the first 64 bytes
+// for trap vectors, but that would overlap with RST.7.5.
+// 8 bytes from that is 0x44.
+#define START 0x44
+
 // initialize
 #define SET_SP 0x00, LXI_SP, 0x01, 0xff, 0x02, 0x00
