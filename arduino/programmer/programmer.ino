@@ -2,6 +2,7 @@
 #include "light_on.h"
 
 const uint8_t
+  LATCH_EN_pin = 4, 
   RD_pin = 10,
   WR_pin = 11,
   LED_pin = 13;
@@ -18,9 +19,11 @@ const uint8_t
 void setup() {
   Serial.begin(38400);
 
+  pinMode(LATCH_EN_pin, OUTPUT);
   pinMode(RD_pin, OUTPUT);
   pinMode(WR_pin, OUTPUT);
 
+  digitalWrite(LATCH_EN_pin, HIGH);
   digitalWrite(RD_pin, HIGH);
   digitalWrite(WR_pin, HIGH);
 
