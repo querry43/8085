@@ -19,6 +19,8 @@ const uint8_t
 void setup() {
   Serial.begin(38400);
 
+  // hold the cpu
+
   pinMode(LATCH_EN_pin, OUTPUT);
   pinMode(RD_pin, OUTPUT);
   pinMode(WR_pin, OUTPUT);
@@ -27,7 +29,13 @@ void setup() {
   digitalWrite(RD_pin, HIGH);
   digitalWrite(WR_pin, HIGH);
 
-  mem_test(); return;
+  //mem_test(); return;
+
+  clear_mem();
+  write_program();
+
+  // set all lines high-impendance
+  // reset and start the cpu
 }
 
 void loop() { }
@@ -113,22 +121,66 @@ void write_incrementing_pattern() {
 
 void dump_mem() {
   char buf[64];
+  bool printed_ellipsis = false;
+
   Serial.println("Memory:");
   for (uint16_t i = 0; i < MEM_SIZE; i += 8) {
-    sprintf(
-      buf,
-      "%04x: %02x %02x %02x %02x    %02x %02x %02x %02x",
-      i,
-      read_mem(i+0),
-      read_mem(i+1),
-      read_mem(i+2),
-      read_mem(i+3),
-      read_mem(i+4),
-      read_mem(i+5),
-      read_mem(i+6),
-      read_mem(i+7)
-    );
-    Serial.println(buf);
+    uint8_t mem[] = {
+      read_mem(i+0), read_mem(i+1), read_mem(i+2), read_mem(i+3),
+      read_mem(i+4), read_mem(i+5), read_mem(i+6), read_mem(i+7),
+    };
+
+    bool all_zero = true;
+    for (int i = 0; i < 8; i++)
+      all_zero = all_zero && mem[i] == 0;
+
+    if (!all_zero || i == 0 || i == MEM_SIZE-8) {
+      sprintf(
+        buf,
+        "%04x: %02x %02x %02x %02x    %02x %02x %02x %02x",
+        i,
+        mem[0], mem[1], mem[2], mem[3],
+        mem[4], mem[5], mem[6], mem[7]
+      );
+      printed_ellipsis = false;
+      Serial.println(buf);
+    } else {
+      if (!printed_ellipsis) {
+        Serial.println("...");
+        printed_ellipsis = true;
+      }
+    }
   }
 }
 
+void write_program() {
+  Serial.print("Writing program length ");
+  Serial.println(program_length());
+  for (uint8_t i = 0; i < program_length(); i++)
+    write_mem(PROGRAM[i*2], PROGRAM[i*2+1]);
+  dump_mem();
+  verify_program();
+}
+
+void verify_program() {
+  uint8_t prog_cksum = 0,
+    mem_cksum = 0;
+
+  for (uint8_t i = 0; i < program_length(); i++)
+    prog_cksum += PROGRAM[i*2+1];
+
+  for (uint16_t i = 0; i < 256; i++)
+    mem_cksum += read_mem(i);
+
+  if (prog_cksum != mem_cksum) {
+    Serial.println("PROGRAMMING FAILED, MISMATCHING CKSUM");
+    Serial.print("Got: ");
+    Serial.print(mem_cksum);
+    Serial.print(" Expected: ");
+    Serial.println(prog_cksum);
+  } else {
+    Serial.println("Programming OK");
+  }
+}
+
+uint8_t program_length() { return sizeof(PROGRAM) / 2; }
