@@ -1,6 +1,6 @@
 #pragma once
 
-const uint8_t light_on_program[] = {
+const uint16_t light_on_program[] = {
   0x00, JMP,
   0x01, START,
   0x02, 0x00,

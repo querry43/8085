@@ -1,6 +1,6 @@
 #pragma once
 
-const uint8_t timer_program[] = {
+const uint16_t timer_program[] = {
   // SOD high
   0x00, MVI_A,
   0x01, 0b11000000,

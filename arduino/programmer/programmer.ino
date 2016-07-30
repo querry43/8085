@@ -8,13 +8,14 @@ const uint8_t
   LED_pin = 13;
 
 /* Hookup:
- *  A0-A7 to PORTC
- *  A8-A15 to PORTA
- *  D0-D7 to PORTL
+ *  A0-A7 to PORTC (37-30)
+ *  A8-A15 to PORTA (22-29)
+ *  D0-D7 to PORTL (49-42)
  */
 
 #define PROGRAM light_on_program
 #define MEM_SIZE 4096
+#define DEBUG false
 
 void setup() {
   Serial.begin(38400);
@@ -29,7 +30,7 @@ void setup() {
   digitalWrite(RD_pin, HIGH);
   digitalWrite(WR_pin, HIGH);
 
-  //mem_test(); return;
+  // mem_test(); return;
 
   clear_mem();
   write_program();
@@ -47,12 +48,12 @@ void write_mem(const uint16_t addr, const uint8_t data) {
   set_data(data);
   digitalWrite(WR_pin, HIGH);
 
-/*
-  Serial.print("writing ");
-  Serial.print(data, HEX);
-  Serial.print(" to ");
-  Serial.println(addr, HEX);
-*/
+  if (DEBUG) {
+    Serial.print("writing ");
+    Serial.print(data, HEX);
+    Serial.print(" to ");
+    Serial.println(addr, HEX);
+  }
 
   DDRC = 0;
   DDRA = 0;
@@ -65,6 +66,13 @@ unsigned char read_mem(const uint16_t addr) {
   digitalWrite(RD_pin, LOW);
   uint8_t data = PINL;
   digitalWrite(RD_pin, HIGH);
+
+  if (DEBUG) {
+    Serial.print("reading ");
+    Serial.print(data, BIN);
+    Serial.print(" from ");
+    Serial.println(addr, HEX);
+  }
 
   DDRC = 0;
   DDRA = 0;
@@ -156,8 +164,18 @@ void dump_mem() {
 void write_program() {
   Serial.print("Writing program length ");
   Serial.println(program_length());
-  for (uint8_t i = 0; i < program_length(); i++)
-    write_mem(PROGRAM[i*2], PROGRAM[i*2+1]);
+  for (uint8_t i = 0; i < program_length(); i++) {
+    uint16_t address = PROGRAM[i*2];
+    uint16_t data = PROGRAM[i*2+1];
+
+    if (address >= MEM_SIZE) {
+      Serial.print("Attempting to write to beyond memory at address ");
+      Serial.println(address, HEX);
+      break;
+    }
+
+    write_mem(address, data);
+  }
   dump_mem();
   verify_program();
 }
@@ -166,10 +184,10 @@ void verify_program() {
   uint8_t prog_cksum = 0,
     mem_cksum = 0;
 
-  for (uint8_t i = 0; i < program_length(); i++)
+  for (uint16_t i = 0; i < program_length(); i++)
     prog_cksum += PROGRAM[i*2+1];
 
-  for (uint16_t i = 0; i < 256; i++)
+  for (uint16_t i = 0; i < MEM_SIZE; i++)
     mem_cksum += read_mem(i);
 
   if (prog_cksum != mem_cksum) {
@@ -183,4 +201,4 @@ void verify_program() {
   }
 }
 
-uint8_t program_length() { return sizeof(PROGRAM) / 2; }
+uint8_t program_length() { return sizeof(PROGRAM) / 4; }

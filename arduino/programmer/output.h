@@ -1,6 +1,6 @@
 #pragma once
 
-const uint8_t output_program[] = {
+const uint16_t output_program[] = {
   // set PA out
   0x00, MVI_H,
   0x01, 0x01,

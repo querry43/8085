@@ -1,6 +1,6 @@
 #pragma once
 
-const uint8_t blink_program[] = {
+const uint16_t blink_program[] = {
   ASM_PREAMBLE,
 
   0x10, MVI_A,

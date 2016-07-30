@@ -1,6 +1,6 @@
 #pragma once
 
-const uint8_t larson_scanner_program[] = {
+const uint16_t larson_scanner_program[] = {
   SET_SP,
 
   // set PA out
