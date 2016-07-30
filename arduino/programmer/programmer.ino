@@ -2,7 +2,9 @@
 #include "light_on.h"
 
 const uint8_t
-  LATCH_EN_pin = 4, 
+  LATCH_EN_pin = 4,
+  RESET_pin = 5,
+  HOLD_pin = 6,
   RD_pin = 10,
   WR_pin = 11,
   LED_pin = 13;
@@ -16,11 +18,17 @@ const uint8_t
 #define PROGRAM light_on_program
 #define MEM_SIZE 4096
 #define DEBUG false
+#define MEMTEST false
 
 void setup() {
   Serial.begin(38400);
 
-  // hold the cpu
+  pinMode(LED_pin, OUTPUT);
+  digitalWrite(LED_pin, LOW);
+
+  // hold cpu
+  pinMode(HOLD_pin, OUTPUT);
+  digitalWrite(HOLD_pin, HIGH);
 
   pinMode(LATCH_EN_pin, OUTPUT);
   pinMode(RD_pin, OUTPUT);
@@ -30,13 +38,31 @@ void setup() {
   digitalWrite(RD_pin, HIGH);
   digitalWrite(WR_pin, HIGH);
 
-  // mem_test(); return;
+  if (MEMTEST) {
+    mem_test();
+    return;
+  }
 
   clear_mem();
   write_program();
 
-  // set all lines high-impendance
-  // reset and start the cpu
+  // release all bus pins
+  pinMode(LATCH_EN_pin, INPUT);
+  pinMode(RD_pin, INPUT);
+  pinMode(WR_pin, INPUT);
+  
+  PORTC = 0;
+  PORTA = 0;
+  PORTL = 0;
+
+  // reset cpu
+  pinMode(RESET_pin, OUTPUT);
+  digitalWrite(RESET_pin, LOW);
+
+  // release hold
+  digitalWrite(HOLD_pin, LOW);
+
+  digitalWrite(LED_pin, HIGH);
 }
 
 void loop() { }

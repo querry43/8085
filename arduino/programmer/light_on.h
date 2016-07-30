@@ -1,12 +1,7 @@
 #pragma once
 
 const uint16_t light_on_program[] = {
-  0x00, JMP,
-  0x01, START,
-  0x02, 0x00,
-
-  START+0, MVI_A,
-  START+1, 0b11000000,
-  START+2, SIM,
-  START+3, HLT,
+  0, MVI_A,
+  1, 0b11000000,
+  2, SIM,
 };
