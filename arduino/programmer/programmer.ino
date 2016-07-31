@@ -5,8 +5,8 @@ const uint8_t
   LATCH_EN_pin = 4,
   RESET_pin = 5,
   HOLD_pin = 6,
-  RD_pin = 10,
-  WR_pin = 11,
+  RD_pin = 11,
+  WR_pin = 10,
   LED_pin = 13;
 
 /* Hookup:
@@ -16,9 +16,10 @@ const uint8_t
  */
 
 #define PROGRAM light_on_program
-#define MEM_SIZE 4096
+#define MEM_SIZE 16
 #define DEBUG false
-#define MEMTEST false
+#define MEMTEST true
+
 
 void setup() {
   Serial.begin(38400);
@@ -27,8 +28,10 @@ void setup() {
   digitalWrite(LED_pin, LOW);
 
   // hold cpu
+  digitalWrite(HOLD_pin, LOW);
   pinMode(HOLD_pin, OUTPUT);
-  digitalWrite(HOLD_pin, HIGH);
+  digitalWrite(RESET_pin, HIGH);
+  pinMode(RESET_pin, OUTPUT);
 
   pinMode(LATCH_EN_pin, OUTPUT);
   pinMode(RD_pin, OUTPUT);
@@ -56,8 +59,7 @@ void setup() {
   PORTL = 0;
 
   // reset cpu
-  pinMode(RESET_pin, OUTPUT);
-  digitalWrite(RESET_pin, LOW);
+  digitalWrite(RESET_pin, HIGH);
 
   // release hold
   digitalWrite(HOLD_pin, LOW);
