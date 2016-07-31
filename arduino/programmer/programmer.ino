@@ -14,9 +14,8 @@ const uint8_t
  *  A8-A15 to PORTA (22-29)
  *  D0-D7 to PORTL (49-42)
  */
-
 #define PROGRAM light_on_program
-#define MEM_SIZE 16
+#define MEM_SIZE 4096
 #define DEBUG false
 #define MEMTEST true
 
@@ -28,7 +27,7 @@ void setup() {
   digitalWrite(LED_pin, LOW);
 
   // hold cpu
-  digitalWrite(HOLD_pin, LOW);
+  digitalWrite(HOLD_pin, HIGH);
   pinMode(HOLD_pin, OUTPUT);
   digitalWrite(RESET_pin, HIGH);
   pinMode(RESET_pin, OUTPUT);
@@ -43,11 +42,10 @@ void setup() {
 
   if (MEMTEST) {
     mem_test();
-    return;
+  } else {
+    clear_mem();
+    write_program();
   }
-
-  clear_mem();
-  write_program();
 
   // release all bus pins
   pinMode(LATCH_EN_pin, INPUT);
@@ -59,6 +57,8 @@ void setup() {
   PORTL = 0;
 
   // reset cpu
+  digitalWrite(RESET_pin, LOW);
+  delay(100);
   digitalWrite(RESET_pin, HIGH);
 
   // release hold
