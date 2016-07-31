@@ -1,5 +1,5 @@
 #include "asm.h"
-#include "light_on.h"
+#include "noop.h"
 
 const uint8_t
   LATCH_EN_pin = 4,
@@ -14,10 +14,10 @@ const uint8_t
  *  A8-A15 to PORTA (22-29)
  *  D0-D7 to PORTL (49-42)
  */
-#define PROGRAM light_on_program
+#define PROGRAM noop_program
 #define MEM_SIZE 4096
 #define DEBUG false
-#define MEMTEST true
+#define MEMTEST false
 
 
 void setup() {
@@ -60,6 +60,41 @@ void setup() {
   digitalWrite(RESET_pin, LOW);
   delay(100);
   pinMode(RESET_pin, INPUT); // high impedance lets reset circuit take over
+
+
+  // DEBUGGING
+  // this tells me that reading works because...
+  // holding all addresses low appears to make cpu run noop with
+  // data bus wired up and no arduino database connections
+  //DDRC = 0xff;
+  //DDRA = 0xff;
+
+  // next step, wire all latch address inputs low and repeat
+  // this does not work, suggesting that the latch outputs are not correct, why?
+  // lets test the ale by setting it high (pass through) which is safe because it isn't wired to the bus yet
+  // NOPE, although using the arduino for address control still works and does not require a reset
+  // what if the arduino addy bus is disconnected?
+  // NOPES, this suggests strongly that the issue is in the latch itself
+  // the mag 85 has a schematic for using the 74373 (same chip) which looks similar
+  // lets test the enable to be sure...
+  //pinMode(LATCH_EN_pin, OUTPUT);
+  //digitalWrite(LATCH_EN_pin, LOW);
+
+  // that didn't work, but good to note that using the arduino for addressing still works without a reset
+  // does that mean the latch outputs are high Z?
+  // maybe it's not the latch and is instead the high addresses?
+  //DDRA = 0xff;
+  // YES, using the arduino for addressing only the high registers seems to work
+  // lets wire the latch back to ALE as a test...
+  // YES, how about the latch enable?
+  // that also seems to be working.
+  
+  // RECAP, when programming memory with all no-ops, the 8085 is only able to step through those noops
+  // with flickering lights on the addy bus (top 2 unused lines) when the arduino holds the msb address lines low.
+  // the latch address pins are held low, but the ale and latch enable are wired correctly
+
+  // so, its this a problem with a8-10 to the memory or a11-12 to the mux?
+  DDRA = 0xff;
 
   // release hold
   digitalWrite(HOLD_pin, LOW);
