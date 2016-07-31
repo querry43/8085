@@ -59,7 +59,7 @@ void setup() {
   // reset cpu
   digitalWrite(RESET_pin, LOW);
   delay(100);
-  digitalWrite(RESET_pin, HIGH);
+  pinMode(RESET_pin, INPUT); // high impedance lets reset circuit take over
 
   // release hold
   digitalWrite(HOLD_pin, LOW);
