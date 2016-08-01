@@ -9,4 +9,7 @@
 | 8251A     | Com Inter.       | [link](https://github.com/querry43/8085/blob/master/documentation/intel-8251A-datasheet.pdf) |
 | 8279-5    | Kbd/Disp Inter.  | [link](https://github.com/querry43/8085/blob/master/documentation/intel-8279-5-datasheet.pdf) |
 | 74138     | 3 to 8 Decoder   | [link](https://github.com/querry43/8085/blob/master/documentation/74138-datasheet.pdf) |
+| 74367     | Hex Buffer       | [link](https://github.com/querry43/8085/blob/master/documentation/74367-datasheet) |
 | 74373     | Oct Latch        | [link](https://github.com/querry43/8085/blob/master/documentation/74373-datasheet.pdf) |
+
+The buffer is probably important if several devices are added but will be left off until then.
