@@ -1,8 +1,10 @@
 #pragma once
 
+#define OFFSET 2048
+
 const uint16_t light_on_program[] = {
-  0, MVI_A,
-  1, 0b11000000,
-  2, SIM,
-  3, HLT,
+  OFFSET+0, MVI_A,
+  OFFSET+1, 0b11000000,
+  OFFSET+2, SIM,
+  OFFSET+3, HLT,
 };
