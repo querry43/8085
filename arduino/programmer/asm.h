@@ -18,6 +18,8 @@
 #define MVI_L 0x2e
 #define MVI_M 0x36
 #define NOP 0x00
+#define POP_PSW 0xf1
+#define PUSH_PSW 0xf5
 #define RAL 0x17
 #define RET 0xc9
 #define SIM 0x30
