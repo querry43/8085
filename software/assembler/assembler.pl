@@ -13,11 +13,6 @@ use constant {
     MEM_SIZE      => 4096,
 };
 
-use constant PREAMBLE => (
-    'LXI ' . (MEM_SIZE()-1),
-    'JMP ' . START_ADDRESS(),
-);
-
 my %op_table = _read_op_table('instructions.txt');
 my @instructions = _read_asm('blink.asm');
 _sanity_check_instructions(@instructions);
@@ -37,16 +32,50 @@ my %symbol_table;
     }
 }
 
+# add preamble
+my @preamble = (
+    {
+        address => 0,
+        mnemonic => 'LXI',
+        operands => ['SP', MEM_SIZE()-1],
+    },
+    {
+        address => 3,
+        mnemonic => 'JMP',
+        operands => ['START'],
+    },
+);
+
+_associate_instruction_with_op($_) for @preamble;
+
+@instructions = (@preamble, @instructions);
+
 # pass 2, handle operands
 {
     my @expanded_instructions;
     foreach my $instruction (@instructions) {
         push @expanded_instructions, $instruction;
 
-        foreach my $i (2..$instruction->{length}) {
+        if ($instruction->{length} == 2) {
             push @expanded_instructions, {
-                address => $instruction->{address} + $i - 1,
-                opcode  => 0,
+                address => $instruction->{address} + 1,
+                opcode  => sprintf('%02x', $instruction->{operands}->[-1]),
+            };
+        } elsif ($instruction->{length} == 3) {
+            my $operand = $instruction->{operands}->[-1];
+
+            if ($operand =~ m/^[A-Z]+$/) {
+                die "Unable to find $operand in the symbol table"
+                    unless defined($symbol_table{$operand});
+                $operand = $symbol_table{$operand};
+            }
+
+            push @expanded_instructions, {
+                address => $instruction->{address} + 1,
+                opcode  => sprintf('%02x', $operand & 0xff),
+            }, {
+                address => $instruction->{address} + 2,
+                opcode  => sprintf('%02x', ($operand & 0xff00) >> 8),
             };
         }
     }
@@ -60,7 +89,7 @@ my %symbol_table;
 
 foreach my $instruction (@instructions) {
     printf(
-        "0x%02x 0x%02s ; %s\n",
+        "0x%04x, 0x%02s, // %s\n",
         $instruction->{address},
         $instruction->{opcode},
         $instruction->{line} // '',
@@ -112,10 +141,12 @@ sub _read_asm {
 
         $label =~ s/:// if $label;
 
+        my @operands = map { _parse_operand($_) } $operands ? split(/,/, $operands) : ();
+
         push @instructions, {
             label    => $label,
             mnemonic => $mnemonic,
-            operands => $operands ? [split(/,/, $operands)] : [],
+            operands => \@operands,
             short    => $operands ? join(' ', $mnemonic, $operands) : $mnemonic,
             line     => $line,
         };
@@ -148,7 +179,7 @@ sub _associate_instruction_with_op {
     my ($instruction) = @_;
 
     my $op;
-    if ($op_table{$instruction->{short}}) {
+    if ($op_table{$instruction->{short} // ''}) {
         $op = $op_table{$instruction->{short}};
 
     } else {
@@ -170,4 +201,24 @@ sub _associate_instruction_with_op {
 
     $instruction->{opcode} = $op->{opcode};
     $instruction->{length} = $op->{length};
+}
+
+sub _parse_operand {
+    my ($operand) = @_;
+
+    my ($root, $suffix) = $operand =~ m/^(.*)(.)$/;
+
+    return $operand unless $root;
+
+    if ($suffix eq 'H') {
+        return hex($root);
+    } elsif ($suffix eq 'D') {
+        return $root;
+    } elsif ($suffix eq 'Q') {
+        return oct($root);
+    } elsif ($suffix eq 'B') {
+        return oct("0b$root");
+    } else {
+        return $operand;
+    }
 }
