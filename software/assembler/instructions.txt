@@ -1,273 +1,273 @@
 # Table from section A-5 (Page 195) of "8080/8085 Assembly Language Programming"
+# Mnemonic | Op Code | Length
+
 
 # Data Transfer Group
-3A LDA Adr
-0A LDAX B
-1A LDAX D
-2A LHLD Adr
-01 LXI B,D16
-11 LXI D,D16
-21 LXI H,D16
-31 LXI SP,D16
-7F MOV A,A
-78 MOV A,B
-79 MOV A,C
-7A MOV A,D
-7B MOV A,E
-7C MOV A,H
-7D MOV A,L
-7E MOV A,M
-47 MOV B,A
-40 MOV B,B
-41 MOV B,C
-42 MOV B,D
-43 MOV B,E
-44 MOV B,H
-45 MOV B,L
-46 MOV B,M
-4F MOV C,A
-48 MOV C,B
-49 MOV C,C
-4A MOV C,D
-4B MOV C,E
-4C MOV C,H
-4D MOV C,L
-4E MOV C,M
-57 MOV D,A
-50 MOV D,B
-51 MOV D,C
-52 MOV D,D
-53 MOV D,E
-54 MOV D,H
-55 MOV D,L
-56 MOV D,M
-5F MOV E,A
-58 MOV E,B
-59 MOV E,C
-5A MOV E,D
-5B MOV E,E
-5C MOV E,H
-5D MOV E,L
-5E MOV E,M
-67 MOV H,A
-60 MOV H,B
-61 MOV H,C
-62 MOV H,D
-63 MOV H,E
-64 MOV H,H
-65 MOV H,L
-66 MOV H,M
-6F MOV L,A
-68 MOV L,B
-69 MOV L,C
-6A MOV L,D
-6B MOV L,E
-6C MOV L,H
-6D MOV L,L
-6E MOV L,M
-77 MOV M,A
-70 MOV M,B
-71 MOV M,C
-72 MOV M,D
-73 MOV M,E
-74 MOV M,H
-75 MOV M,L
-3E MVI A,D8
-06 MVI B,D8
-0E MVI C,D8
-16 MVI D,D8
-1E MVI E,D8
-26 MVI H,D8
-2E MVI L,D8
-36 MVI M,D8
-22 SHLD Adr
-32 STA Adr
-02 STAX B
-12 STAX D
-EB XCHG
+LDA Adr     | 3A | 3
+LDAX B      | 0A | 1
+LDAX D      | 1A | 1
+LHLD Adr    | 2A | 3
+LXI B,D16   | 01 | 3
+LXI D,D16   | 11 | 3
+LXI H,D16   | 21 | 3
+LXI SP,D16  | 31 | 3
+MOV A,A     | 7F | 1
+MOV A,B     | 78 | 1
+MOV A,C     | 79 | 1
+MOV A,D     | 7A | 1
+MOV A,E     | 7B | 1
+MOV A,H     | 7C | 1
+MOV A,L     | 7D | 1
+MOV A,M     | 7E | 1
+MOV B,A     | 47 | 1
+MOV B,B     | 40 | 1
+MOV B,C     | 41 | 1
+MOV B,D     | 42 | 1
+MOV B,E     | 43 | 1
+MOV B,H     | 44 | 1
+MOV B,L     | 45 | 1
+MOV B,M     | 46 | 1
+MOV C,A     | 4F | 1
+MOV C,B     | 48 | 1
+MOV C,C     | 49 | 1
+MOV C,D     | 4A | 1
+MOV C,E     | 4B | 1
+MOV C,H     | 4C | 1
+MOV C,L     | 4D | 1
+MOV C,M     | 4E | 1
+MOV D,A     | 57 | 1
+MOV D,B     | 50 | 1
+MOV D,C     | 51 | 1
+MOV D,D     | 52 | 1
+MOV D,E     | 53 | 1
+MOV D,H     | 54 | 1
+MOV D,L     | 55 | 1
+MOV D,M     | 56 | 1
+MOV E,A     | 5F | 1
+MOV E,B     | 58 | 1
+MOV E,C     | 59 | 1
+MOV E,D     | 5A | 1
+MOV E,E     | 5B | 1
+MOV E,H     | 5C | 1
+MOV E,L     | 5D | 1
+MOV E,M     | 5E | 1
+MOV H,A     | 67 | 1
+MOV H,B     | 60 | 1
+MOV H,C     | 61 | 1
+MOV H,D     | 62 | 1
+MOV H,E     | 63 | 1
+MOV H,H     | 64 | 1
+MOV H,L     | 65 | 1
+MOV H,M     | 66 | 1
+MOV L,A     | 6F | 1
+MOV L,B     | 68 | 1
+MOV L,C     | 69 | 1
+MOV L,D     | 6A | 1
+MOV L,E     | 6B | 1
+MOV L,H     | 6C | 1
+MOV L,L     | 6D | 1
+MOV L,M     | 6E | 1
+MOV M,A     | 77 | 1
+MOV M,B     | 70 | 1
+MOV M,C     | 71 | 1
+MOV M,D     | 72 | 1
+MOV M,E     | 73 | 1
+MOV M,H     | 74 | 1
+MOV M,L     | 75 | 1
+MVI A,D8    | 3E | 2
+MVI B,D8    | 06 | 2
+MVI C,D8    | 0E | 2
+MVI D,D8    | 16 | 2
+MVI E,D8    | 1E | 2
+MVI H,D8    | 26 | 2
+MVI L,D8    | 2E | 2
+MVI M,D8    | 36 | 2
+SHLD Adr    | 22 | 3
+STA Adr     | 32 | 3
+STAX B      | 02 | 1
+STAX D      | 12 | 1
+XCHG        | EB | 1
 
 # Arithmetic Group
-CE ACI D8
-8F ADC A
-88 ADC B
-89 ADC C
-8A ADC D
-8B ADC E
-8C ADC H
-8D ADC L
-8E ADC M
-87 ADD A
-80 ADD B
-81 ADD C
-82 ADD D
-83 ADD E
-84 ADD H
-85 ADD L
-86 ADD M
-C6 ADI D8
-27 DAA
-09 DAD B
-19 DAD D
-29 DAD H
-39 DAD SP
-3D DCR A
-05 DCR B
-0D DCR C
-15 DCR D
-1D DCR E
-25 DCR H
-2D DCR L
-35 DCR M
-0B DCX B
-1B DCX D
-2B DCX H
-3B DCX SP
-3C INR A
-04 INR B
-0C INR C
-14 INR D
-1C INR E
-24 INR H
-2C INR L
-34 INR M
-03 INX B
-13 INX D
-23 INX H
-33 INX SP
-9F SBB A
-98 SBB B
-99 SBB C
-9A SBB D
-9B SBB E
-9C SBB H
-9D SBB L
-9E SBB M
-DE SBI D8
-97 SUB A
-90 SUB B
-91 SUB C
-92 SUB D
-93 SUB E
-94 SUB H
-95 SUB L
-96 SUB M
-D6 SUI D8
+ACI D8      | CE | 2
+ADC A       | 8F | 1
+ADC B       | 88 | 1
+ADC C       | 89 | 1
+ADC D       | 8A | 1
+ADC E       | 8B | 1
+ADC H       | 8C | 1
+ADC L       | 8D | 1
+ADC M       | 8E | 1
+ADD A       | 87 | 1
+ADD B       | 80 | 1
+ADD C       | 81 | 1
+ADD D       | 82 | 1
+ADD E       | 83 | 1
+ADD H       | 84 | 1
+ADD L       | 85 | 1
+ADD M       | 86 | 1
+ADI D8      | C6 | 2
+DAA         | 27 | 1
+DAD B       | 09 | 1
+DAD D       | 19 | 1
+DAD H       | 29 | 1
+DAD SP      | 39 | 1
+DCR A       | 3D | 1
+DCR B       | 05 | 1
+DCR C       | 0D | 1
+DCR D       | 15 | 1
+DCR E       | 1D | 1
+DCR H       | 25 | 1
+DCR L       | 2D | 1
+DCR M       | 35 | 1
+DCX B       | 0B | 1
+DCX D       | 1B | 1
+DCX H       | 2B | 1
+DCX SP      | 3B | 1
+INR A       | 3C | 1
+INR B       | 04 | 1
+INR C       | 0C | 1
+INR D       | 14 | 1
+INR E       | 1C | 1
+INR H       | 24 | 1
+INR L       | 2C | 1
+INR M       | 34 | 1
+INX B       | 03 | 1
+INX D       | 13 | 1
+INX H       | 23 | 1
+INX SP      | 33 | 1
+SBB A       | 9F | 1
+SBB B       | 98 | 1
+SBB C       | 99 | 1
+SBB D       | 9A | 1
+SBB E       | 9B | 1
+SBB H       | 9C | 1
+SBB L       | 9D | 1
+SBB M       | 9E | 1
+SBI D8      | DE | 2
+SUB A       | 97 | 1
+SUB B       | 90 | 1
+SUB C       | 91 | 1
+SUB D       | 92 | 1
+SUB E       | 93 | 1
+SUB H       | 94 | 1
+SUB L       | 95 | 1
+SUB M       | 96 | 1
+SUI D8      | D6 | 2
 
 # Logical Group
-A7 ANA A
-A0 ANA B
-A1 ANA C
-A2 ANA D
-A3 ANA E
-A4 ANA H
-A5 ANA L
-A6 ANA M
-E6 ANI D8
-B7 ORA A
-B0 ORA B
-B1 ORA C
-B2 ORA D
-B3 ORA E
-B4 ORA H
-B5 ORA L
-B6 ORA M
-F6 ORI D8
-AF XRA A
-A8 XRA B
-A9 XRA C
-AA XRA D
-AB XRA E
-AC XRA H
-AD XRA L
-AE XRA M
-EE XRI D8
+ANA A       | A7 | 1
+ANA B       | A0 | 1
+ANA C       | A1 | 1
+ANA D       | A2 | 1
+ANA E       | A3 | 1
+ANA H       | A4 | 1
+ANA L       | A5 | 1
+ANA M       | A6 | 1
+ANI D8      | E6 | 2
+ORA A       | B7 | 1
+ORA B       | B0 | 1
+ORA C       | B1 | 1
+ORA D       | B2 | 1
+ORA E       | B3 | 1
+ORA H       | B4 | 1
+ORA L       | B5 | 1
+ORA M       | B6 | 1
+ORI D8      | F6 | 2
+XRA A       | AF | 1
+XRA B       | A8 | 1
+XRA C       | A9 | 1
+XRA D       | AA | 1
+XRA E       | AB | 1
+XRA H       | AC | 1
+XRA L       | AD | 1
+XRA M       | AE | 1
+XRI D8      | EE | 2
 
 # Compare Group
-BF CMP A
-B8 CMP B
-B9 CMP C
-BA CMP D
-BB CMP E
-BC CMP H
-BD CMP L
-BE CMP M
-FE CPI D8
+CMP A       | BF | 1
+CMP B       | B8 | 1
+CMP C       | B9 | 1
+CMP D       | BA | 1
+CMP E       | BB | 1
+CMP H       | BC | 1
+CMP L       | BD | 1
+CMP M       | BE | 1
+CPI D8      | FE | 2
 
 # Rotate Group
-17 RAL
-1F RAR
-07 RLC
-0F RRC
+RAL         | 17 | 1
+RAR         | 1F | 1
+RLC         | 07 | 1
+RRC         | 0F | 1
 
 # Complement and Carry Group
-2F CMA
-3F CMC
-37 STC
+CMA         | 2F | 1
+CMC         | 3F | 1
+STC         | 37 | 1
 
 # Branch Group
-CD CALL Adr
-C3 JMP Adr
-C9 RET
+CALL Adr    | CD | 3
+JMP Adr     | C3 | 3
+PCHL        | E9 | 1
+RET         | C9 | 1
+RST 0       | C7 | 1
+RST 1       | CF | 1
+RST 2       | D7 | 1
+RST 3       | DF | 1
+RST 4       | E7 | 1
+RST 5       | EF | 1
+RST 6       | F7 | 1
+RST 7       | FF | 1
 
 # Conditional Branching Group
-DC CC Adr
-FC CM Adr
-D4 CNC Adr
-C4 CNZ Adr
-F4 CP Adr
-EC CPE Adr
-E4 CPO Adr
-CC CZ Adr
-DA JC Adr
-FA JM Adr
-D2 JNC Adr
-C2 JNZ Adr
-F2 JP Adr
-EA JPE Adr
-E2 JPO Adr
-CA JZ Adr
-D8 RC
-F8 RM
-D0 RNC
-C0 RNZ
-F0 RP
-E8 RPE
-E0 RPO
-C8 RZ
-
-# Program Counter Control Group
-E9 PCHL
-C7 RST 0
-CF RST 1
-D7 RST 2
-DF RST 3
-E7 RST 4
-EF RST 5
-F7 RST 6
-FF RST 7
+CC Adr      | DC | 3
+CM Adr      | FC | 3
+CNC Adr     | D4 | 3
+CNZ Adr     | C4 | 3
+CP Adr      | F4 | 3
+CPE Adr     | EC | 3
+CPO Adr     | E4 | 3
+CZ Adr      | CC | 3
+JC Adr      | DA | 3
+JM Adr      | FA | 3
+JNC Adr     | D2 | 3
+JNZ Adr     | C2 | 3
+JP Adr      | F2 | 3
+JPE Adr     | EA | 3
+JPO Adr     | E2 | 3
+JZ Adr      | CA | 3
+RC          | D8 | 2
+RM          | F8 | 1
+RNC         | D0 | 1
+RNZ         | C0 | 1
+RP          | F0 | 1
+RPE         | E8 | 1
+RPO         | E0 | 1
+RZ          | C8 | 1
 
 # Stack Control Group
-C1 POP B
-D1 POP D
-E1 POP H
-F1 POP PSW
-C5 PUSH B
-D5 PUSH D
-E5 PUSH H
-F5 PUSH PSW
-F9 SPHL
-E3 XTHL
+POP B       | C1 | 1
+POP D       | D1 | 1
+POP H       | E1 | 1
+POP PSW     | F1 | 1
+PUSH B      | C5 | 1
+PUSH D      | D5 | 1
+PUSH H      | E5 | 1
+PUSH PSW    | F5 | 1
+SPHL        | F9 | 1
+XTHL        | E3 | 1
 
 # IO Group
-DB IN D8
-D3 OUT D8
+IN D8       | DB | 2
+OUT D8      | D3 | 2
 
 # Machine Control Group
-F3 DI
-FB EI
-76 HLT
-00 NOP
+DI          | F3 | 1
+EI          | FB | 1
+HLT         | 76 | 1
+NOP         | 00 | 1
 
 # Interrupt Maxk Group (8085 only)
-20 RIM
-30 SIM
+RIM         | 20 | 1
+SIM         | 30 | 1

@@ -1,5 +1,6 @@
 # 8085
 
+[Instruction Set](https://github.com/querry43/8085/blob/master/software/assembler/instructions.txt)
 
 | Component | Function         | Data Sheet |
 |-----------|------------------|------------|
