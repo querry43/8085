@@ -10,7 +10,7 @@ const uint16_t larson_scanner_program[] = {
   0x13, MVI_M,
   0x14, 0x01,
 
-  // 
+  //
   0x15, MVI_A,
   0x16, 0x01,
 

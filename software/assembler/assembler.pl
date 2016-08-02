@@ -3,6 +3,8 @@
 use warnings;
 use strict;
 use autodie;
+use List::MoreUtils qw/ uniq /;
+use List::Util qw/ any first /;
 
 use Data::Dumper;
 
@@ -11,79 +13,94 @@ use constant {
     MEM_SIZE      => 4096,
 };
 
-my %instruction_table = _read_instruction_table();
-my %instruction_handlers = (
-    'MVI' => sub { },
+use constant PREAMBLE => (
+    'LXI ' . (MEM_SIZE()-1),
+    'JMP ' . START_ADDRESS(),
 );
-my @program = _parse_assembly();
 
-# sanity checks
-# - no duplicate labels
-# - first line is labeled START
-# - no labels are used undefined
+my %op_table = _read_op_table('instructions.txt');
+my @instructions = _read_asm('blink.asm');
+_sanity_check_instructions(@instructions);
 
-# associate each line with an op, figure out command length
-foreach my $line (@program) {
-    my $code = $instruction_table{$line->{op}}
-        // $instruction_table{$line->{op} . ' ' . ($line->{operands} // '')};
-    $line->{code} = $code;
-    $line->{command_length} = 1;
-}
-
-# add addresses
-my %label_addresses;
+# pass 1, look opcodes, build symbol table
+my %symbol_table;
 {
     my $address = START_ADDRESS();
-    foreach my $line (@program) {
-        $line->{address} = $address;
-        $label_addresses{$line->{label}} = $address
-            if $line->{label};
-        $address += $line->{command_length};
+    foreach my $instruction (@instructions) {
+        $instruction->{address} = $address;
+        $symbol_table{$instruction->{label}} = $address
+            if $instruction->{label};
+
+        _associate_instruction_with_op($instruction);
+
+        $address += $instruction->{length};
     }
 }
 
-# expand labels
+# pass 2, handle operands
+{
+    my @expanded_instructions;
+    foreach my $instruction (@instructions) {
+        push @expanded_instructions, $instruction;
 
+        foreach my $i (2..$instruction->{length}) {
+            push @expanded_instructions, {
+                address => $instruction->{address} + $i - 1,
+                opcode  => 0,
+            };
+        }
+    }
 
-foreach my $line (@program) {
+    @instructions = @expanded_instructions;
+}
+
+# print Dumper \%op_table;
+# print Dumper \@instructions;
+# print Dumper \%symbol_table;
+
+foreach my $instruction (@instructions) {
     printf(
-        "0x%02x 0x%02s ; %s %s\n",
-        $line->{address},
-        $line->{code} // '??',
-        $line->{op},
-        $line->{operands} // '',
+        "0x%02x 0x%02s ; %s\n",
+        $instruction->{address},
+        $instruction->{opcode},
+        $instruction->{line} // '',
     );
 }
 
-print Dumper \%label_addresses;
+sub _read_op_table {
+    my ($filename) = @_;
+    my %op_table;
 
-sub _read_instruction_table {
-    my %instructions;
+    open my $fh, '<', $filename;
 
-    open my $fh, '<', 'instructions.txt';
     while (my $line = <$fh>) {
         chomp($line);
         $line =~ s/#.*//;
         next unless $line;
 
-        my ($code, $instruction) = $line =~ m/^([[:xdigit:]]{2}) (.*)$/;
-        if ($line && !$instruction) {
+        my ($mnemonic, $operands, $opcode, $length) = $line =~ m/^([A-Z]+)\s([[:alnum:],]+)?\s+\|\s+([[:xdigit:]]{2})\s+\|\s+(\d)\s*$/;
+
+        if ($line && !$mnemonic) {
             warn "unable to parse instruction from '$line'";
         } else {
-            $instructions{$instruction} = $code;
+            my $key = $operands ? join(' ', $mnemonic, $operands) : $mnemonic;
+            $op_table{$key} = {
+                mnemonic => $mnemonic,
+                operands => $operands ? [split(/,/, $operands)] : [],
+                opcode   => $opcode,
+                length   => $length,
+            };
         }
     }
 
-    return %instructions;
+    return %op_table;
 }
 
-sub _parse_assembly {
-    my @program = (
-        {op => 'LXI', operands => '10H'},
-        {op => 'JMP', operands => 'START'},
-    );
+sub _read_asm {
+    my ($filename) = @_;
+    my @instructions;
 
-    open my $fh, '<', 'blink.asm';
+    open my $fh, '<', $filename;
     while (my $line = <$fh>) {
         chomp($line);
         $line =~ s/;.*//;
@@ -91,17 +108,66 @@ sub _parse_assembly {
         chomp($line);
         next unless $line;
 
-        my ($label, $op, $operands) = $line =~ m/(.*:)?\s*(\w+)(\s+.*)?/;
+        my ($label, $mnemonic, $operands) = $line =~ m/(.*:)?\s*(\w+)\s*(.*)?/;
 
-        $operands =~ s/^ // if $operands;
         $label =~ s/:// if $label;
 
-        push @program, {
+        push @instructions, {
             label    => $label,
-            op       => $op,
-            operands => $operands,
+            mnemonic => $mnemonic,
+            operands => $operands ? [split(/,/, $operands)] : [],
+            short    => $operands ? join(' ', $mnemonic, $operands) : $mnemonic,
+            line     => $line,
         };
+    };
+
+    return @instructions;
+}
+
+sub _sanity_check_instructions {
+    my @instructions = @_;
+
+    die "First line does not have START label"
+        unless $instructions[0]->{label} eq 'START';
+
+    my %seen_labels;
+    $seen_labels{$_}++ for grep { $_ } map { $_->{label} } @instructions;
+    die "Label $_ appears multiple times"
+        for grep { $seen_labels{$_} > 1 } sort keys %seen_labels;
+
+    my @seen_mnemonics = uniq(map { $_->{mnemonic} } @instructions);
+    my @valid_mnemonics = uniq(map { $_->{mnemonic} } values %op_table);
+
+    foreach my $mnemonic (@seen_mnemonics) {
+        die "Invalid mnemonic $mnemonic"
+            unless any { $_ eq $mnemonic } @valid_mnemonics;
+    }
+}
+
+sub _associate_instruction_with_op {
+    my ($instruction) = @_;
+
+    my $op;
+    if ($op_table{$instruction->{short}}) {
+        $op = $op_table{$instruction->{short}};
+
+    } else {
+        my @possible_ops =
+            sort
+            grep { scalar(@{$op_table{$_}->{operands}}) == scalar(@{$instruction->{operands}}) }
+            grep { $op_table{$_}->{mnemonic} eq $instruction->{mnemonic} } sort keys %op_table;
+
+        if (scalar(@possible_ops) == 1) {
+            $op = $op_table{$possible_ops[0]};
+        } else {
+            my $op_match = first { $op_table{$_}->{operands}->[0] eq $instruction->{operands}->[0] } @possible_ops;
+            $op = $op_table{$op_match};
+        }
     }
 
-    return @program;
+    die 'Unable to find opcode for '.$instruction->{line}
+        unless $op;
+
+    $instruction->{opcode} = $op->{opcode};
+    $instruction->{length} = $op->{length};
 }

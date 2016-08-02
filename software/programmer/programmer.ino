@@ -53,7 +53,7 @@ void setup() {
   pinMode(LATCH_EN_pin, INPUT);
   pinMode(RD_pin, INPUT);
   pinMode(WR_pin, INPUT);
-  
+
   PORTC = 0;
   PORTA = 0;
   PORTL = 0;
