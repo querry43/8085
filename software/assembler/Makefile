@@ -1,5 +1,7 @@
 TARGETS = \
-	programs/blink.asm.h
+	programs/blink.asm.h \
+	programs/light_on.asm.h \
+	programs/noop.asm.h \
 
 all: ${TARGETS}
 
