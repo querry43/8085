@@ -5,6 +5,7 @@ use strict;
 use autodie;
 use List::MoreUtils qw/ uniq /;
 use List::Util qw/ any first /;
+use English qw/ -no_match_vars /;
 
 use Data::Dumper;
 
@@ -13,8 +14,15 @@ use constant {
     MEM_SIZE      => 4096,
 };
 
+my @files = @ARGV;
+
+die "Usage: $PROGRAM_NAME file1.asm [file2.asm ...]\n"
+    unless @files;
+
+my @instructions;
+push @instructions, _read_asm($_) for @files;
+
 my %op_table = _read_op_table('instructions.txt');
-my @instructions = _read_asm('blink.asm');
 _sanity_check_instructions(@instructions);
 
 # pass 1, look opcodes, build symbol table
@@ -33,22 +41,26 @@ my %symbol_table;
 }
 
 # add preamble
-my @preamble = (
-    {
-        address => 0,
-        mnemonic => 'LXI',
-        operands => ['SP', MEM_SIZE()-1],
-    },
-    {
-        address => 3,
-        mnemonic => 'JMP',
-        operands => ['START'],
-    },
-);
-
-_associate_instruction_with_op($_) for @preamble;
-
-@instructions = (@preamble, @instructions);
+{
+    my @preamble = (
+        {
+            address  => 0,
+            mnemonic => 'LXI',
+            operands => ['SP', MEM_SIZE()-1],
+            line     => 'LXI SP,'.(MEM_SIZE()-1),
+        },
+        {
+            address  => 3,
+            mnemonic => 'JMP',
+            operands => ['START'],
+            line     => 'JMP START',
+        },
+    );
+    
+    _associate_instruction_with_op($_) for @preamble;
+    
+    @instructions = (@preamble, @instructions);
+}
 
 # pass 2, handle operands
 {
@@ -83,18 +95,16 @@ _associate_instruction_with_op($_) for @preamble;
     @instructions = @expanded_instructions;
 }
 
-# print Dumper \%op_table;
-# print Dumper \@instructions;
-# print Dumper \%symbol_table;
-
+print "const uint16_t program[] = {\n";
 foreach my $instruction (@instructions) {
     printf(
-        "0x%04x, 0x%02s, // %s\n",
+        "  0x%04x, 0x%02s, // %s\n",
         $instruction->{address},
         $instruction->{opcode},
         $instruction->{line} // '',
     );
 }
+print "};\n";
 
 sub _read_op_table {
     my ($filename) = @_;
