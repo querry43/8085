@@ -1,4 +1,4 @@
-const uint16_t program[] = {
+const uint16_t blink_asm[] = {
   0x0000, 0x31, // LXI SP,4095
   0x0001, 0xff, // 
   0x0002, 0x0f, // 

@@ -6,6 +6,7 @@ use autodie;
 use List::MoreUtils qw/ uniq /;
 use List::Util qw/ any first /;
 use English qw/ -no_match_vars /;
+use File::Basename qw/ basename /;
 
 use Data::Dumper;
 
@@ -95,7 +96,8 @@ my %symbol_table;
     @instructions = @expanded_instructions;
 }
 
-print "const uint16_t program[] = {\n";
+(my $program_name = basename($files[0])) =~ s/[\.-]/_/g;
+printf("const uint16_t %s[] = {\n", $program_name);
 foreach my $instruction (@instructions) {
     printf(
         "  0x%04x, 0x%02s, // %s\n",
