@@ -1,13 +1,13 @@
 ; put delay counter in register pair H
 
 DELAY:  PUSH PSW
-        PUSH H
-DLOOP:  DCX H
+        PUSH B
+DLOOP:  DCX B
         MVI A,0
-        ORA L
+        ORA C
         JNZ DLOOP
-        ORA H
+        ORA B
         JNZ DLOOP
-        POP H
+        POP B
         POP PSW
         RET

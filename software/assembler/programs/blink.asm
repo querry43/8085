@@ -1,4 +1,4 @@
-START:  LXI H,FFFFH
+START:  LXI B,FFFFH
 
         MVI A,01000000B
         SIM
