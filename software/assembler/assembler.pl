@@ -57,9 +57,9 @@ my %symbol_table;
             line     => 'JMP START',
         },
     );
-    
+
     _associate_instruction_with_op($_) for @preamble;
-    
+
     @instructions = (@preamble, @instructions);
 }
 
@@ -217,6 +217,8 @@ sub _associate_instruction_with_op {
 
 sub _parse_operand {
     my ($operand) = @_;
+
+    $operand =~ s/ //g;
 
     my ($root, $suffix) = $operand =~ m/^(.*)(.)$/;
 
