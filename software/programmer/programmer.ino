@@ -2,6 +2,7 @@
 #include "noop.h"
 #include "light_on.h"
 #include "blink.h"
+#include "output.h"
 
 const uint8_t
   HOLD_pin = 8,
@@ -16,7 +17,7 @@ const uint8_t
  *  A8-A15 to PORTA (22-29)
  *  D0-D7 to PORTL (49-42)
  */
-#define PROGRAM blink_asm
+#define PROGRAM output_asm
 #define MEM_SIZE 4096
 #define DEBUG false
 #define MEMTEST false
