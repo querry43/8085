@@ -59,5 +59,4 @@ const uint16_t larson_scanner_asm[] = {
   0x0075, 0xC1, //  POP B
   0x0076, 0xF1, //  POP PSW
   0x0077, 0xC9, //  RET
-
 };
