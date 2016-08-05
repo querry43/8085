@@ -151,6 +151,8 @@ sub _read_asm {
 
         my ($label, $mnemonic, $operands) = $line =~ m/(.*:)?\s*(\w+)\s*(.*)?/;
 
+        next unless $mnemonic;
+
         $label =~ s/:// if $label;
 
         my @operands = map { _parse_operand($_) } $operands ? split(/,/, $operands) : ();
