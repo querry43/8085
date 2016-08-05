@@ -222,15 +222,15 @@ sub _parse_operand {
 
     my ($root, $suffix) = $operand =~ m/^(.*)(.)$/;
 
-    return $operand unless $root;
+    return $operand unless defined($root);
 
-    if ($suffix eq 'H') {
+    if ($suffix eq 'H' && $root =~ m/^[[:xdigit:]]+$/) {
         return hex($root);
-    } elsif ($suffix eq 'D') {
+    } elsif ($suffix eq 'D' && $root =~ m/^\d++$/) {
         return $root;
-    } elsif ($suffix eq 'Q') {
+    } elsif ($suffix eq 'Q' && $root =~ m/^[0-7]+$/) {
         return oct($root);
-    } elsif ($suffix eq 'B') {
+    } elsif ($suffix eq 'B' && $root =~ m/^[01]+$/) {
         return oct("0b$root");
     } else {
         return $operand;
