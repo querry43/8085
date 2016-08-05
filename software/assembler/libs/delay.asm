@@ -1,4 +1,4 @@
-; put delay counter in register pair H
+; put delay counter in register pair B
 
 DELAY:  PUSH PSW
         PUSH B

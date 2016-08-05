@@ -3,6 +3,8 @@ START:  LXI H,9800H
 
         MVI A,1
         LXI H,9801H
+
+        ; set delay timer
         LXI B,2000H
 
 FWD:    MOV M,A
