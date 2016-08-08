@@ -40,6 +40,10 @@ class DecOperand extends Operand {
   }
 }
 
+class ChrOperand extends Operand {
+  constructor(value) { super(value.charCodeAt(1)); }
+}
+
 class LabelOperand extends Operand {
   toBytes() { return [ 0, 0 ]; }
 }
@@ -166,10 +170,11 @@ class AsmListener extends asm8085Listener.asm8085Listener {
 
   exitSim(ctx) { this.addInstruction(ctx, 0x30, 1); }
 
-  exitHex(ctx) { this.operands.push(new HexOperand(ctx.getChild(0).getText())); }
-  exitOct(ctx) { this.operands.push(new OctOperand(ctx.getChild(0).getText())); }
-  exitBin(ctx) { this.operands.push(new BinOperand(ctx.getChild(0).getText())); }
-  exitDec(ctx) { this.operands.push(new DecOperand(ctx.getChild(0).getText())); }
+  exitHex(ctx) { this.operands.push(new HexOperand(ctx.getText())); }
+  exitOct(ctx) { this.operands.push(new OctOperand(ctx.getText())); }
+  exitBin(ctx) { this.operands.push(new BinOperand(ctx.getText())); }
+  exitDec(ctx) { this.operands.push(new DecOperand(ctx.getText())); }
+  exitChr(ctx) { this.operands.push(new ChrOperand(ctx.getText())); }
 
   exitLabel(ctx) { this.symbolTable[ctx.getChild(0).getText()] = this.address; }
 

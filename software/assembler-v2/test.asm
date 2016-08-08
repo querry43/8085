@@ -25,6 +25,4 @@ LOOP:   MVI A,01000000B ; light off
         MVI A,10H
         MVI A,10D
         MVI A,10
-
-; but can i math?
-        LXI SP,$+1
+        MVI A,'A'

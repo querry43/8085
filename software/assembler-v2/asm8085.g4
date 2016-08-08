@@ -107,6 +107,7 @@ immediate
 	 | oct
    | bin
    | dec
+   | chr
    ;
 
 hex
@@ -140,6 +141,14 @@ dec
 DEC
    : ([0-9]+ 'D')
    | [0-9]+
+   ;
+
+chr
+   : CHR
+   ;
+
+CHR
+   : '\'' . '\''
    ;
 
 EOL
