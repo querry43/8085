@@ -70,6 +70,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     super();
     this.instructions = [];
     this.address = 0x44;
+    this.symbolTable = {};
   }
 
   addInstruction(ctx, opcode, length) {
@@ -83,6 +84,10 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     );
 
     this.instructions.push(instruction);
+
+    if (this.label) {
+      this.symbolTable[this.label] = this.address;
+    }
 
     this.address = this.address + instruction.length;
   }
@@ -163,6 +168,9 @@ fs.readFile(inputs[0], 'utf8', function (err,data) {
   assembler.instructions.forEach(function(instruction) {
     console.log(instruction.toString());
   });
+
+  console.log('Symbol Table:');
+  console.log(JSON.stringify(assembler.symbolTable, null, 2));
 });
 
 // vim: ts=2 sw=2 et ai
