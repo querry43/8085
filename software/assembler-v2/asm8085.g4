@@ -55,7 +55,7 @@ CALL
    ;
 
 jmp
-   : JMP (immediate | name)
+   : JMP (immediate | labeloperand)
    ;
 
 JMP
