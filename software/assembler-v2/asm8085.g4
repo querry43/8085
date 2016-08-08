@@ -13,209 +13,140 @@ line
    ;
 
 instruction
-   : label? opcode argumentlist? comment?
+   : label? operation comment?
    ;
 
 label
-   : name ':'
-   ;
-
-argumentlist
-   : argument (',' argumentlist)?
-   ;
-
-argument
-   : prefix? (number | name | string | '*') (('+' | '-') number)?
-   | '(' argument ')'
-   ;
-
-prefix
-   : '#'
-   ;
-
-string
-   : STRING
-   ;
-
-name
-   : NAME
-   ;
-
-number
-   : NUMBER
+   : NAME ':'
    ;
 
 comment
    : COMMENT
    ;
 
-opcode
-   : MOV
+operation
+   : call
+   | jmp
+   | lxi
+   | mov
+   | mvi
+   | nop
+   | sim
    ;
 
-
-fragment A
-   : ('a' | 'A')
+REGISTERPAIR
+   : 'B' | 'D' | 'H' | 'SPI'
    ;
 
-
-fragment B
-   : ('b' | 'B')
+REGISTER
+   : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M'
    ;
 
-
-fragment C
-   : ('c' | 'C')
+labeloperand
+   : name
    ;
 
-
-fragment D
-   : ('d' | 'D')
+call
+   : CALL (immediate | labeloperand)
    ;
 
-
-fragment E
-   : ('e' | 'E')
+CALL
+   : 'CALL'
    ;
 
-
-fragment F
-   : ('f' | 'F')
+jmp
+   : JMP (immediate | name)
    ;
 
-
-fragment G
-   : ('g' | 'G')
+JMP
+   : 'JMP'
    ;
 
-
-fragment H
-   : ('h' | 'H')
+lxi
+   : LXI REGISTERPAIR ',' immediate
    ;
 
-
-fragment I
-   : ('i' | 'I')
+LXI
+   : 'LXI'
    ;
 
-
-fragment J
-   : ('j' | 'J')
+mov
+   : MOV REGISTER ',' REGISTER
    ;
-
-
-fragment K
-   : ('k' | 'K')
-   ;
-
-
-fragment L
-   : ('l' | 'L')
-   ;
-
-
-fragment M
-   : ('m' | 'M')
-   ;
-
-
-fragment N
-   : ('n' | 'N')
-   ;
-
-
-fragment O
-   : ('o' | 'O')
-   ;
-
-
-fragment P
-   : ('p' | 'P')
-   ;
-
-
-fragment Q
-   : ('q' | 'Q')
-   ;
-
-
-fragment R
-   : ('r' | 'R')
-   ;
-
-
-fragment S
-   : ('s' | 'S')
-   ;
-
-
-fragment T
-   : ('t' | 'T')
-   ;
-
-
-fragment U
-   : ('u' | 'U')
-   ;
-
-
-fragment V
-   : ('v' | 'V')
-   ;
-
-
-fragment W
-   : ('w' | 'W')
-   ;
-
-
-fragment X
-   : ('x' | 'X')
-   ;
-
-
-fragment Y
-   : ('y' | 'Y')
-   ;
-
-
-fragment Z
-   : ('z' | 'Z')
-   ;
-
-/*
-* opcodes
-*/
 
 MOV
-   : M O V
+   : 'MOV'
    ;
 
-
-NAME
-   : [a-zA-Z] [a-zA-Z0-9."]*
+mvi
+   : MVI REGISTER ',' immediate
    ;
 
-
-NUMBER
-   : '$'? [0-9a-fA-F] +
+MVI
+   : 'MVI'
    ;
 
-
-COMMENT
-   : ';' ~ [\r\n]* -> skip
+nop
+   : NOP
    ;
 
-
-STRING
-   : '"' ~ ["]* '"'
+NOP
+   : 'NOP'
    ;
 
+sim
+   : SIM
+   ;
+
+SIM
+   : 'SIM'
+   ;
+
+immediate
+	 : hex
+	 | oct
+   | bin
+   ;
+
+hex
+   : HEX
+   ;
+
+HEX
+   : [0-9A-F]+ 'H'
+   ;
+
+oct
+   : OCT
+   ;
+
+OCT
+   : [0-7]+ 'Q'
+   ;
+
+bin
+   : BIN
+   ;
+
+BIN
+   : [01]+ 'B'
+   ;
 
 EOL
    : '\r'? '\n'
    ;
 
+name
+   : NAME
+   ;
+
+NAME
+   : [a-zA-Z] [a-zA-Z0-9."]*
+   ;
+
+COMMENT
+   : ';' ~ [\r\n]* -> skip
+   ;
 
 WS
    : [ \t] -> skip

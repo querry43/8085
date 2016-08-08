@@ -1,4 +1,15 @@
 ; test comment
  ; test comment
-TEST1:  MOV A,B ; comment?
-       	MOV A,B
+
+START:  LXI B,FFFFH
+
+        MVI A,01000000B ; light off
+        SIM
+        CALL DELAY
+
+        MVI A,11000000B ; light on
+        SIM
+        CALL DELAY
+
+        JMP START
+
