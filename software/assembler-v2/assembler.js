@@ -10,17 +10,18 @@ const util = require('util');
 var inputs = process.argv.slice(2);
 
 class Instruction {
-  constructor(label, opcode, operands, length, text) {
+  constructor(label, opcode, operands, length, text, address) {
     this.label = label;
     this.opcode = opcode;
     this.operands = operands;
     this.length = length;
     this.text = text;
+    this.address = address;
   }
 
   toString() {
     function formatLabel(l) {
-      var width = 10;
+      var width = 8;
       if (l) {
         return l + ':' + Array(width - l.length - 1).join(' ');
       } else {
@@ -34,28 +35,29 @@ class Instruction {
     }
 
     var opstring = util.format(
-      '%s %s // %s',
-      formatLabel(this.label),
+      '%s %s // %s %s',
+      formatHex(this.address),
       formatHex(this.opcode),
+      formatLabel(this.label),
       this.text
     );
 
     if (this.length == 2) {
       opstring = opstring + util.format(
         '\n%s %s',
-        formatLabel(null),
-        '0x00'
+        formatHex(this.address+1),
+        formatHex(0)
       );
     } else if (this.length == 3) {
       opstring = opstring + util.format(
         '\n%s %s',
-        formatLabel(null),
-        '0x00'
+        formatHex(this.address+1),
+        formatHex(0)
       );
       opstring = opstring + util.format(
         '\n%s %s',
-        formatLabel(null),
-        '0x00'
+        formatHex(this.address+2),
+        formatHex(0)
       );
     }
 
@@ -67,16 +69,22 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   constructor() {
     super();
     this.instructions = [];
+    this.address = 0x44;
   }
 
   addInstruction(ctx, opcode, length) {
-    this.instructions.push(new Instruction(
+    var instruction = new Instruction(
       this.label,
       opcode,
       this.operands,
       length,
-      ctx.children.map(function(child) { return child.getText(); }).join(' ')
-    ));
+      ctx.children.map(function(child) { return child.getText(); }).join(' '),
+      this.address
+    );
+
+    this.instructions.push(instruction);
+
+    this.address = this.address + instruction.length;
   }
 
   addOperand(type, ctx) {
@@ -85,24 +93,18 @@ class AsmListener extends asm8085Listener.asm8085Listener {
       'value': ctx.getChild(0).getText(),
     });
   }
-  
+
   enterInstruction(ctx) {
     this.label = null;
     this.operands = [];
   };
-  
-  exitLabel(ctx) {
-    this.label = ctx.getChild(0).getText();
-  }
-  
-  exitCall(ctx) {
-    this.addInstruction(ctx, 0xCD, 3);
-  }
 
-  exitJmp(ctx) {
-    this.addInstruction(ctx, 0xC3, 3);
-  }
-  
+  exitLabel(ctx) { this.label = ctx.getChild(0).getText(); }
+
+  exitCall(ctx) { this.addInstruction(ctx, 0xCD, 3); }
+
+  exitJmp(ctx) { this.addInstruction(ctx, 0xC3, 3); }
+
   exitLxi(ctx) {
     var opcodes = {
       'B': 0x01,
@@ -110,10 +112,10 @@ class AsmListener extends asm8085Listener.asm8085Listener {
       'H': 0x21,
       'SP': 0x31,
     };
-  
+
     this.addInstruction(ctx, opcodes[ctx.getChild(1).getText()], 3);
   }
-  
+
   exitMvi(ctx) {
     var opcodes = {
       'A': 0x3E,
@@ -125,27 +127,18 @@ class AsmListener extends asm8085Listener.asm8085Listener {
       'L': 0x2E,
       'M': 0x36,
     };
-  
+
     this.addInstruction(ctx, opcodes[ctx.getChild(1).getText()], 2);
   }
-  
-  exitSim(ctx) {
-    this.addInstruction(ctx, 0x30, 1);
-  }
-  
-  
-  exitHex(ctx) {
-    this.addOperand('hex', ctx);
-  }
-  
-  exitOct(ctx) {
-    this.addOperand('oct', ctx);
-  }
-  
-  exitBin(ctx) {
-    this.addOperand('bin', ctx);
-  }
-  
+
+  exitSim(ctx) { this.addInstruction(ctx, 0x30, 1); }
+
+  exitHex(ctx) { this.addOperand('hex', ctx); }
+
+  Oct(ctx) { this.addOperand('oct', ctx); }
+
+  exitBin(ctx) { this.addOperand('bin', ctx); }
+
   exitLabeloperand(ctx) {
     this.addOperand('label', ctx);
   }

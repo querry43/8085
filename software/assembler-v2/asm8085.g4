@@ -43,7 +43,7 @@ REGISTER
    ;
 
 labeloperand
-   : name
+   : NAME
    ;
 
 call
@@ -134,10 +134,6 @@ BIN
 
 EOL
    : '\r'? '\n'
-   ;
-
-name
-   : NAME
    ;
 
 NAME
