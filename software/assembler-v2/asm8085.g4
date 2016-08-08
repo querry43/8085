@@ -17,7 +17,7 @@ instruction
    ;
 
 label
-   : NAME ':'
+   : LABEL ':'
    ;
 
 comment
@@ -43,7 +43,7 @@ REGISTER
    ;
 
 labeloperand
-   : NAME
+   : LABEL
    ;
 
 call
@@ -136,8 +136,9 @@ EOL
    : '\r'? '\n'
    ;
 
-NAME
-   : [a-zA-Z] [a-zA-Z0-9."]*
+// "A dollar sign can be used as a symbol to denote the value currently in the location counter"
+LABEL
+   : [A-Z] [A-Z0-9]*
    ;
 
 COMMENT

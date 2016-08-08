@@ -9,6 +9,31 @@ const util = require('util');
 
 var inputs = process.argv.slice(2);
 
+class Operand {
+  constructor(value) { this.value = value; }
+  toString() { return this.value; }
+  toBytes() { return this.value.toString(16).match(/.{1,2}/g); }
+}
+
+class HexOperand extends Operand {
+  constructor(value) { super(parseInt(value.slice(0, -1), 16)); }
+  toString() { return '0x' + this.value.toString(16); }
+}
+
+class OctOperand extends Operand {
+  constructor(value) { super(parseInt(value.slice(0, -1), 8)); }
+  toString() { return '0' + this.value.toString(8); }
+}
+
+class BinOperand extends Operand {
+  constructor(value) { super(parseInt(value.slice(0, -1), 2)); }
+  toString() { return '0b' + this.value.toString(2); }
+}
+
+class LabelOperand extends Operand {
+  toBytes() { return [ 0, 0 ]; }
+}
+
 class Instruction {
   constructor(label, opcode, operands, length, text, address) {
     this.label = label;
@@ -44,20 +69,20 @@ class Instruction {
 
     if (this.length == 2) {
       opstring = opstring + util.format(
-        '\n%s %s',
+        '\n%s %s //',
         formatHex(this.address+1),
-        formatHex(0)
+        formatHex(this.operands[0].toBytes()[0])
       );
     } else if (this.length == 3) {
       opstring = opstring + util.format(
-        '\n%s %s',
+        '\n%s %s //',
         formatHex(this.address+1),
-        formatHex(0)
+        formatHex(this.operands[0].toBytes()[0])
       );
       opstring = opstring + util.format(
-        '\n%s %s',
+        '\n%s %s //',
         formatHex(this.address+2),
-        formatHex(0)
+        formatHex(this.operands[0].toBytes()[1])
       );
     }
 
@@ -90,13 +115,6 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     }
 
     this.address = this.address + instruction.length;
-  }
-
-  addOperand(type, ctx) {
-    this.operands.push({
-      'type': type,
-      'value': ctx.getChild(0).getText(),
-    });
   }
 
   enterInstruction(ctx) {
@@ -138,15 +156,11 @@ class AsmListener extends asm8085Listener.asm8085Listener {
 
   exitSim(ctx) { this.addInstruction(ctx, 0x30, 1); }
 
-  exitHex(ctx) { this.addOperand('hex', ctx); }
+  exitHex(ctx) { this.operands.push(new HexOperand(ctx.getChild(0).getText())); }
+  exitOct(ctx) { this.operands.push(new OctOperand(ctx.getChild(0).getText())); }
+  exitBin(ctx) { this.operands.push(new BinOperand(ctx.getChild(0).getText())); }
 
-  Oct(ctx) { this.addOperand('oct', ctx); }
-
-  exitBin(ctx) { this.addOperand('bin', ctx); }
-
-  exitLabeloperand(ctx) {
-    this.addOperand('label', ctx);
-  }
+  exitLabeloperand(ctx) { this.operands.push(new LabelOperand(ctx.getChild(0).getText())); }
 }
 
 fs.readFile(inputs[0], 'utf8', function (err,data) {
