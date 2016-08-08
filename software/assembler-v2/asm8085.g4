@@ -34,18 +34,6 @@ operation
    | sim
    ;
 
-REGISTERPAIR
-   : 'B' | 'D' | 'H' | 'SPI'
-   ;
-
-REGISTER
-   : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M'
-   ;
-
-labeloperand
-   : LABEL
-   ;
-
 call
    : CALL (immediate | labeloperand)
    ;
@@ -63,7 +51,7 @@ JMP
    ;
 
 lxi
-   : LXI REGISTERPAIR ',' immediate
+   : LXI REGISTERPAIR ',' (immediate | labeloperand)
    ;
 
 LXI
@@ -102,10 +90,23 @@ SIM
    : 'SIM'
    ;
 
+REGISTERPAIR
+   : 'B' | 'D' | 'H' | 'SP'
+   ;
+
+REGISTER
+   : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M'
+   ;
+
+labeloperand
+   : LABEL | LOCATIONCOUNTER
+   ;
+
 immediate
 	 : hex
 	 | oct
    | bin
+   | dec
    ;
 
 hex
@@ -132,13 +133,25 @@ BIN
    : [01]+ 'B'
    ;
 
+dec
+   : DEC
+   ;
+
+DEC
+   : ([0-9]+ 'D')
+   | [0-9]+
+   ;
+
 EOL
    : '\r'? '\n'
    ;
 
-// "A dollar sign can be used as a symbol to denote the value currently in the location counter"
 LABEL
    : [A-Z] [A-Z0-9]*
+   ;
+
+LOCATIONCOUNTER
+   : '$'
    ;
 
 COMMENT

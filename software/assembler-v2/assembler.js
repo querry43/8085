@@ -30,6 +30,16 @@ class BinOperand extends Operand {
   toString() { return '0b' + this.value.toString(2); }
 }
 
+class DecOperand extends Operand {
+  constructor(value) {
+    if (value.slice(-1) == 'D') {
+      super(parseInt(value.slice(0, -1)));
+    } else {
+      super(parseInt(value));
+    }
+  }
+}
+
 class LabelOperand extends Operand {
   toBytes() { return [ 0, 0 ]; }
 }
@@ -159,6 +169,9 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   exitHex(ctx) { this.operands.push(new HexOperand(ctx.getChild(0).getText())); }
   exitOct(ctx) { this.operands.push(new OctOperand(ctx.getChild(0).getText())); }
   exitBin(ctx) { this.operands.push(new BinOperand(ctx.getChild(0).getText())); }
+  exitDec(ctx) { this.operands.push(new DecOperand(ctx.getChild(0).getText())); }
+
+  exitLabel(ctx) { this.symbolTable[ctx.getChild(0).getText()] = this.address; }
 
   exitLabeloperand(ctx) { this.operands.push(new LabelOperand(ctx.getChild(0).getText())); }
 }
