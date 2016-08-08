@@ -35,67 +35,35 @@ operation
    ;
 
 call
-   : CALL (immediate | labeloperand)
-   ;
-
-CALL
-   : 'CALL'
+   : 'CALL' immediate
    ;
 
 jmp
-   : JMP (immediate | labeloperand)
-   ;
-
-JMP
-   : 'JMP'
+   : 'JMP' immediate
    ;
 
 lxi
-   : LXI REGISTERPAIR ',' (immediate | labeloperand)
-   ;
-
-LXI
-   : 'LXI'
+   : 'LXI' REGISTER ',' immediate
    ;
 
 mov
-   : MOV REGISTER ',' REGISTER
-   ;
-
-MOV
-   : 'MOV'
+   : 'MOV' REGISTER ',' REGISTER
    ;
 
 mvi
-   : MVI REGISTER ',' immediate
-   ;
-
-MVI
-   : 'MVI'
+   : 'MVI' REGISTER ',' immediate
    ;
 
 nop
-   : NOP
-   ;
-
-NOP
    : 'NOP'
    ;
 
 sim
-   : SIM
-   ;
-
-SIM
    : 'SIM'
    ;
 
-REGISTERPAIR
-   : 'B' | 'D' | 'H' | 'SP'
-   ;
-
 REGISTER
-   : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M'
+   : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M' | 'SP'
    ;
 
 labeloperand
@@ -103,11 +71,12 @@ labeloperand
    ;
 
 immediate
-	 : hex
-	 | oct
+   : hex
+   | oct
    | bin
    | dec
    | chr
+   | labeloperand
    ;
 
 hex

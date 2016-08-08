@@ -143,18 +143,43 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   exitJmp(ctx) { this.addInstruction(ctx, 0xC3, 3); }
 
   exitLxi(ctx) {
-    var opcodes = {
+    var opcode = {
       'B': 0x01,
       'D': 0x11,
       'H': 0x21,
       'SP': 0x31,
-    };
+    }[ctx.getChild(1).getText()];
 
-    this.addInstruction(ctx, opcodes[ctx.getChild(1).getText()], 3);
+    if (!opcode) {
+      console.error('failed to parse instruction on line ' + ctx.start.line);
+      process.exit(1);
+    }
+
+    this.addInstruction(ctx, opcode, 3);
+  }
+
+  exitMov(ctx) {
+    var opcode = {
+      'A': { 'A': 0x7F, 'B': 0x78, 'C': 0x79, 'D': 0x7A, 'E': 0x7B, 'H': 0x7C, 'L': 0x7D, 'M': 0x7E, },
+      'B': { 'A': 0x47, 'B': 0x40, 'C': 0x41, 'D': 0x42, 'E': 0x43, 'H': 0x44, 'L': 0x45, 'M': 0x46, },
+      'C': { 'A': 0x4F, 'B': 0x48, 'C': 0x49, 'D': 0x4A, 'E': 0x4B, 'H': 0x4C, 'L': 0x4D, 'M': 0x4E, },
+      'D': { 'A': 0x57, 'B': 0x50, 'C': 0x51, 'D': 0x52, 'E': 0x53, 'H': 0x54, 'L': 0x55, 'M': 0x56, },
+      'E': { 'A': 0x5F, 'B': 0x58, 'C': 0x59, 'D': 0x5A, 'E': 0x5B, 'H': 0x5C, 'L': 0x5D, 'M': 0x5E, },
+      'H': { 'A': 0x67, 'B': 0x60, 'C': 0x61, 'D': 0x62, 'E': 0x63, 'H': 0x64, 'L': 0x65, 'M': 0x66, },
+      'L': { 'A': 0x6F, 'B': 0x68, 'C': 0x69, 'D': 0x6A, 'E': 0x6B, 'H': 0x6C, 'L': 0x6D, 'M': 0x6E, },
+      'M': { 'A': 0x77, 'B': 0x70, 'C': 0x71, 'D': 0x72, 'E': 0x73, 'H': 0x74, 'L': 0x75, },
+    }[ctx.getChild(1).getText()][ctx.getChild(3).getText()];
+
+    if (!opcode) {
+      console.error('failed to parse instruction on line ' + ctx.start.line);
+      process.exit(1);
+    }
+
+    this.addInstruction(ctx, opcode, 1);
   }
 
   exitMvi(ctx) {
-    var opcodes = {
+    var opcode = {
       'A': 0x3E,
       'B': 0x06,
       'C': 0x0E,
@@ -163,11 +188,17 @@ class AsmListener extends asm8085Listener.asm8085Listener {
       'H': 0x26,
       'L': 0x2E,
       'M': 0x36,
-    };
+    }[ctx.getChild(1).getText()];
 
-    this.addInstruction(ctx, opcodes[ctx.getChild(1).getText()], 2);
+    if (!opcode) {
+      console.error('failed to parse instruction on line ' + ctx.start.line);
+      process.exit(1);
+    }
+
+    this.addInstruction(ctx, opcode, 2);
   }
 
+  exitNop(ctx) { this.addInstruction(ctx, 0x00, 1); }
   exitSim(ctx) { this.addInstruction(ctx, 0x30, 1); }
 
   exitHex(ctx) { this.operands.push(new HexOperand(ctx.getText())); }

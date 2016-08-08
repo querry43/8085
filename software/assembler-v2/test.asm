@@ -16,6 +16,11 @@ LOOP:   MVI A,01000000B ; light off
 
         JMP LOOP
 
+; various instructions
+        NOP
+        MOV A,B
+        MOV M,D
+
 ; stack pointer and program counter manipulation
         LXI SP,$
 
