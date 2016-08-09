@@ -1,11 +1,12 @@
 "use strict"
 
-var antlr4 = require('antlr4/index');
-var asm8085Lexer = require('./asm8085Lexer.js');
-var asm8085Parser = require('./asm8085Parser.js');
-var asm8085Listener = require('./asm8085Listener.js');
+const antlr4 = require('antlr4/index');
+const asm8085Lexer = require('./asm8085Lexer.js');
+const asm8085Parser = require('./asm8085Parser.js');
+const asm8085Listener = require('./asm8085Listener.js');
 const fs = require('fs');
 const util = require('util');
+const path = require('path');
 
 var inputs = process.argv.slice(2);
 
@@ -82,14 +83,17 @@ class Instruction {
       }
     }
 
-    function formatHex(d) {
+    function formatHex(d, length=2) {
       var hex = d.toString(16);
-      return '0x' + (hex.length == 1 ? '0' + hex : hex);
+      if (hex.length < length) {
+        hex = Array(length - hex.length + 1).join('0') + hex;
+      }
+      return '0x' + hex;
     }
 
     var opstring = util.format(
       '%s, %s, // %s %s',
-      formatHex(this.address),
+      formatHex(this.address, 4),
       formatHex(this.opcode),
       formatLabel(this.label),
       this.text
@@ -99,16 +103,16 @@ class Instruction {
       var bytes = this.operands[0].toBytes(this.address, symbolTable)
       opstring = opstring + util.format(
         '\n%s, %s, //',
-        formatHex(this.address+1),
+        formatHex(this.address+1, 4),
         formatHex(bytes[0] || 0)
       );
     } else if (this.length == 3) {
       var bytes = this.operands[0].toBytes(this.address, symbolTable)
       opstring = opstring + util.format(
         '\n%s, %s, //\n%s, %s, //',
-        formatHex(this.address+1),
+        formatHex(this.address+1, 4),
         formatHex(bytes[0] || 0),
-        formatHex(this.address+2),
+        formatHex(this.address+2, 4),
         formatHex(bytes[1] || 0)
       );
     }
@@ -251,7 +255,7 @@ assembler.instructions.push(
 
 inputs.forEach(function(file) {
   var data = fs.readFileSync(file, 'utf8');
-  console.log('Input:\n' + data);
+  // console.log('Input:\n' + data);
   
   var chars = new antlr4.InputStream(data);
   var lexer = new asm8085Lexer.asm8085Lexer(chars);
@@ -264,12 +268,15 @@ inputs.forEach(function(file) {
   // console.log(JSON.stringify(assembler.instructions, null, 2));
 });
 
-console.log('Symbol Table:');
-console.log(JSON.stringify(assembler.symbolTable, null, 2));
+// console.log('Symbol Table:');
+// console.log(JSON.stringify(assembler.symbolTable, null, 2));
 
-console.log('Output:');
+// console.log('Output:');
+var program_name = path.basename(inputs[0]).replace(/[\.-]/, '_');
+console.log('const uint16_t ' + program_name + '[] = {\n');
 assembler.instructions.forEach(function(instruction) {
   console.log(instruction.toString(assembler.symbolTable));
 });
+console.log('\n};');
 
 // vim: ts=2 sw=2 et ai
