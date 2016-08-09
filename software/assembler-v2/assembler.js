@@ -12,7 +12,7 @@ var inputs = process.argv.slice(2);
 class Operand {
   constructor(value) { this.value = value; }
   toString() { return this.value; }
-  toBytes() { return this.value.toString(16).match(/.{1,2}/g); }
+  toBytes(programCounter, symbolTable) { return this.value.toString(16).match(/.{1,2}/g); }
 }
 
 class HexOperand extends Operand {
@@ -45,7 +45,14 @@ class ChrOperand extends Operand {
 }
 
 class LabelOperand extends Operand {
-  toBytes() { return [ 0, 0 ]; }
+  toBytes(programCounter, symbolTable) {
+    var addy = symbolTable[this.value];
+    if (!addy) {
+      console.error('unable to find address ' + this.value);
+      process.exit(1);
+    }
+    return addy.toString(16).match(/.{1,2}/g);
+  }
 }
 
 class Instruction {
@@ -58,7 +65,7 @@ class Instruction {
     this.address = address;
   }
 
-  toString() {
+  toString(programCounter, symbolTable) {
     function formatLabel(l) {
       var width = 8;
       if (l) {
@@ -82,21 +89,23 @@ class Instruction {
     );
 
     if (this.length == 2) {
+      var bytes = this.operands[0].toBytes(programCounter, symbolTable)
       opstring = opstring + util.format(
         '\n%s %s //',
         formatHex(this.address+1),
-        formatHex(this.operands[0].toBytes()[0])
+        formatHex(bytes[0] || 0)
       );
     } else if (this.length == 3) {
+      var bytes = this.operands[0].toBytes(programCounter, symbolTable)
       opstring = opstring + util.format(
         '\n%s %s //',
         formatHex(this.address+1),
-        formatHex(this.operands[0].toBytes()[0])
+        formatHex(bytes[1] || 0)
       );
       opstring = opstring + util.format(
         '\n%s %s //',
         formatHex(this.address+2),
-        formatHex(this.operands[0].toBytes()[1])
+        formatHex(bytes[0] || 0)
       );
     }
 
@@ -229,7 +238,7 @@ fs.readFile(inputs[0], 'utf8', function (err,data) {
 
   console.log('Output:');
   assembler.instructions.forEach(function(instruction) {
-    console.log(instruction.toString());
+    console.log(instruction.toString(null, assembler.symbolTable));
   });
 
   console.log('Symbol Table:');

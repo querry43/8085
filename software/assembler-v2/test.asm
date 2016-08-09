@@ -1,7 +1,7 @@
 ; test comment
  ; test comment
 
-NOWHERE: ; a label without an instruction
+DELAY:   ; a label without an instruction
 
 ; a basic blink loop
 START:  LXI B,FFFFH
