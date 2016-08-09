@@ -154,7 +154,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   };
 
   exitCall(ctx) { this.addInstruction(ctx, 0xCD, 3); }
-
+  exitHlt(ctx) { this.addInstruction(ctx, 0x76, 1); }
   exitJmp(ctx) { this.addInstruction(ctx, 0xC3, 3); }
 
   exitLxi(ctx) {

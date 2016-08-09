@@ -26,6 +26,7 @@ comment
 
 operation
    : call
+   | hlt
    | jmp
    | lxi
    | mov
@@ -36,6 +37,10 @@ operation
 
 call
    : 'CALL' immediate
+   ;
+
+hlt
+   : 'HLT'
    ;
 
 jmp
