@@ -14,7 +14,7 @@ NODEJS = nodejs
 all: ${TARGETS}
 
 test: 
-	${NODEJS} assembler.js test.asm
+	${NODEJS} assembler.js test/*.asm
 
 %Lexer.js %Lexer.tokens %Listener.js %Parser.js %.tokens: %.g4 deps
 	${ANTLR} -Dlanguage=JavaScript $<

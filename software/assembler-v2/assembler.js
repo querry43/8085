@@ -223,33 +223,34 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.symbolTable[this.label] = this.address;
   }
 
-  exitLocationcounteroperand(ctx) { console.log('saw LC'); this.operands.push(new LocationCounterOperand()) }
+  exitLocationcounteroperand(ctx) { this.operands.push(new LocationCounterOperand()) }
 
   exitLabeloperand(ctx) { this.operands.push(new LabelOperand(ctx.getChild(0).getText())); }
 }
 
-fs.readFile(inputs[0], 'utf8', function (err,data) {
-  if (err) { return console.log(err); }
-  console.log('Input:\n' + data);
+var assembler = new AsmListener();
 
+inputs.forEach(function(file) {
+  var data = fs.readFileSync(file, 'utf8');
+  console.log('Input:\n' + data);
+  
   var chars = new antlr4.InputStream(data);
   var lexer = new asm8085Lexer.asm8085Lexer(chars);
   var tokens = new antlr4.CommonTokenStream(lexer);
   var parser = new asm8085Parser.asm8085Parser(tokens);
   var tree = parser.prog();
-
-  var assembler = new AsmListener();
+  
   antlr4.tree.ParseTreeWalker.DEFAULT.walk(assembler, tree);
-
+  
   // console.log(JSON.stringify(assembler.instructions, null, 2));
+});
 
-  console.log('Output:');
-  assembler.instructions.forEach(function(instruction) {
-    console.log(instruction.toString(assembler.symbolTable));
-  });
+console.log('Symbol Table:');
+console.log(JSON.stringify(assembler.symbolTable, null, 2));
 
-  console.log('Symbol Table:');
-  console.log(JSON.stringify(assembler.symbolTable, null, 2));
+console.log('Output:');
+assembler.instructions.forEach(function(instruction) {
+  console.log(instruction.toString(assembler.symbolTable));
 });
 
 // vim: ts=2 sw=2 et ai

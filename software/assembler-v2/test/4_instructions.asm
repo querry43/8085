@@ -1,0 +1,5 @@
+        SIM
+        NOP
+        MOV A,B
+        MOV M,D
+        LXI SP,$
