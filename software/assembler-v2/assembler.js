@@ -230,6 +230,25 @@ class AsmListener extends asm8085Listener.asm8085Listener {
 
 var assembler = new AsmListener();
 
+assembler.instructions.push(
+  new Instruction(
+    null,
+    0x31,
+    [new DecOperand('4095')],
+    3,
+    'LXI SP , 4095',
+    0x00
+  ),
+  new Instruction(
+    null,
+    0xC3,
+    [new LabelOperand('START')],
+    3,
+    'JMP START',
+    0x03
+  )
+);
+
 inputs.forEach(function(file) {
   var data = fs.readFileSync(file, 'utf8');
   console.log('Input:\n' + data);
