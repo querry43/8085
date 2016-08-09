@@ -67,7 +67,11 @@ REGISTER
    ;
 
 labeloperand
-   : LABEL | LOCATIONCOUNTER
+   : LABEL
+   ;
+
+locationcounteroperand
+   : '$'
    ;
 
 immediate
@@ -77,6 +81,7 @@ immediate
    | dec
    | chr
    | labeloperand
+   | locationcounteroperand
    ;
 
 hex
@@ -126,10 +131,6 @@ EOL
 
 LABEL
    : [A-Z] [A-Z0-9]*
-   ;
-
-LOCATIONCOUNTER
-   : '$'
    ;
 
 COMMENT

@@ -55,6 +55,13 @@ class LabelOperand extends Operand {
   }
 }
 
+class LocationCounterOperand extends Operand {
+  constructor() { super('$'); }
+  toBytes(programCounter, symbolTable) {
+    return programCounter.toString(16).match(/.{1,2}/g);
+  }
+}
+
 class Instruction {
   constructor(label, opcode, operands, length, text, address) {
     this.label = label;
@@ -65,7 +72,7 @@ class Instruction {
     this.address = address;
   }
 
-  toString(programCounter, symbolTable) {
+  toString(symbolTable) {
     function formatLabel(l) {
       var width = 8;
       if (l) {
@@ -81,7 +88,7 @@ class Instruction {
     }
 
     var opstring = util.format(
-      '%s %s // %s %s',
+      '%s, %s, // %s %s',
       formatHex(this.address),
       formatHex(this.opcode),
       formatLabel(this.label),
@@ -89,23 +96,20 @@ class Instruction {
     );
 
     if (this.length == 2) {
-      var bytes = this.operands[0].toBytes(programCounter, symbolTable)
+      var bytes = this.operands[0].toBytes(this.address, symbolTable)
       opstring = opstring + util.format(
-        '\n%s %s //',
+        '\n%s, %s, //',
         formatHex(this.address+1),
         formatHex(bytes[0] || 0)
       );
     } else if (this.length == 3) {
-      var bytes = this.operands[0].toBytes(programCounter, symbolTable)
+      var bytes = this.operands[0].toBytes(this.address, symbolTable)
       opstring = opstring + util.format(
-        '\n%s %s //',
+        '\n%s, %s, //\n%s, %s, //',
         formatHex(this.address+1),
-        formatHex(bytes[1] || 0)
-      );
-      opstring = opstring + util.format(
-        '\n%s %s //',
+        formatHex(bytes[0] || 0),
         formatHex(this.address+2),
-        formatHex(bytes[0] || 0)
+        formatHex(bytes[1] || 0)
       );
     }
 
@@ -144,8 +148,6 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.label = null;
     this.operands = [];
   };
-
-  exitLabel(ctx) { this.label = ctx.getChild(0).getText(); }
 
   exitCall(ctx) { this.addInstruction(ctx, 0xCD, 3); }
 
@@ -216,7 +218,12 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   exitDec(ctx) { this.operands.push(new DecOperand(ctx.getText())); }
   exitChr(ctx) { this.operands.push(new ChrOperand(ctx.getText())); }
 
-  exitLabel(ctx) { this.symbolTable[ctx.getChild(0).getText()] = this.address; }
+  exitLabel(ctx) {
+    this.label = ctx.getChild(0).getText();
+    this.symbolTable[this.label] = this.address;
+  }
+
+  exitLocationcounteroperand(ctx) { console.log('saw LC'); this.operands.push(new LocationCounterOperand()) }
 
   exitLabeloperand(ctx) { this.operands.push(new LabelOperand(ctx.getChild(0).getText())); }
 }
@@ -238,7 +245,7 @@ fs.readFile(inputs[0], 'utf8', function (err,data) {
 
   console.log('Output:');
   assembler.instructions.forEach(function(instruction) {
-    console.log(instruction.toString(null, assembler.symbolTable));
+    console.log(instruction.toString(assembler.symbolTable));
   });
 
   console.log('Symbol Table:');
