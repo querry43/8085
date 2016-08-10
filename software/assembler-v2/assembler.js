@@ -13,7 +13,9 @@ var inputs = process.argv.slice(2);
 class Operand {
   constructor(value) { this.value = value; }
   toString() { return this.value; }
-  toBytes(programCounter, symbolTable) { return this.value.toString(16).match(/.{1,2}/g); }
+  toBytes(programCounter, symbolTable) {
+    return [ (this.value & 0xff).toString(16), (this.value >> 8).toString(16) ];
+  }
 }
 
 class HexOperand extends Operand {
