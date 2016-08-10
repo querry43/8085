@@ -25,47 +25,16 @@ comment
    ;
 
 operation
-   : call
-   | hlt
-   | jmp
-   | lxi
-   | mov
-   | mvi
-   | nop
-   | sim
+   : ('CALL' immediate) # Call
+   | 'HLT' # Hlt
+   | ('JMP' immediate) # Jmp
+   | ('LXI' REGISTER ',' immediate) # Lxi
+   | ('MOV' REGISTER ',' REGISTER) # Mov
+   | ('MVI' REGISTER ',' immediate) # Mvi
+   | 'NOP' # Nop
+   | 'SIM' # Sim
    ;
 
-call
-   : 'CALL' immediate
-   ;
-
-hlt
-   : 'HLT'
-   ;
-
-jmp
-   : 'JMP' immediate
-   ;
-
-lxi
-   : 'LXI' REGISTER ',' immediate
-   ;
-
-mov
-   : 'MOV' REGISTER ',' REGISTER
-   ;
-
-mvi
-   : 'MVI' REGISTER ',' immediate
-   ;
-
-nop
-   : 'NOP'
-   ;
-
-sim
-   : 'SIM'
-   ;
 
 REGISTER
    : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M' | 'SP'
