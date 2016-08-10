@@ -25,19 +25,25 @@ comment
    ;
 
 operation
-   : ('CALL' immediate) # Call
-   | 'HLT' # Hlt
-   | ('JMP' immediate) # Jmp
-   | ('LXI' REGISTER ',' immediate) # Lxi
-   | ('MOV' REGISTER ',' REGISTER) # Mov
-   | ('MVI' REGISTER ',' immediate) # Mvi
-   | 'NOP' # Nop
-   | 'SIM' # Sim
+   : ('CALL' immediate) # CALL
+   | ('DCX' REGISTER) # DCX
+   | 'HLT' # HLT
+   | ('JMP' immediate) # JMP
+   | ('JNZ' immediate) # JNZ
+   | ('LXI' REGISTER ',' immediate) # LXI
+   | ('MOV' REGISTER ',' REGISTER) # MOV
+   | ('MVI' REGISTER ',' immediate) # MVI
+   | 'NOP' # NOP
+   | ('ORA' REGISTER) # ORA
+   | ('POP' REGISTER) # POP
+   | ('PUSH' REGISTER) # PUSH
+   | 'RET' # RET
+   | 'SIM' # SIM
    ;
 
 
 REGISTER
-   : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M' | 'SP'
+   : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M' | 'SP' | 'PSW'
    ;
 
 labeloperand

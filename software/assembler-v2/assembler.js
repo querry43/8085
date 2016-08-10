@@ -155,11 +155,27 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.operands = [];
   };
 
-  exitCall(ctx) { this.addInstruction(ctx, 0xCD, 3); }
-  exitHlt(ctx) { this.addInstruction(ctx, 0x76, 1); }
-  exitJmp(ctx) { this.addInstruction(ctx, 0xC3, 3); }
+  exitCALL(ctx) { this.addInstruction(ctx, 0xCD, 3); }
+  exitDCX(ctx) {
+    var opcode = {
+      'B': 0x0B,
+      'D': 0x1B,
+      'H': 0x2B,
+      'SP': 0x3B,
+    }[ctx.getChild(1).getText()];
 
-  exitLxi(ctx) {
+    if (!opcode) {
+      console.error('failed to parse instruction on line ' + ctx.start.line);
+      process.exit(1);
+    }
+
+    this.addInstruction(ctx, opcode, 1);
+  }
+  exitHLT(ctx) { this.addInstruction(ctx, 0x76, 1); }
+  exitJMP(ctx) { this.addInstruction(ctx, 0xC3, 3); }
+  exitJNZ(ctx) { this.addInstruction(ctx, 0xC2, 3); }
+
+  exitLXI(ctx) {
     var opcode = {
       'B': 0x01,
       'D': 0x11,
@@ -175,7 +191,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.addInstruction(ctx, opcode, 3);
   }
 
-  exitMov(ctx) {
+  exitMOV(ctx) {
     var opcode = {
       'A': { 'A': 0x7F, 'B': 0x78, 'C': 0x79, 'D': 0x7A, 'E': 0x7B, 'H': 0x7C, 'L': 0x7D, 'M': 0x7E, },
       'B': { 'A': 0x47, 'B': 0x40, 'C': 0x41, 'D': 0x42, 'E': 0x43, 'H': 0x44, 'L': 0x45, 'M': 0x46, },
@@ -195,7 +211,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.addInstruction(ctx, opcode, 1);
   }
 
-  exitMvi(ctx) {
+  exitMVI(ctx) {
     var opcode = {
       'A': 0x3E,
       'B': 0x06,
@@ -215,8 +231,58 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.addInstruction(ctx, opcode, 2);
   }
 
-  exitNop(ctx) { this.addInstruction(ctx, 0x00, 1); }
-  exitSim(ctx) { this.addInstruction(ctx, 0x30, 1); }
+  exitNOP(ctx) { this.addInstruction(ctx, 0x00, 1); }
+  exitORA(ctx) {
+    var opcode = {
+      'A': 0xB7,
+      'B': 0xB0,
+      'C': 0xB1,
+      'D': 0xB2,
+      'E': 0xB3,
+      'H': 0xB4,
+      'L': 0xB5,
+      'M': 0xB6,
+    }[ctx.getChild(1).getText()];
+
+    if (!opcode) {
+      console.error('failed to parse instruction on line ' + ctx.start.line);
+      process.exit(1);
+    }
+
+    this.addInstruction(ctx, opcode, 1);
+  }
+  exitPOP(ctx) {
+    var opcode = {
+      'B': 0xC1,
+      'D': 0xD1,
+      'H': 0xE1,
+      'PSW': 0xF1,
+    }[ctx.getChild(1).getText()];
+
+    if (!opcode) {
+      console.error('failed to parse instruction on line ' + ctx.start.line);
+      process.exit(1);
+    }
+
+    this.addInstruction(ctx, opcode, 1);
+  }
+  exitPUSH(ctx) {
+    var opcode = {
+      'B': 0xC5,
+      'D': 0xD5,
+      'H': 0xE5,
+      'PSW': 0xF5,
+    }[ctx.getChild(1).getText()];
+
+    if (!opcode) {
+      console.error('failed to parse instruction on line ' + ctx.start.line);
+      process.exit(1);
+    }
+
+    this.addInstruction(ctx, opcode, 1);
+  }
+  exitRET(ctx) { this.addInstruction(ctx, 0xC9, 1); }
+  exitSIM(ctx) { this.addInstruction(ctx, 0x30, 1); }
 
   exitHex(ctx) { this.operands.push(new HexOperand(ctx.getText())); }
   exitOct(ctx) { this.operands.push(new OctOperand(ctx.getText())); }

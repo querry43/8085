@@ -13,8 +13,13 @@ NODEJS = nodejs
 
 all: ${TARGETS}
 
+programs/blink.asm.h: programs/blink.asm libs/delay.asm
+
 test: 
 	${NODEJS} assembler.js test/*.asm
+
+%.asm.h : %.asm
+	${NODEJS} assembler.js $^ > $@
 
 %Lexer.js %Lexer.tokens %Listener.js %Parser.js %.tokens: %.g4 deps
 	${ANTLR} -Dlanguage=JavaScript $<
