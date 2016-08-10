@@ -25,22 +25,25 @@ comment
    ;
 
 operation
-   : ('CALL' immediate) # CALL
-   | ('DCX' REGISTER) # DCX
-   | 'HLT' # HLT
-   | ('JMP' immediate) # JMP
-   | ('JNZ' immediate) # JNZ
-   | ('LXI' REGISTER ',' immediate) # LXI
-   | ('MOV' REGISTER ',' REGISTER) # MOV
-   | ('MVI' REGISTER ',' immediate) # MVI
-   | 'NOP' # NOP
-   | ('ORA' REGISTER) # ORA
-   | ('POP' REGISTER) # POP
-   | ('PUSH' REGISTER) # PUSH
-   | 'RET' # RET
-   | 'SIM' # SIM
+   : ('CALL' immediate)
+   | ('DCX' register)
+   | 'HLT'
+   | ('JMP' immediate)
+   | ('JNZ' immediate)
+   | ('LXI' register ',' immediate)
+   | ('MOV' register ',' register)
+   | ('MVI' register ',' immediate)
+   | 'NOP'
+   | ('ORA' register)
+   | ('POP' register)
+   | ('PUSH' register)
+   | 'RET'
+   | 'SIM'
    ;
 
+register
+   : REGISTER
+   ;
 
 REGISTER
    : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M' | 'SP' | 'PSW'
