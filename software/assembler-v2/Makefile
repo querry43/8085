@@ -1,9 +1,5 @@
 TARGETS = \
-    asm8085Lexer.js \
-    asm8085Lexer.tokens \
-    asm8085Listener.js \
-    asm8085Parser.js \
-    asm8085.tokens
+    node_modules/asm8085/asm8085Listener.js
 
 js_runtime = antlr-javascript-runtime-4.5.3.zip
 antlr_jar = antlr-4.5.3-complete.jar
@@ -21,8 +17,9 @@ test:
 %.asm.h : %.asm
 	${NODEJS} assembler.js $^ > $@
 
-%Lexer.js %Lexer.tokens %Listener.js %Parser.js %.tokens: %.g4 deps
-	${ANTLR} -Dlanguage=JavaScript $<
+node_modules/asm8085/asm8085Listener.js: asm8085.g4 node_modules/antlr4/index.js ${antlr_jar}
+	mkdir -p node_modules/asm8085
+	${ANTLR} -Dlanguage=JavaScript -o node_modules/asm8085 $<
 
 deps: node_modules/antlr4/index.js ${antlr_jar}
 
@@ -36,6 +33,7 @@ node_modules/antlr4/index.js:
 
 clean:
 	rm -f ${TARGETS}
+	rm -rf node_modules/asm8085
 
 distclean: clean
 	rm -f ${antlr_jar}

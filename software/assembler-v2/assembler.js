@@ -1,12 +1,13 @@
 "use strict"
 
 const antlr4 = require('antlr4/index');
-const asm8085Lexer = require('./asm8085Lexer.js');
-const asm8085Parser = require('./asm8085Parser.js');
-const asm8085Listener = require('./asm8085Listener.js');
 const fs = require('fs');
 const util = require('util');
 const path = require('path');
+
+const asm8085Lexer = require('asm8085/asm8085Lexer');
+const asm8085Parser = require('asm8085/asm8085Parser');
+const asm8085Listener = require('asm8085/asm8085Listener');
 
 var inputs = process.argv.slice(2);
 
