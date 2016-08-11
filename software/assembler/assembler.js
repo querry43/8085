@@ -14,6 +14,7 @@ var inputs = process.argv.slice(2);
 class Operand {
   constructor(value) { this.value = value; }
   toString() { return this.value; }
+  toInt(programCounter, symbolTable) { return this.value; }
   toBytes(programCounter, symbolTable) {
     return [ (this.value & 0xff).toString(16), (this.value >> 8).toString(16) ];
   }
@@ -49,13 +50,16 @@ class ChrOperand extends Operand {
 }
 
 class LabelOperand extends Operand {
-  toBytes(programCounter, symbolTable) {
+  toInt(programCounter, symbolTable) {
     var addy = symbolTable[this.value];
     if (!addy) {
       console.error('unable to find address ' + this.value);
       process.exit(1);
     }
-    return addy.toString(16).match(/.{1,2}/g);
+    return addy;
+  }
+  toBytes(programCounter, symbolTable) {
+    return this.toInt(programCounter, symbolTable).toString(16).match(/.{1,2}/g);
   }
 }
 
@@ -63,6 +67,39 @@ class LocationCounterOperand extends Operand {
   constructor() { super('$'); }
   toBytes(programCounter, symbolTable) {
     return programCounter.toString(16).match(/.{1,2}/g);
+  }
+}
+
+function formatLabel(l) {
+  var width = 8;
+  if (l) {
+    return l + ':' + Array(width - l.length - 1).join(' ');
+  } else {
+    return Array(width).join(' ');
+  }
+}
+
+function formatHex(d, length=2) {
+  var hex = d.toString(16);
+  if (hex.length < length) {
+    hex = Array(length - hex.length + 1).join('0') + hex;
+  }
+  return '0x' + hex;
+}
+
+class Directive {
+  constructor(label, length, text) {
+    this.label = label;
+    this.length = length;
+    this.text = text;
+  }
+
+  toString(symbolTable) {
+    return util.format(
+      '              // %s %s',
+      formatLabel(this.label),
+      this.text
+    );
   }
 }
 
@@ -77,22 +114,6 @@ class Instruction {
   }
 
   toString(symbolTable) {
-    function formatLabel(l) {
-      var width = 8;
-      if (l) {
-        return l + ':' + Array(width - l.length - 1).join(' ');
-      } else {
-        return Array(width).join(' ');
-      }
-    }
-
-    function formatHex(d, length=2) {
-      var hex = d.toString(16);
-      if (hex.length < length) {
-        hex = Array(length - hex.length + 1).join('0') + hex;
-      }
-      return '0x' + hex;
-    }
 
     var opstring = util.format(
       '%s, %s, // %s %s',
@@ -222,6 +243,14 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     };
   };
 
+  directiveTable() {
+    return {
+      'DB': 1,
+      'DS': 1,
+      'DW': 1,
+    };
+  }
+
   enterInstruction(ctx) {
     this.label = null;
     this.op = [];
@@ -230,27 +259,38 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   };
 
   exitInstruction(ctx) {
+    var directiveEntry = this.directiveTable()[this.op];
     var opEntry = AsmListener.opTable()[this.op];
 
-    if (!opEntry) {
+
+    console.log([ this.label, this.op, this.immediate, opEntry ]);
+
+    if (directiveEntry) {
+      var directive = new Directive(
+        this.label,
+        this.immediate.toInt(this.address, this.symbolTable),
+        this.text
+      );
+      this.instructions.push(directive);
+      this.address = this.address + directive.length;
+    } else if (opEntry) {
+      var instruction = new Instruction(
+        this.label,
+        opEntry[0],
+        this.immediate,
+        opEntry[1],
+        this.text,
+        this.address
+      );
+
+      this.instructions.push(instruction);
+
+      this.address = this.address + instruction.length;
+    } else {
       console.error('failed to parse instruction ' + this.text + ' line ' + ctx.start.line);
       process.exit(1);
     }
 
-    // console.log([ this.label, this.op, this.immediate, opEntry ]);
-
-    var instruction = new Instruction(
-      this.label,
-      opEntry[0],
-      this.immediate,
-      opEntry[1],
-      this.text,
-      this.address
-    );
-
-    this.instructions.push(instruction);
-
-    this.address = this.address + instruction.length;
   };
 
   exitRegister(ctx) {

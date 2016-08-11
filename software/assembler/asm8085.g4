@@ -49,6 +49,7 @@ operation
    | ('DCR'  register)
    | ('DCX'  register)
    | ('DI')
+   | ('DS'   immediate)
    | ('EI')
    | ('HLT')
    | ('IN'   immediate)
