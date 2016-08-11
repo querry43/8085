@@ -109,7 +109,7 @@ register
    ;
 
 REGISTER
-   : 'A' | 'B' | 'C' | 'D' | 'H' | 'L' | 'M' | 'SP' | 'PSW'
+   : 'A' | 'B' | 'C' | 'D' | 'E' | 'H' | 'L' | 'M' | 'SP' | 'PSW'
    ;
 
 labeloperand
