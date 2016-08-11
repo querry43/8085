@@ -1,33 +1,44 @@
 TARGETS = \
     node_modules/asm8085/asm8085Listener.js
 
+ASM = \
+	asm/blink.asm.h \
+	asm/larson_scanner.asm.h \
+	asm/larson_scanner2.asm.h \
+	asm/light_on.asm.h \
+	asm/noop.asm.h \
+	asm/output.asm.h
+
 js_runtime = antlr-javascript-runtime-4.5.3.zip
 antlr_jar = antlr-4.5.3-complete.jar
 
-ANTLR = java -jar ${antlr_jar}
+ANTLR = java -jar java/${antlr_jar}
 NODEJS = nodejs
 
 all: ${TARGETS}
 
-programs/blink.asm.h: programs/blink.asm libs/delay.asm
-programs/larson_scanner.asm.h: programs/larson_scanner.asm libs/delay.asm
-programs/larson_scanner2.asm.h: programs/larson_scanner2.asm libs/delay.asm
+asm: ${ASM}
+
+asm/blink.asm.h: asm/blink.asm asm/libs/delay.asm
+asm/larson_scanner.asm.h: asm/larson_scanner.asm asm/libs/delay.asm
+asm/larson_scanner2.asm.h: asm/larson_scanner2.asm asm/libs/delay.asm
 
 
 test: 
-	${NODEJS} assembler.js test/*.asm
+	${NODEJS} assembler.js asm/test/*.asm
 
 %.asm.h : %.asm
 	${NODEJS} assembler.js $^ > $@
 
-node_modules/asm8085/asm8085Listener.js: asm8085.g4 node_modules/antlr4/index.js ${antlr_jar}
+node_modules/asm8085/asm8085Listener.js: asm8085.g4 node_modules/antlr4/index.js java/${antlr_jar}
 	mkdir -p node_modules/asm8085
 	${ANTLR} -Dlanguage=JavaScript -o node_modules/asm8085 $<
 
-deps: node_modules/antlr4/index.js ${antlr_jar}
+deps: node_modules/antlr4/index.js java/${antlr_jar}
 
-${antlr_jar}:
-	wget http://www.antlr.org/download/${antlr_jar}
+java/${antlr_jar}:
+	mkdir -p java
+	wget --output-document $@ http://www.antlr.org/download/${antlr_jar}
 
 node_modules/antlr4/index.js:
 	mkdir -p node_modules
@@ -39,9 +50,10 @@ clean:
 	rm -rf node_modules/asm8085
 
 distclean: clean
-	rm -f ${antlr_jar}
+	rm ${ASM}
+	rm -rf java
 	rm -rf node_modules
 
-.PHONY: all test deps clean distclean
+.PHONY: all asm test deps clean distclean
 
 # vim: noet
