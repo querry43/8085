@@ -243,37 +243,24 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     };
   };
 
-  directiveTable() {
-    return {
-      'DB': 1,
-      'DS': 1,
-      'DW': 1,
-    };
-  }
-
-  enterInstruction(ctx) {
+  enterOperation(ctx) {
     this.label = null;
     this.op = [];
     this.immediate = null;
-    this.text = null;
   };
 
+  enterInstruction(ctx) {
+    this.text = ctx.children.map(function(child) { return child.getText(); }).join(' ');
+    this.op.push(ctx.getChild(0).getText());
+  }
+
+
   exitInstruction(ctx) {
-    var directiveEntry = this.directiveTable()[this.op];
     var opEntry = AsmListener.opTable()[this.op];
 
+    console.log({'label': this.label, 'op': this.op, 'immediate': this.immediate, 'opEntry': opEntry });
 
-    console.log([ this.label, this.op, this.immediate, opEntry ]);
-
-    if (directiveEntry) {
-      var directive = new Directive(
-        this.label,
-        this.immediate.toInt(this.address, this.symbolTable),
-        this.text
-      );
-      this.instructions.push(directive);
-      this.address = this.address + directive.length;
-    } else if (opEntry) {
+    if (opEntry) {
       var instruction = new Instruction(
         this.label,
         opEntry[0],
@@ -290,17 +277,21 @@ class AsmListener extends asm8085Listener.asm8085Listener {
       console.error('failed to parse instruction ' + this.text + ' line ' + ctx.start.line);
       process.exit(1);
     }
-
   };
 
-  exitRegister(ctx) {
-    this.op.push(ctx.getText());
-  };
-
-  enterOperation(ctx) { this.op.push(ctx.getChild(0).getText()); }
-  exitOperation(ctx) {
+  exitDS(ctx) {
     this.text = ctx.children.map(function(child) { return child.getText(); }).join(' ');
+
+    console.log({'label': this.label, 'op': this.op, 'immediate': this.immediate });
+
+    this.instructions.push(new Directive(
+      this.label,
+      this.immediate.toInt(),
+      this.text
+    ));
   }
+
+  exitRegister(ctx) { this.op.push(ctx.getText()); };
 
   exitHex(ctx) { this.immediate = new HexOperand(ctx.getText()); }
   exitOct(ctx) { this.immediate = new OctOperand(ctx.getText()); }
@@ -322,15 +313,15 @@ var assembler = new AsmListener();
 
 inputs.forEach(function(file) {
   var data = fs.readFileSync(file, 'utf8');
-  
+
   var chars = new antlr4.InputStream(data);
   var lexer = new asm8085Lexer.asm8085Lexer(chars);
   var tokens = new antlr4.CommonTokenStream(lexer);
   var parser = new asm8085Parser.asm8085Parser(tokens);
   var tree = parser.prog();
-  
+
   antlr4.tree.ParseTreeWalker.DEFAULT.walk(assembler, tree);
-  
+
   // console.log(JSON.stringify(assembler.instructions, null, 2));
 });
 

@@ -8,12 +8,12 @@ prog
 
 line
    : comment
-   | instruction
+   | operation
    | label
    ;
 
-instruction
-   : label? operation comment?
+operation
+   : label? (instruction | directive) comment?
    ;
 
 label
@@ -24,7 +24,7 @@ comment
    : COMMENT
    ;
 
-operation
+instruction
    : ('ACI'  immediate)
    | ('ADC'  register)
    | ('ADD'  register)
@@ -49,7 +49,6 @@ operation
    | ('DCR'  register)
    | ('DCX'  register)
    | ('DI')
-   | ('DS'   immediate)
    | ('EI')
    | ('HLT')
    | ('IN'   immediate)
@@ -103,6 +102,10 @@ operation
    | ('XRA'  register)
    | ('XRI'  immediate)
    | ('XTHL')
+   ;
+
+directive
+   : ('DS'   immediate) # DS
    ;
 
 register
