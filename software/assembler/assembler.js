@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 const antlr4 = require('antlr4/index');
 const fs = require('fs');
@@ -15,8 +15,18 @@ class Operand {
   constructor(value) { this.value = value; }
   toString() { return this.value; }
   toInt(programCounter, symbolTable) { return this.value; }
+
+  // bytes[0] = LSB
   toBytes(programCounter, symbolTable) {
-    return [ (this.value & 0xff).toString(16), (this.value >> 8).toString(16) ];
+    var bytes = [ ];
+    var value = this.value;
+
+    while (value > 0) {
+      bytes.push((value & 0xff).toString(16));
+      value = value >> 8;
+    }
+
+    return bytes;
   }
 }
 
@@ -45,8 +55,21 @@ class DecOperand extends Operand {
   }
 }
 
-class ChrOperand extends Operand {
-  constructor(value) { super(value.charCodeAt(1)); }
+class StrOperand extends Operand {
+  constructor(value) { super(value.slice(1, -1)); }
+
+  toInt(programCounter, symbolTable) { return this.value.charCodeAt(1); }
+
+  // bytes[0] = first character
+  toBytes(programCounter, symbolTable) {
+    var bytes = [ ];
+
+    for (var i = 0; i < this.value.length; i++) {
+      bytes.push(this.value.charCodeAt(i, 16));
+    }
+
+    return bytes;
+  }
 }
 
 class LabelOperand extends Operand {
@@ -58,15 +81,19 @@ class LabelOperand extends Operand {
     }
     return addy;
   }
+
+  // bytes[0] = LSB
   toBytes(programCounter, symbolTable) {
-    return this.toInt(programCounter, symbolTable).toString(16).match(/.{1,2}/g);
+    return this.toInt(programCounter, symbolTable).toString(16).match(/.{1,2}/g).reverse();
   }
 }
 
 class LocationCounterOperand extends Operand {
   constructor() { super('$'); }
+
+  // bytes[0] = LSB
   toBytes(programCounter, symbolTable) {
-    return programCounter.toString(16).match(/.{1,2}/g);
+    return programCounter.toString(16).match(/.{1,2}/g).reverse();
   }
 }
 
@@ -88,18 +115,41 @@ function formatHex(d, length=2) {
 }
 
 class Directive {
-  constructor(label, length, text) {
+  constructor(label, length, text, bytes, address) {
     this.label = label;
     this.length = length;
     this.text = text;
+    this.bytes = bytes;
+    this.address = address;
   }
 
   toString(symbolTable) {
-    return util.format(
-      '              // %s %s',
-      formatLabel(this.label),
-      this.text
-    );
+    if (this.bytes.length) {
+      var str = util.format(
+        '%s, %s, // %s %s',
+        formatHex(this.address, 4),
+        formatHex(this.bytes.shift()),
+        formatLabel(this.label),
+        this.text
+      );
+
+      var self = this;
+      this.bytes.forEach(function(byte, index) {
+        str = str + util.format(
+          '\n%s, %s, //',
+          formatHex(self.address+index+1, 4),
+          formatHex(byte)
+        );
+      });
+
+      return str;
+    } else {
+      return util.format(
+        '              // %s %s',
+        formatLabel(this.label),
+        this.text
+      );
+    }
   }
 }
 
@@ -246,7 +296,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   enterOperation(ctx) {
     this.label = null;
     this.op = [];
-    this.immediate = null;
+    this.immediates = [];
   };
 
   enterInstruction(ctx) {
@@ -258,13 +308,13 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   exitInstruction(ctx) {
     var opEntry = AsmListener.opTable()[this.op];
 
-    console.log({'label': this.label, 'op': this.op, 'immediate': this.immediate, 'opEntry': opEntry });
+    // console.log({'label': this.label, 'op': this.op, 'immediates': this.immediates, 'opEntry': opEntry });
 
     if (opEntry) {
       var instruction = new Instruction(
         this.label,
         opEntry[0],
-        this.immediate,
+        this.immediates[0],
         opEntry[1],
         this.text,
         this.address
@@ -282,31 +332,64 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   exitDS(ctx) {
     this.text = ctx.children.map(function(child) { return child.getText(); }).join(' ');
 
-    console.log({'label': this.label, 'op': this.op, 'immediate': this.immediate });
+    // console.log({'label': this.label, 'op': this.op, 'immediates': this.immediates });
 
-    this.instructions.push(new Directive(
+    var directive = new Directive(
       this.label,
-      this.immediate.toInt(),
-      this.text
-    ));
+      this.immediates[0].toInt(),
+      this.text,
+      [ ],
+      this.address
+    );
+
+    this.instructions.push(directive);
+    this.address = this.address + directive.length;
   }
+
+  exitDB(ctx) {
+    this.text = ctx.children.map(function(child) { return child.getText(); }).join(' ');
+    var bytes = [];
+
+    // console.log({'label': this.label, 'op': 'DB', 'immediates': this.immediates, 'bytes': bytes });
+
+    var self = this;
+    this.immediates.forEach(function(immediate) {
+      var immediateBytes = immediate.toBytes(self.address, self.symbolTable);
+      if (! (immediate instanceof StrOperand)) {
+        immediateBytes = immediateBytes.reverse();
+      }
+      bytes = bytes.concat(immediateBytes);
+    });
+
+    var directive = new Directive(
+      this.label,
+      bytes.length,
+      this.text,
+      bytes,
+      this.address
+    );
+
+    this.instructions.push(directive);
+    this.address = this.address + directive.length;
+  }
+
 
   exitRegister(ctx) { this.op.push(ctx.getText()); };
 
-  exitHex(ctx) { this.immediate = new HexOperand(ctx.getText()); }
-  exitOct(ctx) { this.immediate = new OctOperand(ctx.getText()); }
-  exitBin(ctx) { this.immediate = new BinOperand(ctx.getText()); }
-  exitDec(ctx) { this.immediate = new DecOperand(ctx.getText()); }
-  exitChr(ctx) { this.immediate = new ChrOperand(ctx.getText()); }
+  exitHex(ctx) { this.immediates.push(new HexOperand(ctx.getText())); }
+  exitOct(ctx) { this.immediates.push(new OctOperand(ctx.getText())); }
+  exitBin(ctx) { this.immediates.push(new BinOperand(ctx.getText())); }
+  exitDec(ctx) { this.immediates.push(new DecOperand(ctx.getText())); }
+  exitStr(ctx) { this.immediates.push(new StrOperand(ctx.getText())); }
 
   exitLabel(ctx) {
     this.label = ctx.getChild(0).getText();
     this.symbolTable[this.label] = this.address;
   }
 
-  exitLocationcounteroperand(ctx) { this.immediate = new LocationCounterOperand(); }
+  exitLocationcounteroperand(ctx) { this.immediates.push(new LocationCounterOperand()); }
 
-  exitLabeloperand(ctx) { this.immediate = new LabelOperand(ctx.getChild(0).getText()); }
+  exitLabeloperand(ctx) { this.immediates.push(new LabelOperand(ctx.getChild(0).getText())); }
 }
 
 var assembler = new AsmListener();

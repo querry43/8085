@@ -105,7 +105,8 @@ instruction
    ;
 
 directive
-   : ('DS'   immediate) # DS
+   : ('DB'   immediatelist) # DB
+   | ('DS'   immediate) # DS
    ;
 
 register
@@ -124,12 +125,17 @@ locationcounteroperand
    : '$'
    ;
 
+immediatelist
+   : (immediate ',' immediatelist)
+   | immediate
+   ;
+
 immediate
    : hex
    | oct
    | bin
    | dec
-   | chr
+   | str 
    | labeloperand
    | locationcounteroperand
    ;
@@ -167,12 +173,12 @@ DEC
    | [0-9]+
    ;
 
-chr
-   : CHR
+str
+   : STR
    ;
 
-CHR
-   : '\'' . '\''
+STR
+   : '\'' ~ [\']* '\''
    ;
 
 EOL

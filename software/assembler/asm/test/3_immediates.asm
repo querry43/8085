@@ -5,3 +5,4 @@
         MVI A,10D
         MVI A,10
         MVI A,'A'
+        MVI A,'AB' ; should be 'A'

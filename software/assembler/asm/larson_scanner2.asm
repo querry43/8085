@@ -1,24 +1,8 @@
 ; memory range is 0077 to 0x1000
 
-START:  LXI H,0500H ; write the pattern
-        MVI M,00000001B
-        LXI H,0501H
-        MVI M,00000010B
-        LXI H,0502H
-        MVI M,00000100B
-        LXI H,0503H
-        MVI M,00001000B
-        LXI H,0504H
-        MVI M,00010000B
-        LXI H,0505H
-        MVI M,00100000B
-        LXI H,0506H
-        MVI M,01000000B
-        LXI H,0507H
-        MVI M,10000000B
-
+START:
         ; pointer
-        LXI D,0500H
+        LXI D,PTN
 
         ; setup output
         LXI H,9800H
@@ -33,7 +17,7 @@ FWD:    LDAX D
         CALL DELAY
         INX D
         MOV A,E
-        CPI 07H
+        CPI 0074H ; should be PTN+7
         JNZ FWD
 
 REV:    LDAX D
@@ -41,11 +25,9 @@ REV:    LDAX D
         CALL DELAY
         DCX D
         MOV A,E
-        CPI 00H
+        CPI PTN
         JNZ REV
 
         JMP FWD
 
-
-
-
+PTN:    DB 00000001B,00000010B,00000100B,00001000B,00010000B,00100000B,01000000B,10000000B
