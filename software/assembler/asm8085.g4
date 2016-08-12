@@ -25,25 +25,25 @@ comment
    ;
 
 instruction
-   : ('ACI'  immediate)
+   : ('ACI'  expression)
    | ('ADC'  register)
    | ('ADD'  register)
-   | ('ADI'  immediate)
+   | ('ADI'  expression)
    | ('ANA'  register)
-   | ('ANI'  immediate)
-   | ('CALL' immediate)
-   | ('CC'   immediate)
-   | ('CM'   immediate)
+   | ('ANI'  expression)
+   | ('CALL' expression)
+   | ('CC'   expression)
+   | ('CM'   expression)
    | ('CMA')
    | ('CMC')
    | ('CMP'  register)
-   | ('CNC'  immediate)
-   | ('CNZ'  immediate)
-   | ('CP'   immediate)
-   | ('CPE'  immediate)
-   | ('CPI'  immediate)
-   | ('CPO'  immediate)
-   | ('CZ'   immediate)
+   | ('CNC'  expression)
+   | ('CNZ'  expression)
+   | ('CP'   expression)
+   | ('CPE'  expression)
+   | ('CPI'  expression)
+   | ('CPO'  expression)
+   | ('CZ'   expression)
    | ('DAA')
    | ('DAD'  register)
    | ('DCR'  register)
@@ -51,27 +51,27 @@ instruction
    | ('DI')
    | ('EI')
    | ('HLT')
-   | ('IN'   immediate)
+   | ('IN'   expression)
    | ('INR'  register)
    | ('INX'  register)
-   | ('JM'   immediate)
-   | ('JMP'  immediate)
-   | ('JNC'  immediate)
-   | ('JNZ'  immediate)
-   | ('JP'   immediate)
-   | ('JPE'  immediate)
-   | ('JPO'  immediate)
-   | ('JZ'   immediate)
-   | ('LDA'  immediate)
+   | ('JM'   expression)
+   | ('JMP'  expression)
+   | ('JNC'  expression)
+   | ('JNZ'  expression)
+   | ('JP'   expression)
+   | ('JPE'  expression)
+   | ('JPO'  expression)
+   | ('JZ'   expression)
+   | ('LDA'  expression)
    | ('LDAX' register)
-   | ('LHLD' immediate)
-   | ('LXI'  register ',' immediate)
+   | ('LHLD' expression)
+   | ('LXI'  register ',' expression)
    | ('MOV'  register ',' register)
-   | ('MVI'  register ',' immediate)
+   | ('MVI'  register ',' expression)
    | ('NOP')
    | ('ORA'  register)
-   | ('ORA'  immediate)
-   | ('OUT'  immediate)
+   | ('ORA'  expression)
+   | ('OUT'  expression)
    | ('PCHL')
    | ('POP'  register)
    | ('PUSH' register)
@@ -90,23 +90,23 @@ instruction
    | ('RRC')
    | ('RZ')
    | ('SBB'  register)
-   | ('SBI'  immediate)
-   | ('SHLD' immediate)
+   | ('SBI'  expression)
+   | ('SHLD' expression)
    | ('SIM')
    | ('SPHL')
-   | ('STA'  immediate)
+   | ('STA'  expression)
    | ('STAX' register)
    | ('SUB'  register)
-   | ('SUI'  immediate)
+   | ('SUI'  expression)
    | ('XCHG')
    | ('XRA'  register)
-   | ('XRI'  immediate)
+   | ('XRI'  expression)
    | ('XTHL')
    ;
 
 directive
-   : ('DB'   immediatelist) # DB
-   | ('DS'   immediate) # DS
+   : ('DB'   expressionlist) # DB
+   | ('DS'   expression) # DS
    ;
 
 register
@@ -125,8 +125,26 @@ locationcounteroperand
    : '$'
    ;
 
-immediatelist
-   : (immediate ',' immediatelist)
+expressionlist
+   : (expression ',' expressionlist)
+   | expression
+   ;
+
+expression
+   : (multexpression '+' expression) # Plus
+   | (multexpression '-' expression) # Minus
+   | multexpression # MultExpression
+   ;
+
+multexpression
+   : (parenexpression '*' expression) # Mult
+   | (parenexpression '/' expression) # Div
+   | (parenexpression 'MOD' expression) # Mod
+   | parenexpression # ParenExpression
+   ;
+
+parenexpression
+   : ( '(' expression ')' )
    | immediate
    ;
 

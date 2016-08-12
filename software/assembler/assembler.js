@@ -91,9 +91,56 @@ class LabelOperand extends Operand {
 class LocationCounterOperand extends Operand {
   constructor() { super('$'); }
 
+  toInt(programCounter, symbolTable) {
+    return programCounter;
+  }
+
   // bytes[0] = LSB
   toBytes(programCounter, symbolTable) {
-    return programCounter.toString(16).match(/.{1,2}/g).reverse();
+    return this.toInt(programCounter, symbolTable).toString(16).match(/.{1,2}/g).reverse();
+  }
+}
+
+class ExpressionOperand extends Operand {
+  constructor(left, right, text) {
+    super(text);
+    this.left = left;
+    this.right = right;
+  }
+
+  toBytes(programCounter, symbolTable) {
+    return this.toInt(programCounter, symbolTable).toString(16).match(/.{1,2}/g).reverse();
+  }
+}
+
+
+class PlusOperand extends ExpressionOperand {
+  toInt(programCounter, symbolTable) {
+    return this.left.toInt(programCounter, symbolTable) + this.right.toInt(programCounter, symbolTable);
+  }
+}
+
+class MinusOperand extends ExpressionOperand {
+  toInt(programCounter, symbolTable) {
+    return this.left.toInt(programCounter, symbolTable) - this.right.toInt(programCounter, symbolTable);
+  }
+}
+
+class MultOperand extends ExpressionOperand {
+  toInt(programCounter, symbolTable) {
+    return this.left.toInt(programCounter, symbolTable) * this.right.toInt(programCounter, symbolTable);
+  }
+}
+
+class DivOperand extends ExpressionOperand {
+  toInt(programCounter, symbolTable) {
+    return parseInt(this.left.toInt(programCounter, symbolTable) / this.right.toInt(programCounter, symbolTable));
+  }
+}
+
+class ModOperand extends ExpressionOperand {
+  toInt(programCounter, symbolTable) {
+    return this.left.toInt(programCounter, symbolTable) % this.right.toInt(programCounter, symbolTable);
   }
 }
 
@@ -373,8 +420,37 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.address = this.address + directive.length;
   }
 
+  exitPlus(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new PlusOperand(left, right, ctx.getText()));
+  }
 
-  exitRegister(ctx) { this.op.push(ctx.getText()); };
+  exitMinus(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new MinusOperand(left, right, ctx.getText()));
+  }
+
+  exitMult(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new MultOperand(left, right, ctx.getText()));
+  }
+
+  exitDiv(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new DivOperand(left, right, ctx.getText()));
+  }
+
+  exitMod(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new ModOperand(left, right, ctx.getText()));
+  }
+
+  exitRegister(ctx) { this.op.push(ctx.getText()); }
 
   exitHex(ctx) { this.immediates.push(new HexOperand(ctx.getText())); }
   exitOct(ctx) { this.immediates.push(new OctOperand(ctx.getText())); }
