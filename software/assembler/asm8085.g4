@@ -107,6 +107,7 @@ instruction
 directive
    : ('DB'   expressionlist) # DB
    | ('DS'   expression) # DS
+   | (LABEL 'SET' expression) # SET
    ;
 
 register

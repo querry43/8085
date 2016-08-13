@@ -420,6 +420,10 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.address = this.address + directive.length;
   }
 
+  exitSET(ctx) {
+    this.symbolTable[ctx.getChild(0).getText()] = this.immediates.pop().toInt(this.address, this.symbolTable);
+  }
+
   exitPlus(ctx) {
     var right = this.immediates.pop();
     var left = this.immediates.pop();
