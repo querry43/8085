@@ -1,8 +1,8 @@
-START:  LXI H,9800H
+START:  LXI H,CSADDY
         MVI M,00000001B ; PA output
 
         MVI A,1
-        LXI H,9801H
+        LXI H,PAADDY
 
         ; set delay timer
         LXI B,2000H

@@ -19,9 +19,10 @@ all: ${TARGETS}
 
 asm: ${ASM}
 
+asm/output.asm.h: asm/output.asm asm/libs/addresses.asm
 asm/blink.asm.h: asm/blink.asm asm/libs/delay.asm
-asm/larson_scanner.asm.h: asm/larson_scanner.asm asm/libs/delay.asm
-asm/larson_scanner2.asm.h: asm/larson_scanner2.asm asm/libs/delay.asm
+asm/larson_scanner.asm.h: asm/larson_scanner.asm asm/libs/delay.asm asm/libs/addresses.asm
+asm/larson_scanner2.asm.h: asm/larson_scanner2.asm asm/libs/delay.asm asm/libs/addresses.asm
 
 
 test: 
