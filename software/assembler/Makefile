@@ -8,7 +8,9 @@ ASM = \
 	asm/light_on.asm.h \
 	asm/multiplex_output.asm.h \
 	asm/noop.asm.h \
-	asm/output.asm.h
+	asm/output.asm.h \
+	asm/reversi/reversi.asm.h \
+	asm/reversi/test/test_1_board.asm.h
 
 js_runtime = antlr-javascript-runtime-4.5.3.zip
 antlr_jar = antlr-4.5.3-complete.jar
@@ -25,6 +27,9 @@ asm/blink.asm.h: asm/blink.asm asm/libs/delay.asm
 asm/larson_scanner.asm.h: asm/larson_scanner.asm asm/libs/delay.asm asm/libs/addresses.asm
 asm/larson_scanner2.asm.h: asm/larson_scanner2.asm asm/libs/delay.asm asm/libs/addresses.asm
 asm/multiplex_output.asm.h: asm/multiplex_output.asm asm/libs/delay.asm asm/libs/addresses.asm
+
+asm/reversi/reversi.asm.h: asm/reversi/reversi.asm asm/reversi/board.asm asm/libs/delay.asm asm/libs/addresses.asm
+asm/reversi/test/test_1_board.asm.h: asm/reversi/test/test_1_board.asm asm/reversi/board.asm
 
 
 test: 
