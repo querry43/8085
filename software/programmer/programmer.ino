@@ -5,6 +5,7 @@
 #include "output.h"
 #include "larson_scanner.h"
 #include "larson_scanner2.h"
+#include "multiplex_output.h"
 
 const uint8_t
   HOLD_pin = 8,
@@ -19,7 +20,7 @@ const uint8_t
  *  A8-A15 to PORTA (22-29)
  *  D0-D7 to PORTL (49-42)
  */
-#define PROGRAM larson_scanner2_asm
+#define PROGRAM multiplex_output_asm
 #define MEM_SIZE 4096
 #define DEBUG false
 #define MEMTEST false
