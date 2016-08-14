@@ -13,14 +13,14 @@ const uint8_t
   RD_pin = 10,
   WR_pin = 11,
   LATCH_EN_pin = 12,
-  LED_pin = 13;
+  DIAG_pin = 13;
 
 /* Hookup:
  *  A0-A7 to PORTC (37-30)
  *  A8-A15 to PORTA (22-29)
  *  D0-D7 to PORTL (49-42)
  */
-#define PROGRAM multiplex_output_asm
+#define PROGRAM larson_scanner2_asm
 #define MEM_SIZE 4096
 #define DEBUG false
 #define MEMTEST false
@@ -29,22 +29,13 @@ const uint8_t
 void setup() {
   Serial.begin(38400);
 
-  pinMode(LED_pin, OUTPUT);
-  digitalWrite(LED_pin, LOW);
+  pinMode(DIAG_pin, INPUT);
 
-  // hold cpu
-  digitalWrite(HOLD_pin, HIGH);
-  pinMode(HOLD_pin, OUTPUT);
+  hold_and_commandeer_bus();
+
+  // prepare for reset
   digitalWrite(RESET_pin, HIGH);
   pinMode(RESET_pin, OUTPUT);
-
-  pinMode(LATCH_EN_pin, OUTPUT);
-  pinMode(RD_pin, OUTPUT);
-  pinMode(WR_pin, OUTPUT);
-
-  digitalWrite(LATCH_EN_pin, HIGH);
-  digitalWrite(RD_pin, HIGH);
-  digitalWrite(WR_pin, HIGH);
 
   if (MEMTEST) {
     mem_test();
@@ -53,27 +44,28 @@ void setup() {
     write_program();
   }
 
-  // release all bus pins
-  pinMode(LATCH_EN_pin, INPUT);
-  pinMode(RD_pin, INPUT);
-  pinMode(WR_pin, INPUT);
-
-  PORTC = 0;
-  PORTA = 0;
-  PORTL = 0;
+  release_bus();
 
   // reset cpu
   digitalWrite(RESET_pin, LOW);
   delay(100);
   pinMode(RESET_pin, INPUT); // high impedance lets reset circuit take over
 
-  // release hold
-  digitalWrite(HOLD_pin, LOW);
-
-  digitalWrite(LED_pin, HIGH);
+  release_hold();
 }
 
-void loop() { }
+void loop() {
+  if (digitalRead(DIAG_pin) == 0) {
+    Serial.println("\nDIAG");
+    hold_and_commandeer_bus();
+    dump_mem();
+    release_bus();
+    release_hold();
+
+    delay(500); // cheap debounce
+    while (digitalRead(DIAG_pin) == 0);
+  }
+}
 
 void write_mem(const uint16_t addr, const uint8_t data) {
   set_address(addr);
@@ -236,3 +228,32 @@ void verify_program() {
 }
 
 uint8_t program_length() { return sizeof(PROGRAM) / 4; }
+
+void hold_and_commandeer_bus() {
+  digitalWrite(HOLD_pin, HIGH);
+  pinMode(HOLD_pin, OUTPUT);
+  delay(100);
+
+  pinMode(LATCH_EN_pin, OUTPUT);
+  pinMode(RD_pin, OUTPUT);
+  pinMode(WR_pin, OUTPUT);
+
+  digitalWrite(LATCH_EN_pin, HIGH);
+  digitalWrite(RD_pin, HIGH);
+  digitalWrite(WR_pin, HIGH);
+}
+
+void release_bus() {
+  pinMode(LATCH_EN_pin, INPUT);
+  pinMode(RD_pin, INPUT);
+  pinMode(WR_pin, INPUT);
+
+  PORTC = 0;
+  PORTA = 0;
+  PORTL = 0;
+}
+
+void release_hold() {
+  digitalWrite(HOLD_pin, LOW);
+  pinMode(HOLD_pin, INPUT);
+}
