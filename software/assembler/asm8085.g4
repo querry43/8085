@@ -54,6 +54,7 @@ instruction
    | ('IN'   expression)
    | ('INR'  register)
    | ('INX'  register)
+   | ('JC'   expression)
    | ('JM'   expression)
    | ('JMP'  expression)
    | ('JNC'  expression)
