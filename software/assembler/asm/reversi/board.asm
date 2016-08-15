@@ -10,7 +10,7 @@ BOARD:  DS 64
 
 ; Get the address for a tile.  The x, y coordinates are passed in D, E
 ; respectively and the resulting address is stored in pair DE
-TILEAD: PUSH PSW
+TILEA:  PUSH PSW
         PUSH H
 
         ; calculate offset A
@@ -32,10 +32,10 @@ TILEAD: PUSH PSW
         RET
 
 ; Get the value for a tile.  The x, y coordinates are passed in D, E
-; respectively and the resulting value is stored in pair DE LSB
+; respectively and the resulting value is stored in E and D is 0
 TILEV:  PUSH H
 
-        CALL TILEAD
+        CALL TILEA
         XCHG
         LXI D,0
         MOV E,M
