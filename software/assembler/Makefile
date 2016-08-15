@@ -28,7 +28,7 @@ asm/larson_scanner.asm.h: asm/larson_scanner.asm asm/libs/delay.asm asm/libs/add
 asm/larson_scanner2.asm.h: asm/larson_scanner2.asm asm/libs/delay.asm asm/libs/addresses.asm
 asm/multiplex_output.asm.h: asm/multiplex_output.asm asm/libs/delay.asm asm/libs/addresses.asm
 
-asm/reversi/reversi.asm.h: asm/reversi/reversi.asm asm/reversi/board.asm asm/libs/delay.asm asm/libs/addresses.asm
+asm/reversi/reversi.asm.h: asm/reversi/reversi.asm asm/reversi/board.asm asm/libs/addresses.asm
 asm/reversi/test/test_1_board.asm.h: asm/reversi/test/test_1_board.asm asm/reversi/board.asm
 
 

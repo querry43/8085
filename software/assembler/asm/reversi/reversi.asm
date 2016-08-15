@@ -1,50 +1,58 @@
 START:
         CALL RESET
 
-        LXI H,WORK
+        ; this breaks everything, why?
+        ; LXI D,0303H
+        ; CALL TILEA
+        ; XCHG
+        ; MVI M,WHITE
 
+        ; black selects 2,3 (valid)
+        MVI B,BLACK ; our color
+        MVI C,WHITE ; opponent tile
         LXI D,0203H
+        PUSH D
+
+        ; test if tile available
         CALL TILEV
-        MOV M,E
-        INX H
+        MOV A,E
+        CPI BLANK
+        JNZ INVLD
 
-        LXI D,0303H
+        ; recall user selection
+        POP D
+        PUSH D
+
+        ; look for opponent tile to right
+        ; are there enough tiles to the right?
+        MVI A,6
+        CMP D
+        JZ INVLD
+        JC INVLD
+
+        ; is the next tile to the right an opponent tile?
+        INR D
         CALL TILEV
-        MOV M,E
-        INX H
+        MOV A,E
+        XRA C
+        CPI 0
+        JNZ INVLD ; did not find opponent tile
 
-        LXI D,0403H
-        CALL TILEV
-        MOV M,E
-        INX H
+VLD:    LXI H,WORK
+        MVI M,01B
+        JMP OUTPUT
 
-        LXI D,0503H
-        CALL TILEV
-        MOV M,E
-        INX H
+INVLD:  LXI H,WORK
+        MVI M,10B
+        JMP OUTPUT
 
-        LXI D,0204H
-        CALL TILEV
-        MOV M,E
-        INX H
+OUTPUT: LXI H,CSADDY
+        MVI M,00000001B ; PA output
 
-        LXI D,0304H
-        CALL TILEV
-        MOV M,E
-        INX H
-
-        LXI D,0404H
-        CALL TILEV
-        MOV M,E
-        INX H
-
-        LXI D,0504H
-        CALL TILEV
-        MOV M,E
-        INX H
-
-
+        LXI H,WORK
+        MOV B,M
+        LXI H,PAADDY
+        MOV M,B
         HLT
-
 
 WORK:   DS 8
