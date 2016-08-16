@@ -4,6 +4,7 @@ const antlr4 = require('antlr4/index');
 const asm8085Listener = require('asm8085/asm8085Listener');
 const operands = require('./operands');
 const operations = require('./operations');
+const utils = require('./utils');
 
 class AsmListener extends asm8085Listener.asm8085Listener {
   constructor(memSize = 4096) {
@@ -17,9 +18,19 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   toString() {
     var output = '';
     var self = this;
-    this.instructions.forEach(function(instruction) {
+
+    output = output + '// Symbol Table:\n';
+    Object.keys(self.symbolTable).sort().forEach(function(property) {
+      output = output
+        + '//   ' + utils.formatLabel(property) + ' ' + utils.formatHex(self.symbolTable[property], 4) + '\n';
+    });
+
+    output = output + '\n\n';
+
+    self.instructions.forEach(function(instruction) {
       output = output + instruction.toString(self.symbolTable) + '\n';
     });
+
     return output;
   }
 

@@ -1,6 +1,7 @@
 "use strict";
 
 const util = require('util');
+const utils = require('./utils');
 
   
 const opTable = {
@@ -70,31 +71,6 @@ const opTable = {
   'CM':       [ 0xFC, 3 ], '':         [ 0xFD, 0 ], 'CPI':      [ 0xFE, 2 ], '':         [ 0xFF, 0 ],
 };
 
-function truncOrPad(str, len) {
-  if (str.length > len) {
-    return str.substr(0,len-6)+'... '
-  } else {
-    return str + Array(len - str.length - 1).join(' ');
-  }
-}
-
-function formatLabel(l) {
-  var width = 8;
-  if (l) {
-    return l + ':' + Array(width - l.length - 1).join(' ');
-  } else {
-    return Array(width).join(' ');
-  }
-}
-
-function formatHex(d, length=2) {
-  var hex = d.toString(16);
-  if (hex.length < length) {
-    hex = Array(length - hex.length + 1).join('0') + hex;
-  }
-  return '0x' + hex;
-}
-
 class Operation {
   constructor(file, line, address, label, length, text) {
     this.file = file;
@@ -116,21 +92,21 @@ class Directive extends Operation {
     if (this.bytes.length) {
       var str = util.format(
         '%s, %s, // %s %s',
-        formatHex(this.address, 4),
-        formatHex(this.bytes.shift()),
-        formatLabel(this.label),
+        utils.formatHex(this.address, 4),
+        utils.formatHex(this.bytes.shift()),
+        utils.formatLabel(this.label),
         this.text
       );
 
-      str = truncOrPad(str, 55);
+      str = utils.truncOrPad(str, 55);
       str = str + this.file + ':' + this.line;
 
       var self = this;
       this.bytes.forEach(function(byte, index) {
         str = str + util.format(
           '\n%s, %s, //',
-          formatHex(self.address+index+1, 4),
-          formatHex(byte)
+          utils.formatHex(self.address+index+1, 4),
+          utils.formatHex(byte)
         );
       });
 
@@ -138,10 +114,10 @@ class Directive extends Operation {
     } else {
       var str = util.format(
         '              // %s %s',
-        formatLabel(this.label),
+        utils.formatLabel(this.label),
         this.text
       );
-      str = truncOrPad(str, 55);
+      str = utils.truncOrPad(str, 55);
       str = str + this.file + ':' + this.line;
       return str;
     }
@@ -158,30 +134,30 @@ class Instruction extends Operation {
   toString(symbolTable) {
     var opstring = util.format(
       '%s, %s, // %s %s',
-      formatHex(this.address, 4),
-      formatHex(this.opcode),
-      formatLabel(this.label),
+      utils.formatHex(this.address, 4),
+      utils.formatHex(this.opcode),
+      utils.formatLabel(this.label),
       this.text
     );
 
-    opstring = truncOrPad(opstring, 55);
+    opstring = utils.truncOrPad(opstring, 55);
     opstring = opstring + this.file + ':' + this.line;
 
     if (this.length == 2) {
       var bytes = this.operand.toBytes(this.address, symbolTable)
       opstring = opstring + util.format(
         '\n%s, %s, //',
-        formatHex(this.address+1, 4),
-        formatHex(bytes[0] || 0)
+        utils.formatHex(this.address+1, 4),
+        utils.formatHex(bytes[0] || 0)
       );
     } else if (this.length == 3) {
       var bytes = this.operand.toBytes(this.address, symbolTable)
       opstring = opstring + util.format(
         '\n%s, %s, //\n%s, %s, //',
-        formatHex(this.address+1, 4),
-        formatHex(bytes[0] || 0),
-        formatHex(this.address+2, 4),
-        formatHex(bytes[1] || 0)
+        utils.formatHex(this.address+1, 4),
+        utils.formatHex(bytes[0] || 0),
+        utils.formatHex(this.address+2, 4),
+        utils.formatHex(bytes[1] || 0)
       );
     }
 

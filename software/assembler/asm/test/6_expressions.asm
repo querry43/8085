@@ -20,6 +20,3 @@ PRECID: MVI A,3+4*2 ; = 11
 
 PARENS: MVI A,(3+4)*2 ; = 14
         MVI A,16/(8-2) ; = 2
-
-SETFOO: FOO SET 10
-        MVI A,FOO

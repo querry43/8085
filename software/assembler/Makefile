@@ -36,6 +36,7 @@ asm/reversi/test/test_1_board.asm.h: asm/reversi/test/test_1_board.asm asm/rever
 
 
 test: ${TEST_ASM}
+	diff -u asm/test/all.asm.h asm/test/all.asm.h.expected
 
 asm/test/all.asm.h: asm/test/*.asm
 	${NODEJS} assemble $@ asm/test/*.asm
