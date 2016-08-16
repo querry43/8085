@@ -6,6 +6,7 @@
 #include "larson_scanner.h"
 #include "larson_scanner2.h"
 #include "multiplex_output.h"
+#include "reversi.h"
 
 const uint8_t
   HOLD_pin = 8,
@@ -20,7 +21,7 @@ const uint8_t
  *  A8-A15 to PORTA (22-29)
  *  D0-D7 to PORTL (49-42)
  */
-#define PROGRAM larson_scanner2_asm
+#define PROGRAM reversi_asm_h
 #define MEM_SIZE 4096
 #define DEBUG false
 #define MEMTEST false
@@ -190,7 +191,7 @@ void dump_mem() {
 void write_program() {
   Serial.print("Writing program length ");
   Serial.println(program_length());
-  for (uint8_t i = 0; i < program_length(); i++) {
+  for (uint32_t i = 0; i < program_length(); i++) {
     uint16_t address = PROGRAM[i*2];
     uint16_t data = PROGRAM[i*2+1];
 
@@ -227,7 +228,7 @@ void verify_program() {
   }
 }
 
-uint8_t program_length() { return sizeof(PROGRAM) / 4; }
+uint32_t program_length() { return sizeof(PROGRAM) / 4; }
 
 void hold_and_commandeer_bus() {
   digitalWrite(HOLD_pin, HIGH);
