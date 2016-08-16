@@ -8,7 +8,7 @@ class Operand {
   // bytes[0] = LSB
   toBytes(programCounter, symbolTable) {
     var bytes = [ ];
-    var value = this.value;
+    var value = this.toInt(programCounter, symbolTable);
 
     while (value > 0) {
       bytes.push((value & 0xff).toString(16));
@@ -70,11 +70,6 @@ class Label extends Operand {
     }
     return addy;
   }
-
-  // bytes[0] = LSB
-  toBytes(programCounter, symbolTable) {
-    return this.toInt(programCounter, symbolTable).toString(16).match(/.{1,2}/g).reverse();
-  }
 }
 
 class LocationCounter extends Operand {
@@ -83,11 +78,6 @@ class LocationCounter extends Operand {
   toInt(programCounter, symbolTable) {
     return programCounter;
   }
-
-  // bytes[0] = LSB
-  toBytes(programCounter, symbolTable) {
-    return this.toInt(programCounter, symbolTable).toString(16).match(/.{1,2}/g).reverse();
-  }
 }
 
 class Expression extends Operand {
@@ -95,10 +85,6 @@ class Expression extends Operand {
     super(text);
     this.left = left;
     this.right = right;
-  }
-
-  toBytes(programCounter, symbolTable) {
-    return this.toInt(programCounter, symbolTable).toString(16).match(/.{1,2}/g).reverse();
   }
 }
 
