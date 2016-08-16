@@ -1,0 +1,212 @@
+"use strict";
+
+const antlr4 = require('antlr4/index');
+const asm8085Listener = require('asm8085/asm8085Listener');
+const operands = require('./operands');
+const operations = require('./operations');
+
+class AsmListener extends asm8085Listener.asm8085Listener {
+  constructor(memSize = 4096) {
+    super();
+    this.instructions = AsmListener.preamble(memSize);
+    this.address = 0x44;
+    this.symbolTable = {};
+    this.file = null;
+  }
+
+  toString() {
+    var output = '';
+    var self = this;
+    this.instructions.forEach(function(instruction) {
+      output = output + instruction.toString(self.symbolTable) + '\n';
+    });
+    return output;
+  }
+
+  toJSON() {
+    return JSON.stringify(this.instructions, null, 2);
+  }
+
+  static preamble(memSize) {
+    return [
+      new operations.Instruction(
+        'preamble',
+        1,
+        0x00,
+        null,
+        3,
+        'LXI SP , ' + (memSize-1),
+        0x31,
+        new operands.Dec((memSize-1).toString())
+      ),
+      new operations.Instruction(
+        'preamble',
+        2,
+        0x03,
+        null,
+        3,
+        'JMP START',
+        0xC3,
+        new operands.Label('START')
+      ),
+    ];
+  }
+
+  enterOperation(ctx) {
+    this.label = null;
+    this.op = [];
+    this.immediates = [];
+  };
+
+  enterInstruction(ctx) {
+    this.text = ctx.children.map(function(child) { return child.getText(); }).join(' ');
+    this.op.push(ctx.getChild(0).getText());
+  }
+
+
+  exitInstruction(ctx) {
+    var opEntry = operations.opTable[this.op];
+
+    // console.log({'label': this.label, 'op': this.op, 'immediates': this.immediates, 'opEntry': opEntry });
+
+    if (opEntry) {
+      var instruction = new operations.Instruction(
+        this.file,
+        ctx.start.line,
+        this.address,
+        this.label,
+        opEntry[1],
+        this.text,
+        opEntry[0],
+        this.immediates[0]
+      );
+
+      this.instructions.push(instruction);
+
+      this.address = this.address + instruction.length;
+    } else {
+      console.error('failed to parse instruction ' + this.text + ' line ' + ctx.start.line);
+      process.exit(1);
+    }
+  };
+
+  exitDS(ctx) {
+    this.text = ctx.children.map(function(child) { return child.getText(); }).join(' ');
+
+    // console.log({'label': this.label, 'op': this.op, 'immediates': this.immediates });
+
+    var directive = new operations.Directive(
+      this.file,
+      ctx.start.line,
+      this.address,
+      this.label,
+      this.immediates[0].toInt(),
+      this.text,
+      [ ]
+    );
+
+    this.instructions.push(directive);
+    this.address = this.address + directive.length;
+  }
+
+  exitDB(ctx) {
+    this.text = ctx.children.map(function(child) { return child.getText(); }).join(' ');
+    var bytes = [];
+
+    // console.log({'label': this.label, 'op': 'DB', 'immediates': this.immediates, 'bytes': bytes });
+
+    var self = this;
+    this.immediates.forEach(function(immediate) {
+      var immediateBytes = immediate.toBytes(self.address, self.symbolTable);
+      if (! (immediate instanceof operands.Str)) {
+        immediateBytes = immediateBytes.reverse();
+      }
+      bytes = bytes.concat(immediateBytes);
+    });
+
+    var directive = new operations.Directive(
+      this.file,
+      ctx.start.line,
+      this.address,
+      this.label,
+      bytes.length,
+      this.text,
+      bytes
+    );
+
+    this.instructions.push(directive);
+    this.address = this.address + directive.length;
+  }
+
+  exitSET(ctx) {
+    this.symbolTable[ctx.getChild(0).getText()] = this.immediates.pop().toInt(this.address, this.symbolTable);
+  }
+
+  exitPlus(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new operands.Add(left, right, ctx.getText()));
+  }
+
+  exitMinus(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new operands.Sub(left, right, ctx.getText()));
+  }
+
+  exitMult(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new operands.Mult(left, right, ctx.getText()));
+  }
+
+  exitDiv(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new operands.Div(left, right, ctx.getText()));
+  }
+
+  exitMod(ctx) {
+    var right = this.immediates.pop();
+    var left = this.immediates.pop();
+    this.immediates.push(new operands.Mod(left, right, ctx.getText()));
+  }
+
+  exitRegister(ctx) { this.op.push(ctx.getText()); }
+
+  exitHex(ctx) { this.immediates.push(new operands.Hex(ctx.getText())); }
+  exitOct(ctx) { this.immediates.push(new operands.Oct(ctx.getText())); }
+  exitBin(ctx) { this.immediates.push(new operands.Bin(ctx.getText())); }
+  exitDec(ctx) { this.immediates.push(new operands.Dec(ctx.getText())); }
+  exitStr(ctx) { this.immediates.push(new operands.Str(ctx.getText())); }
+
+  exitLabel(ctx) {
+    this.label = ctx.getChild(0).getText();
+    if (this.symbolTable[this.label]) {
+      console.error('redefinition of label ' + this.label);
+      process.exit(1);
+    }
+    this.symbolTable[this.label] = this.address;
+  }
+
+  exitLocationcounteroperand(ctx) { this.immediates.push(new operands.LocationCounter()); }
+
+  exitLabeloperand(ctx) { this.immediates.push(new operands.Label(ctx.getChild(0).getText())); }
+}
+
+class DieOnErrorListener extends antlr4.error.ErrorListener {
+  constructor(file) {
+    super();
+    this.file = file;
+  }
+
+  syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
+    console.error('Syntax error in ' + this.file + ':' + line + ':\n' + msg);
+    process.exit(1);
+  }
+}
+
+exports.AsmListener = AsmListener;
+exports.DieOnErrorListener = DieOnErrorListener;
+
+// vim: ts=2 sw=2 et

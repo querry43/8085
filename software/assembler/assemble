@@ -1,0 +1,15 @@
+#!/usr/bin/env nodejs
+"use strict";
+
+const Assembler = require('./lib/assembler').Assembler;
+const AsmListener = require('./lib/listeners').AsmListener;
+
+var output = process.argv[2];
+var inputs = process.argv.slice(3);
+
+var asm = new Assembler(new AsmListener());
+
+inputs.forEach(function(file) { asm.readAsmFile(file); });
+asm.writeObjectFile(output);
+
+// vim: ts=2 sw=2 et

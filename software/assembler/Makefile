@@ -12,6 +12,9 @@ ASM = \
 	asm/reversi/reversi.asm.h \
 	asm/reversi/test/test_1_board.asm.h
 
+TEST_ASM = \
+	asm/test/all.asm.h
+
 js_runtime = antlr-javascript-runtime-4.5.3.zip
 antlr_jar = antlr-4.5.3-complete.jar
 
@@ -32,13 +35,13 @@ asm/reversi/reversi.asm.h: asm/reversi/reversi.asm asm/reversi/board.asm asm/lib
 asm/reversi/test/test_1_board.asm.h: asm/reversi/test/test_1_board.asm asm/reversi/board.asm
 
 
-test: asm/test/all.asm.h
+test: ${TEST_ASM}
 
 asm/test/all.asm.h: asm/test/*.asm
-	${NODEJS} assembler.js $@ asm/test/*.asm
+	${NODEJS} assemble $@ asm/test/*.asm
 
 %.asm.h : %.asm
-	${NODEJS} assembler.js $@ $^
+	${NODEJS} assemble $@ $^
 
 node_modules/asm8085/asm8085Listener.js: asm8085.g4 node_modules/antlr4/index.js java/${antlr_jar}
 	mkdir -p node_modules/asm8085
@@ -56,11 +59,11 @@ node_modules/antlr4/index.js:
 	unzip -d node_modules node_modules/${js_runtime}
 
 clean:
-	rm -f ${TARGETS}
+	rm -f ${TARGETS} ${TEST_ASM}
 	rm -rf node_modules/asm8085
 
 distclean: clean
-	rm ${ASM}
+	rm -f ${ASM}
 	rm -rf java
 	rm -rf node_modules
 
