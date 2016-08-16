@@ -1,4 +1,3 @@
-START:
 PLUS:   MVI A,1 + 1
         LXI SP,PLUS+2
         LXI SP,$+3

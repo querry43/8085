@@ -9,7 +9,28 @@ const asm8085Lexer = require('asm8085/asm8085Lexer');
 const asm8085Parser = require('asm8085/asm8085Parser');
 const asm8085Listener = require('asm8085/asm8085Listener');
 
-var inputs = process.argv.slice(2);
+var output = process.argv[2];
+var inputs = process.argv.slice(3);
+
+String.prototype.trunc_or_pad = function(n){
+  if (this.length > n) {
+    return this.substr(0,n-1)+'&hellip;'
+  } else {
+    return this + Array(n - this.length - 1).join(' ');
+  }
+};
+
+class DieOnErrorListener extends antlr4.error.ErrorListener {
+  constructor(file) {
+    super();
+    this.file = file;
+  }
+
+  syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
+    console.error('Syntax error in ' + this.file + ':' + line + ':\n' + msg);
+    process.exit(1);
+  }
+}
 
 class Operand {
   constructor(value) { this.value = value; }
@@ -162,12 +183,14 @@ function formatHex(d, length=2) {
 }
 
 class Directive {
-  constructor(label, length, text, bytes, address) {
+  constructor(label, length, text, bytes, address, file, line) {
     this.label = label;
     this.length = length;
     this.text = text;
     this.bytes = bytes;
     this.address = address;
+    this.file = file;
+    this.line = line;
   }
 
   toString(symbolTable) {
@@ -180,6 +203,9 @@ class Directive {
         this.text
       );
 
+      str = str.trunc_or_pad(55);
+      str = str + this.file + ':' + this.line;
+
       var self = this;
       this.bytes.forEach(function(byte, index) {
         str = str + util.format(
@@ -191,23 +217,28 @@ class Directive {
 
       return str;
     } else {
-      return util.format(
+      var str = util.format(
         '              // %s %s',
         formatLabel(this.label),
         this.text
       );
+      str = str.trunc_or_pad(55);
+      str = str + this.file + ':' + this.line;
+      return str;
     }
   }
 }
 
 class Instruction {
-  constructor(label, opcode, operand, length, text, address) {
+  constructor(label, opcode, operand, length, text, address, file, line) {
     this.label = label;
     this.opcode = opcode;
     this.operand = operand;
     this.length = length;
     this.text = text;
     this.address = address;
+    this.file = file;
+    this.line = line;
   }
 
   toString(symbolTable) {
@@ -219,6 +250,9 @@ class Instruction {
       formatLabel(this.label),
       this.text
     );
+
+    opstring = opstring.trunc_or_pad(55);
+    opstring = opstring + this.file + ':' + this.line;
 
     if (this.length == 2) {
       var bytes = this.operand.toBytes(this.address, symbolTable)
@@ -248,6 +282,19 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.instructions = AsmListener.preamble(memSize);
     this.address = 0x44;
     this.symbolTable = {};
+    this.file = null;
+  }
+
+  toString() {
+    var output = '';
+    assembler.instructions.forEach(function(instruction) {
+      output = output + instruction.toString(assembler.symbolTable) + '\n';
+    });
+    return output;
+  }
+
+  toJSON() {
+    return JSON.stringify(this.instructions, null, 2);
   }
 
   static preamble(memSize) {
@@ -258,7 +305,9 @@ class AsmListener extends asm8085Listener.asm8085Listener {
         new DecOperand((memSize-1).toString()),
         3,
         'LXI SP , ' + (memSize-1),
-        0x00
+        0x00,
+        'preamble',
+        1
       ),
       new Instruction(
         null,
@@ -266,7 +315,9 @@ class AsmListener extends asm8085Listener.asm8085Listener {
         new LabelOperand('START'),
         3,
         'JMP START',
-        0x03
+        0x03,
+        'preamble',
+        2
       ),
     ];
   }
@@ -364,7 +415,9 @@ class AsmListener extends asm8085Listener.asm8085Listener {
         this.immediates[0],
         opEntry[1],
         this.text,
-        this.address
+        this.address,
+        this.file,
+        ctx.start.line
       );
 
       this.instructions.push(instruction);
@@ -386,7 +439,9 @@ class AsmListener extends asm8085Listener.asm8085Listener {
       this.immediates[0].toInt(),
       this.text,
       [ ],
-      this.address
+      this.address,
+      this.file,
+      ctx.start.line
     );
 
     this.instructions.push(directive);
@@ -413,7 +468,9 @@ class AsmListener extends asm8085Listener.asm8085Listener {
       bytes.length,
       this.text,
       bytes,
-      this.address
+      this.address,
+      this.file,
+      ctx.start.line
     );
 
     this.instructions.push(directive);
@@ -464,6 +521,10 @@ class AsmListener extends asm8085Listener.asm8085Listener {
 
   exitLabel(ctx) {
     this.label = ctx.getChild(0).getText();
+    if (this.symbolTable[this.label]) {
+      console.error('redefinition of label ' + this.label);
+      process.exit(1);
+    }
     this.symbolTable[this.label] = this.address;
   }
 
@@ -479,23 +540,27 @@ inputs.forEach(function(file) {
 
   var chars = new antlr4.InputStream(data);
   var lexer = new asm8085Lexer.asm8085Lexer(chars);
+
+  lexer.removeErrorListeners();
+  lexer.addErrorListener(new DieOnErrorListener(file));
+
   var tokens = new antlr4.CommonTokenStream(lexer);
   var parser = new asm8085Parser.asm8085Parser(tokens);
   var tree = parser.prog();
 
+  assembler.file = file;
+
   antlr4.tree.ParseTreeWalker.DEFAULT.walk(assembler, tree);
 
-  // console.log(JSON.stringify(assembler.instructions, null, 2));
+  // console.log(assembler.toJSON());
 });
 
-console.error('Symbol Table:');
-console.error(JSON.stringify(assembler.symbolTable, null, 2));
+{
+  var program_name = path.basename(output).replace(/[\.-]/, '_');
+  var data = 'const uint16_t ' + program_name + '[] = {\n\n'
+    + assembler.toString() + '\n};';
+  fs.writeFileSync(output, data);
+}
 
-var program_name = path.basename(inputs[0]).replace(/[\.-]/, '_');
-console.log('const uint16_t ' + program_name + '[] = {\n');
-assembler.instructions.forEach(function(instruction) {
-  console.log(instruction.toString(assembler.symbolTable));
-});
-console.log('\n};');
 
 // vim: ts=2 sw=2 et ai

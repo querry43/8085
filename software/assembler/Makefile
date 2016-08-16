@@ -32,11 +32,13 @@ asm/reversi/reversi.asm.h: asm/reversi/reversi.asm asm/reversi/board.asm asm/lib
 asm/reversi/test/test_1_board.asm.h: asm/reversi/test/test_1_board.asm asm/reversi/board.asm
 
 
-test: 
-	${NODEJS} assembler.js asm/test/*.asm
+test: asm/test/all.asm.h
+
+asm/test/all.asm.h: asm/test/*.asm
+	${NODEJS} assembler.js $@ asm/test/*.asm
 
 %.asm.h : %.asm
-	${NODEJS} assembler.js $^ > $@
+	${NODEJS} assembler.js $@ $^
 
 node_modules/asm8085/asm8085Listener.js: asm8085.g4 node_modules/antlr4/index.js java/${antlr_jar}
 	mkdir -p node_modules/asm8085
