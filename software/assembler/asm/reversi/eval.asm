@@ -9,6 +9,51 @@ EVALWS: DS 9
         VALID SET 1
         IVALID SET 0
 
+; Load EVALWS from the BOARD, starting at position x, y stored
+; in D, E.  Each subsequent position is calulated by adding
+; the values in B, C to D, E.  Ex: 1,0 is right, -1,-1 is
+; left down.
+LOADWS: PUSH PSW
+        PUSH H
+        PUSH B
+        PUSH D
+
+        CALL EVALRS
+
+        LXI H,EVALWS
+
+        ; copy from board
+L4:     PUSH D
+        CALL TILEV
+        MOV M,E
+        POP D
+
+        ; increment and test position
+        MOV A,D
+        ADD B
+        CPI 8
+        JZ END
+        CPI FFH
+        JZ END
+        MOV D,A
+
+        MOV A,E
+        ADD C
+        CPI 8
+        JZ END
+        CPI FFH
+        JZ END
+        MOV E,A
+
+        INX H
+
+        JMP L4
+
+END:    POP D
+        POP B
+        POP H
+        POP PSW
+        RET
 
 ; Reset EVALWS with all BLANK
 EVALRS: PUSH H
