@@ -10,7 +10,8 @@ ASM = \
 	asm/noop.asm.h \
 	asm/output.asm.h \
 	asm/reversi/reversi.asm.h \
-	asm/reversi/test/test_1_board.asm.h
+	asm/reversi/test/test_1_board.asm.h \
+	asm/reversi/test/test_2_eval.asm.h
 
 TEST_ASM = \
 	asm/test/all.asm.h
@@ -33,6 +34,7 @@ asm/multiplex_output.asm.h: asm/multiplex_output.asm asm/libs/delay.asm asm/libs
 
 asm/reversi/reversi.asm.h: asm/reversi/reversi.asm asm/reversi/board.asm asm/libs/addresses.asm
 asm/reversi/test/test_1_board.asm.h: asm/reversi/test/test_1_board.asm asm/reversi/board.asm
+asm/reversi/test/test_2_eval.asm.h: asm/reversi/test/test_2_eval.asm asm/reversi/eval.asm asm/reversi/board.asm
 
 
 test: ${TEST_ASM}
