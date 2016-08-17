@@ -64,7 +64,7 @@ class Str extends Operand {
 class Label extends Operand {
   toInt(programCounter, symbolTable) {
     var addy = symbolTable[this.value];
-    if (!addy) {
+    if (addy == null) {
       console.error('unable to find address ' + this.value);
       process.exit(1);
     }
