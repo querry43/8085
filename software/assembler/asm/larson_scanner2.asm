@@ -1,4 +1,5 @@
 ; a larson scanner repeating a stored pattern
+; for the 8155
 
 START:
 

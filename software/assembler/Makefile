@@ -8,7 +8,7 @@ ASM = \
 	asm/light_on.asm.h \
 	asm/multiplex_output.asm.h \
 	asm/noop.asm.h \
-	asm/output.asm.h \
+	asm/output-8155.asm.h \
 	asm/reversi/reversi.asm.h \
 	asm/reversi/test/test_1_board.asm.h \
 	asm/reversi/test/test_2_eval.asm.h
@@ -26,7 +26,7 @@ all: ${TARGETS}
 
 asm: ${ASM}
 
-asm/output.asm.h: asm/output.asm asm/libs/addresses.asm
+asm/output-8155.asm.h: asm/output-8155.asm asm/libs/addresses.asm
 asm/blink.asm.h: asm/blink.asm asm/libs/delay.asm
 asm/larson_scanner.asm.h: asm/larson_scanner.asm asm/libs/delay.asm asm/libs/addresses.asm
 asm/larson_scanner2.asm.h: asm/larson_scanner2.asm asm/libs/delay.asm asm/libs/addresses.asm
