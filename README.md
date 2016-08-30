@@ -13,4 +13,11 @@
 | 74367     | Hex Buffer       | [link](https://github.com/querry43/8085/blob/master/documentation/74367-datasheet) |
 | 74373     | Oct Latch        | [link](https://github.com/querry43/8085/blob/master/documentation/74373-datasheet.pdf) |
 
+Additional components to consider purchasing:
+
+| Component     | Function                 |
+|---------------|--------------------------|
+| M48Z02-150PC1 | NVRAM HM6116 Replacement |
+| 74154,74159   | 4-16 Decoder, OBSOLETE   |
+
 The buffer is probably important if several devices are added but will be left off until then.
