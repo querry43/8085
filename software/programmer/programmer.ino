@@ -6,7 +6,7 @@
 #include "larson_scanner.h"
 #include "larson_scanner2.h"
 #include "multiplex_output.h"
-#include "reversi.h"
+//#include "reversi.h"
 
 const uint8_t
   HOLD_pin = 8,
@@ -21,10 +21,10 @@ const uint8_t
  *  A8-A15 to PORTA (22-29)
  *  D0-D7 to PORTL (49-42)
  */
-#define PROGRAM reversi_asm_h
-#define MEM_SIZE 4096
+#define PROGRAM light_on_asm_h
+#define MEM_SIZE 8192
 #define DEBUG false
-#define MEMTEST false
+#define MEMTEST true
 
 
 void setup() {
@@ -129,9 +129,13 @@ void clear_mem() {
 void mem_test() {
   Serial.println("Writing test pattern to memory");
 
+  Serial.println();
+  Serial.println("Alternating Pattern");
   write_alternative_pattern();
   dump_mem();
 
+  Serial.println();
+  Serial.println("Incrementing Pattern");
   write_incrementing_pattern();
   dump_mem();
 }
