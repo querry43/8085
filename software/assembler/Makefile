@@ -20,7 +20,7 @@ js_runtime = antlr-javascript-runtime-4.5.3.zip
 antlr_jar = antlr-4.5.3-complete.jar
 
 ANTLR = java -jar java/${antlr_jar}
-NODEJS = nodejs
+NODEJS = node
 
 all: ${TARGETS}
 

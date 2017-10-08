@@ -1,6 +1,12 @@
 const uint16_t blink_asm_h[] = {
 
-0x0000, 0x31, //         LXI SP , 4095               preamble:1
+// Symbol Table:
+//   DELAY:  0x0056
+//   DLOOP:  0x0058
+//   START:  0x0044
+
+
+0x0000, 0x31, //         LXI SP , 8191               preamble:1
 0x0001, 0xff, //
 0x0002, 0x1f, //
 0x0003, 0xc3, //         JMP START                   preamble:2
@@ -42,4 +48,3 @@ const uint16_t blink_asm_h[] = {
 0x0065, 0xc9, //         RET                         asm/libs/delay.asm:13
 
 };
-
