@@ -1,7 +1,7 @@
 "use strict";
 
 const antlr4 = require('antlr4/index');
-const asm8085Listener = require('asm8085/asm8085Listener');
+const asm8085Listener = require('./grammar/asm8085Listener');
 const operands = require('./operands');
 const operations = require('./operations');
 const utils = require('./utils');

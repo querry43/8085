@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 "use strict";
 
-const Assembler = require('./lib/assembler').Assembler;
-const AsmListener = require('./lib/listeners').AsmListener;
+const Assembler = require('./libs/assembler').Assembler;
+const AsmListener = require('./libs/listeners').AsmListener;
 
 var output = process.argv[2];
 var inputs = process.argv.slice(3);

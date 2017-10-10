@@ -1,0 +1,110 @@
+
+const uint16_t all_asm_h[] = {
+
+// Symbol Table:
+//   DELAY:  0x0044
+//   DIV:    0x008e
+//   FOO:    0x000a
+//   LOOP:   0x0045
+//   MINUS:  0x008a
+//   MODS:   0x0092
+//   MULT:   0x008c
+//   PARENS: 0x009c
+//   PLUS:   0x0080
+//   PRECID: 0x0098
+//   SPACE:  0x0061
+//   START:  0x0044
+
+
+0x0000, 0x31, //         LXI SP , 8191               preamble:1
+0x0001, 0xff, //
+0x0002, 0x1f, //
+0x0003, 0xc3, //         JMP START                   preamble:2
+0x0004, 0x44, //
+0x0005, 0x00, //
+0x0044, 0x78, // START:  MOV A , B                   tests/test-asm/2_labels.asm:3
+0x0045, 0x47, // LOOP:   MOV B , A                   tests/test-asm/2_labels.asm:5
+0x0046, 0xcd, //         CALL DELAY                  tests/test-asm/2_labels.asm:6
+0x0047, 0x44, //
+0x0048, 0x00, //
+0x0049, 0xc3, //         JMP LOOP                    tests/test-asm/2_labels.asm:7
+0x004a, 0x45, //
+0x004b, 0x00, //
+0x004c, 0x3e, //         MVI A , 10B                 tests/test-asm/3_immediates.asm:2
+0x004d, 0x02, //
+0x004e, 0x3e, //         MVI A , 10Q                 tests/test-asm/3_immediates.asm:3
+0x004f, 0x08, //
+0x0050, 0x3e, //         MVI A , 10H                 tests/test-asm/3_immediates.asm:4
+0x0051, 0x10, //
+0x0052, 0x3e, //         MVI A , 10D                 tests/test-asm/3_immediates.asm:5
+0x0053, 0x0a, //
+0x0054, 0x3e, //         MVI A , 10                  tests/test-asm/3_immediates.asm:6
+0x0055, 0x0a, //
+0x0056, 0x3e, //         MVI A , 'A'                 tests/test-asm/3_immediates.asm:7
+0x0057, 0x41, //
+0x0058, 0x3e, //         MVI A , 'AB'                tests/test-asm/3_immediates.asm:8
+0x0059, 0x41, //
+0x005a, 0x30, //         SIM                         tests/test-asm/4_instructions.asm:1
+0x005b, 0x00, //         NOP                         tests/test-asm/4_instructions.asm:2
+0x005c, 0x78, //         MOV A , B                   tests/test-asm/4_instructions.asm:3
+0x005d, 0x72, //         MOV M , D                   tests/test-asm/4_instructions.asm:4
+0x005e, 0x31, //         LXI SP , $                  tests/test-asm/4_instructions.asm:5
+0x005f, 0x5e, //
+0x0060, 0x00, //
+              // SPACE:  DS 10                       tests/test-asm/5_directives.asm:1
+0x006b, 0x21, //         LXI H , SPACE               tests/test-asm/5_directives.asm:2
+0x006c, 0x61, //
+0x006d, 0x00, //
+0x006e, 0x01, //         DB 1                        tests/test-asm/5_directives.asm:4
+0x006f, 0xf0, //         DB F00FABH                  tests/test-asm/5_directives.asm:5
+0x0070, 0x0f, //
+0x0071, 0xab, //
+0x0072, 0x68, //         DB 'hello'                  tests/test-asm/5_directives.asm:6
+0x0073, 0x65, //
+0x0074, 0x6c, //
+0x0075, 0x6c, //
+0x0076, 0x6f, //
+0x0077, 0x01, //         DB 1,2,3,4                  tests/test-asm/5_directives.asm:7
+0x0078, 0x02, //
+0x0079, 0x03, //
+0x007a, 0x04, //
+0x007b, 0x0a, //         DB 10D,F00FH                tests/test-asm/5_directives.asm:8
+0x007c, 0xf0, //
+0x007d, 0x0f, //
+0x007e, 0x3e, //         MVI A , FOO                 tests/test-asm/5_directives.asm:11
+0x007f, 0x0a, //
+0x0080, 0x3e, // PLUS:   MVI A , 1+1                 tests/test-asm/6_expressions.asm:1
+0x0081, 0x02, //
+0x0082, 0x31, //         LXI SP , PLUS+2             tests/test-asm/6_expressions.asm:2
+0x0083, 0x82, //
+0x0084, 0x00, //
+0x0085, 0x31, //         LXI SP , $+3                tests/test-asm/6_expressions.asm:3
+0x0086, 0x88, //
+0x0087, 0x00, //
+0x0088, 0x3e, //         MVI A , 1+1+1               tests/test-asm/6_expressions.asm:4
+0x0089, 0x03, //
+0x008a, 0x3e, // MINUS:  MVI A , 5-4                 tests/test-asm/6_expressions.asm:6
+0x008b, 0x01, //
+0x008c, 0x3e, // MULT:   MVI A , 5*2                 tests/test-asm/6_expressions.asm:8
+0x008d, 0x0a, //
+0x008e, 0x3e, // DIV:    MVI A , 10/5                tests/test-asm/6_expressions.asm:10
+0x008f, 0x02, //
+0x0090, 0x3e, //         MVI A , 10/4                tests/test-asm/6_expressions.asm:11
+0x0091, 0x02, //
+0x0092, 0x3e, // MODS:   MVI A , 10MOD5              tests/test-asm/6_expressions.asm:14
+0x0093, 0x00, //
+0x0094, 0x3e, //         MVI A , 10MOD4              tests/test-asm/6_expressions.asm:15
+0x0095, 0x02, //
+0x0096, 0x3e, //         MVI A , 10MOD3              tests/test-asm/6_expressions.asm:16
+0x0097, 0x01, //
+0x0098, 0x3e, // PRECID: MVI A , 3+4*2               tests/test-asm/6_expressions.asm:18
+0x0099, 0x0b, //
+0x009a, 0x3e, //         MVI A , 16/8-2              tests/test-asm/6_expressions.asm:19
+0x009b, 0x00, //
+0x009c, 0x3e, // PARENS: MVI A , (3+4)*2             tests/test-asm/6_expressions.asm:21
+0x009d, 0x0e, //
+0x009e, 0x3e, //         MVI A , 16/(8-2)            tests/test-asm/6_expressions.asm:22
+0x009f, 0x02, //
+
+};
+

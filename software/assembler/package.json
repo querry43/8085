@@ -1,0 +1,13 @@
+{
+  "name": "8085-assembler",
+  "version": "0.0.1",
+  "author": "Matt Harrington",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/npm/npm.git"
+  },
+  "dependencies": {
+    "antlr4": "latest"
+  }
+}

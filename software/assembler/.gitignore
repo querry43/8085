@@ -1,6 +1,3 @@
 *.jar
-*.tokens
-*Lexer.js
-*Listener.js
-*Parser.js
 node_modules/
+tests/test-asm/all.asm.h

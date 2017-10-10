@@ -1,20 +1,8 @@
-TARGETS = \
-    node_modules/asm8085/asm8085Listener.js
-
-ASM = \
-	asm/blink.asm.h \
-	asm/larson_scanner.asm.h \
-	asm/larson_scanner2.asm.h \
-	asm/light_on.asm.h \
-	asm/multiplex_output.asm.h \
-	asm/noop.asm.h \
-	asm/output-8155.asm.h \
-	asm/reversi/reversi.asm.h \
-	asm/reversi/test/test_1_board.asm.h \
-	asm/reversi/test/test_2_eval.asm.h
+GRAMMAR = \
+    libs/grammar/asm8085Listener.js
 
 TEST_ASM = \
-	asm/test/all.asm.h
+	tests/test-asm/all.asm.h
 
 js_runtime = antlr-javascript-runtime-4.5.3.zip
 antlr_jar = antlr-4.5.3-complete.jar
@@ -22,34 +10,21 @@ antlr_jar = antlr-4.5.3-complete.jar
 ANTLR = java -jar java/${antlr_jar}
 NODEJS = node
 
-all: ${TARGETS}
+all:
 
-asm: ${ASM}
+grammar: ${GRAMMAR}
 
-asm/output-8155.asm.h: asm/output-8155.asm asm/libs/addresses.asm
-asm/blink.asm.h: asm/blink.asm asm/libs/delay.asm
-asm/larson_scanner.asm.h: asm/larson_scanner.asm asm/libs/delay.asm asm/libs/addresses.asm
-asm/larson_scanner2.asm.h: asm/larson_scanner2.asm asm/libs/delay.asm asm/libs/addresses.asm
-asm/multiplex_output.asm.h: asm/multiplex_output.asm asm/libs/delay.asm asm/libs/addresses.asm
+test: node_modules/antlr4/index.js ${TEST_ASM}
+	diff -u tests/test-asm/all.asm.h tests/test-asm/all.asm.h.expected
 
-asm/reversi/reversi.asm.h: asm/reversi/reversi.asm asm/reversi/board.asm asm/libs/addresses.asm
-asm/reversi/test/test_1_board.asm.h: asm/reversi/test/test_1_board.asm asm/reversi/board.asm
-asm/reversi/test/test_2_eval.asm.h: asm/reversi/test/test_2_eval.asm asm/reversi/eval.asm asm/reversi/board.asm
-asm/reversi/test/test_3_load_workspace.asm.h: asm/reversi/test/test_3_load_workspace.asm asm/reversi/eval.asm asm/reversi/board.asm
-
-
-test: ${TEST_ASM}
-	diff -u asm/test/all.asm.h asm/test/all.asm.h.expected
-
-asm/test/all.asm.h: asm/test/*.asm
-	${NODEJS} assemble $@ asm/test/*.asm
+tests/test-asm/all.asm.h: tests/test-asm/*.asm
+	${NODEJS} assemble $@ $^
 
 %.asm.h : %.asm
 	${NODEJS} assemble $@ $^
 
-node_modules/asm8085/asm8085Listener.js: asm8085.g4 node_modules/antlr4/index.js java/${antlr_jar}
-	mkdir -p node_modules/asm8085
-	${ANTLR} -Dlanguage=JavaScript -o node_modules/asm8085 $<
+libs/grammar/asm8085Listener.js: libs/grammar/asm8085.g4 node_modules/antlr4/index.js java/${antlr_jar}
+	${ANTLR} -Dlanguage=JavaScript libs/grammar/asm8085.g4
 
 deps: node_modules/antlr4/index.js java/${antlr_jar}
 
@@ -58,19 +33,15 @@ java/${antlr_jar}:
 	wget --output-document $@ http://www.antlr.org/download/${antlr_jar}
 
 node_modules/antlr4/index.js:
-	mkdir -p node_modules
-	wget --output-document node_modules/${js_runtime} http://www.antlr.org/download/${js_runtime}
-	unzip -d node_modules node_modules/${js_runtime}
+	npm install
 
 clean:
 	rm -f ${TARGETS} ${TEST_ASM}
-	rm -rf node_modules/asm8085
 
 distclean: clean
-	rm -f ${ASM}
 	rm -rf java
 	rm -rf node_modules
 
-.PHONY: all asm test deps clean distclean
+.PHONY: all asm test deps clean distclean ${GRAMMAR}
 
 # vim: noet

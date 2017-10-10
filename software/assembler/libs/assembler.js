@@ -5,8 +5,8 @@ const InputStream = require('antlr4/index').InputStream;
 const CommonTokenStream = require('antlr4/index').CommonTokenStream;
 const fs = require('fs');
 const path = require('path');
-const asm8085Lexer = require('asm8085/asm8085Lexer').asm8085Lexer;
-const asm8085Parser = require('asm8085/asm8085Parser').asm8085Parser;
+const asm8085Lexer = require('./grammar/asm8085Lexer').asm8085Lexer;
+const asm8085Parser = require('./grammar/asm8085Parser').asm8085Parser;
 const DieOnErrorListener = require('./listeners').DieOnErrorListener;
 
 class Assembler {
