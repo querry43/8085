@@ -8,6 +8,7 @@
     "url": "https://github.com/npm/npm.git"
   },
   "dependencies": {
-    "antlr4": "latest"
+    "antlr4": "latest",
+    "minimist": "latest"
   }
 }

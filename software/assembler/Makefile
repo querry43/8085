@@ -18,7 +18,7 @@ test: node_modules/antlr4/index.js ${TEST_ASM}
 	diff -u tests/test-asm/all.asm.h tests/test-asm/all.asm.h.expected
 
 tests/test-asm/all.asm.h: tests/test-asm/*.asm
-	${NODEJS} assemble $@ $^
+	${NODEJS} assemble --preamble -o $@ $^
 
 %.asm.h : %.asm
 	${NODEJS} assemble $@ $^
@@ -42,6 +42,6 @@ distclean: clean
 	rm -rf java
 	rm -rf node_modules
 
-.PHONY: all asm test deps clean distclean ${GRAMMAR}
+.PHONY: all asm test deps clean distclean ${GRAMMAR} tests/test-asm/all.asm.h
 
 # vim: noet

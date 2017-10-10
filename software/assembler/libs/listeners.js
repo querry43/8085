@@ -7,10 +7,15 @@ const operations = require('./operations');
 const utils = require('./utils');
 
 class AsmListener extends asm8085Listener.asm8085Listener {
-  constructor(memStart = 6144, heapStart = 8192-1) {
+  constructor(preamble, stackStart, progStart) {
     super();
-    this.instructions = AsmListener.preamble(heapStart);
-    this.address = 0x44;
+    if (preamble) {
+      this.instructions = AsmListener.preamble(stackStart);
+      this.address = progStart;
+    } else {
+      this.instructions = [];
+      this.address = 0;
+    }
     this.symbolTable = {};
     this.file = null;
   }
@@ -38,7 +43,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     return JSON.stringify(this.instructions, null, 2);
   }
 
-  static preamble(heapStart) {
+  static preamble(stackStart) {
     return [
       new operations.Instruction(
         'preamble',
@@ -46,9 +51,9 @@ class AsmListener extends asm8085Listener.asm8085Listener {
         0x00,
         null,
         3,
-        'LXI SP , ' + heapStart,
+        'LXI SP , ' + stackStart,
         0x31,
-        new operands.Dec(heapStart.toString())
+        new operands.Dec(stackStart.toString())
       ),
       new operations.Instruction(
         'preamble',
