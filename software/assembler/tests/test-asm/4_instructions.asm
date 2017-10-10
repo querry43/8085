@@ -1,3 +1,4 @@
+        ORG 400H
         SIM
         NOP
         MOV A,B

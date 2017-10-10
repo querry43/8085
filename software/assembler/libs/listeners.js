@@ -7,17 +7,23 @@ const operations = require('./operations');
 const utils = require('./utils');
 
 class AsmListener extends asm8085Listener.asm8085Listener {
-  constructor(preamble, stackStart, progStart) {
+  constructor() {
     super();
-    if (preamble) {
-      this.instructions = AsmListener.preamble(stackStart);
-      this.address = progStart;
-    } else {
-      this.instructions = [];
-      this.address = 0;
-    }
+    this.instructions = [];
+    this.address = 0;
     this.symbolTable = {};
     this.file = null;
+  }
+
+  toHex() {
+    var output = '';
+    var self = this;
+
+    self.instructions.forEach(function(instruction) {
+      output = output + instruction.toHex(self.symbolTable);
+    });
+
+    return output;
   }
 
   toString() {
@@ -41,31 +47,6 @@ class AsmListener extends asm8085Listener.asm8085Listener {
 
   toJSON() {
     return JSON.stringify(this.instructions, null, 2);
-  }
-
-  static preamble(stackStart) {
-    return [
-      new operations.Instruction(
-        'preamble',
-        1,
-        0x00,
-        null,
-        3,
-        'LXI SP , ' + stackStart,
-        0x31,
-        new operands.Dec(stackStart.toString())
-      ),
-      new operations.Instruction(
-        'preamble',
-        2,
-        0x03,
-        null,
-        3,
-        'JMP START',
-        0xC3,
-        new operands.Label('START')
-      ),
-    ];
   }
 
   enterOperation(ctx) {
@@ -204,6 +185,8 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     }
     this.symbolTable[this.label] = this.address;
   }
+
+  exitORG(ctx) { this.address = this.immediates[0].toInt(); }
 
   exitLocationcounteroperand(ctx) { this.immediates.push(new operands.LocationCounter()); }
 

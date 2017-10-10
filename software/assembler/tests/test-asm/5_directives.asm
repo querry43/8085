@@ -1,3 +1,4 @@
+        ORG 500H
 SPACE:  DS 10
         LXI H, SPACE ; next instruction is +10
 

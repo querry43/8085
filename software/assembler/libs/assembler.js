@@ -32,7 +32,11 @@ class Assembler {
     ParseTreeWalker.DEFAULT.walk(this.listener, tree);
   }
 
-  writeObjectFile(file) {
+  writeHexFile(file) {
+    fs.writeFileSync(file, this.listener.toHex());
+  }
+
+  writeTextFile(file) {
     var programName = path.basename(file).replace(/[\.-]/g, '_');
     fs.writeFileSync(
       file,

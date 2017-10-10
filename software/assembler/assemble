@@ -7,43 +7,32 @@ const AsmListener = require('./libs/listeners').AsmListener;
 var argv = require('minimist')(
   process.argv.slice(2),
   {
-    'boolean': [ 'help', 'preamble' ],
-    'strings': [ 'output', 'stack', 'prog' ],
+    'boolean': [ 'help' ],
+    'strings': [ 'hex', 'text', 'stack' ],
     'alias': {
-      'output': [ 'o', 'out' ],
       'help': [ 'h', '?' ],
-      'stack': [ 'stack-start' ],
-      'prog': [ 'prog-start' ]
-    },
-    'default': {
-      'stack': 8192-1,
-      'prog': 68
     }
   }
 )
 
 argv.inputs = argv._;
 
-if (argv.help || !argv.output || !argv.inputs) {
-  console.error('Usage: ' + process.argv[1] + ' --output output.h file1.asm [file2.asm ...]');
+if (argv.help || !argv.hex || !argv.inputs) {
+  console.error('Usage: ' + process.argv[1] + ' --hex output.hex file1.asm [file2.asm ...]');
   console.error();
   console.error('  --help -h      Show this help dialog');
   console.error();
-  console.error('  --output -o    Output file');
-  console.error('  --preamble     Include a standard preamble');
-  console.error('  --stack-start  Address of the start of the stack, used when including a preamble');
-  console.error('  --prog-start   Address of the start of the program, used when including a preamble');
+  console.error('  --hex          output hex file');
+  console.error('  --text         output text file');
   process.exit(1);
 }
 
-console.log('Assembling ' + argv.inputs.join(', ') + ' into ' + argv.output);
-if (argv.preamble) {
-  console.log(' - including standard preamble');
-}
+console.log('Assembling ' + argv.inputs.join(', ') + ' into ' + argv.hex);
 
-var asm = new Assembler(new AsmListener(argv.preamble, argv.stack, argv.prog));
+var asm = new Assembler(new AsmListener());
 
 argv.inputs.forEach(function(file) { asm.readAsmFile(file); });
-asm.writeObjectFile(argv.output);
+asm.writeHexFile(argv.hex);
+if (argv.text) { asm.writeTextFile(argv.text); }
 
 // vim: ts=2 sw=2 et

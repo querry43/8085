@@ -19,12 +19,12 @@ function formatLabel(l) {
   }
 }
 
-function formatHex(d, length=2) {
+function formatHex(d, length=2, prefix=true) {
   var hex = d.toString(16);
   if (hex.length < length) {
     hex = Array(length - hex.length + 1).join('0') + hex;
   }
-  return '0x' + hex;
+  return prefix ? '0x' + hex : hex;
 }
 
 exports.truncOrPad = truncOrPad;

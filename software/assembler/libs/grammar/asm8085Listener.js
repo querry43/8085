@@ -83,6 +83,15 @@ asm8085Listener.prototype.exitDS = function(ctx) {
 };
 
 
+// Enter a parse tree produced by asm8085Parser#ORG.
+asm8085Listener.prototype.enterORG = function(ctx) {
+};
+
+// Exit a parse tree produced by asm8085Parser#ORG.
+asm8085Listener.prototype.exitORG = function(ctx) {
+};
+
+
 // Enter a parse tree produced by asm8085Parser#SET.
 asm8085Listener.prototype.enterSET = function(ctx) {
 };

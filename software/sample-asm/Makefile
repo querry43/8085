@@ -25,7 +25,7 @@ reversi/test/test_2_eval.asm.h: reversi/test/test_2_eval.asm reversi/eval.asm re
 reversi/test/test_3_load_workspace.asm.h: reversi/test/test_3_load_workspace.asm reversi/eval.asm reversi/board.asm
 
 %.asm.h : %.asm
-	${ASSEMBLE} --preamble -o $@ $^
+	${ASSEMBLE} --hex /dev/null --text $@ $^
 
 clean:
 	rm -f ${ASM}

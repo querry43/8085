@@ -5,7 +5,7 @@ var asm8085Listener = require('./asm8085Listener').asm8085Listener;
 var grammarFileName = "asm8085.g4";
 
 var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
-    "\u0003f\u011e\u0004\u0002\t\u0002\u0004\u0003\t\u0003\u0004\u0004\t",
+    "\u0003g\u0120\u0004\u0002\t\u0002\u0004\u0003\t\u0003\u0004\u0004\t",
     "\u0004\u0004\u0005\t\u0005\u0004\u0006\t\u0006\u0004\u0007\t\u0007\u0004",
     "\b\t\b\u0004\t\t\t\u0004\n\t\n\u0004\u000b\t\u000b\u0004\f\t\f\u0004",
     "\r\t\r\u0004\u000e\t\u000e\u0004\u000f\t\u000f\u0004\u0010\t\u0010\u0004",
@@ -39,53 +39,53 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0007\u0003\u0007\u0003\u0007\u0003\u0007\u0003\u0007\u0003\u0007\u0003",
     "\u0007\u0003\u0007\u0003\u0007\u0003\u0007\u0003\u0007\u0003\u0007\u0005",
     "\u0007\u00d2\n\u0007\u0003\b\u0003\b\u0003\b\u0003\b\u0003\b\u0003\b",
-    "\u0003\b\u0005\b\u00db\n\b\u0003\t\u0003\t\u0003\n\u0003\n\u0003\u000b",
-    "\u0003\u000b\u0003\f\u0003\f\u0003\f\u0003\f\u0003\f\u0005\f\u00e8\n",
-    "\f\u0003\r\u0003\r\u0003\r\u0003\r\u0003\r\u0003\r\u0003\r\u0003\r\u0003",
-    "\r\u0005\r\u00f3\n\r\u0003\u000e\u0003\u000e\u0003\u000e\u0003\u000e",
+    "\u0003\b\u0003\b\u0003\b\u0005\b\u00dd\n\b\u0003\t\u0003\t\u0003\n\u0003",
+    "\n\u0003\u000b\u0003\u000b\u0003\f\u0003\f\u0003\f\u0003\f\u0003\f\u0005",
+    "\f\u00ea\n\f\u0003\r\u0003\r\u0003\r\u0003\r\u0003\r\u0003\r\u0003\r",
+    "\u0003\r\u0003\r\u0005\r\u00f5\n\r\u0003\u000e\u0003\u000e\u0003\u000e",
     "\u0003\u000e\u0003\u000e\u0003\u000e\u0003\u000e\u0003\u000e\u0003\u000e",
-    "\u0003\u000e\u0003\u000e\u0003\u000e\u0005\u000e\u0102\n\u000e\u0003",
-    "\u000f\u0003\u000f\u0003\u000f\u0003\u000f\u0003\u000f\u0005\u000f\u0109",
-    "\n\u000f\u0003\u0010\u0003\u0010\u0003\u0010\u0003\u0010\u0003\u0010",
-    "\u0003\u0010\u0003\u0010\u0005\u0010\u0112\n\u0010\u0003\u0011\u0003",
-    "\u0011\u0003\u0012\u0003\u0012\u0003\u0013\u0003\u0013\u0003\u0014\u0003",
-    "\u0014\u0003\u0015\u0003\u0015\u0003\u0015\u0002\u0002\u0016\u0002\u0004",
-    "\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016\u0018\u001a\u001c\u001e ",
-    "\"$&(\u0002\u0002\u016c\u0002.\u0003\u0002\u0002\u0002\u00045\u0003",
-    "\u0002\u0002\u0002\u00068\u0003\u0002\u0002\u0002\bA\u0003\u0002\u0002",
-    "\u0002\nD\u0003\u0002\u0002\u0002\f\u00d1\u0003\u0002\u0002\u0002\u000e",
-    "\u00da\u0003\u0002\u0002\u0002\u0010\u00dc\u0003\u0002\u0002\u0002\u0012",
-    "\u00de\u0003\u0002\u0002\u0002\u0014\u00e0\u0003\u0002\u0002\u0002\u0016",
-    "\u00e7\u0003\u0002\u0002\u0002\u0018\u00f2\u0003\u0002\u0002\u0002\u001a",
-    "\u0101\u0003\u0002\u0002\u0002\u001c\u0108\u0003\u0002\u0002\u0002\u001e",
-    "\u0111\u0003\u0002\u0002\u0002 \u0113\u0003\u0002\u0002\u0002\"\u0115",
-    "\u0003\u0002\u0002\u0002$\u0117\u0003\u0002\u0002\u0002&\u0119\u0003",
-    "\u0002\u0002\u0002(\u011b\u0003\u0002\u0002\u0002*,\u0005\u0004\u0003",
-    "\u0002+*\u0003\u0002\u0002\u0002+,\u0003\u0002\u0002\u0002,-\u0003\u0002",
-    "\u0002\u0002-/\u0007c\u0002\u0002.+\u0003\u0002\u0002\u0002/0\u0003",
-    "\u0002\u0002\u00020.\u0003\u0002\u0002\u000201\u0003\u0002\u0002\u0002",
-    "1\u0003\u0003\u0002\u0002\u000226\u0005\n\u0006\u000236\u0005\u0006",
-    "\u0004\u000246\u0005\b\u0005\u000252\u0003\u0002\u0002\u000253\u0003",
-    "\u0002\u0002\u000254\u0003\u0002\u0002\u00026\u0005\u0003\u0002\u0002",
-    "\u000279\u0005\b\u0005\u000287\u0003\u0002\u0002\u000289\u0003\u0002",
-    "\u0002\u00029<\u0003\u0002\u0002\u0002:=\u0005\f\u0007\u0002;=\u0005",
-    "\u000e\b\u0002<:\u0003\u0002\u0002\u0002<;\u0003\u0002\u0002\u0002=",
-    "?\u0003\u0002\u0002\u0002>@\u0005\n\u0006\u0002?>\u0003\u0002\u0002",
-    "\u0002?@\u0003\u0002\u0002\u0002@\u0007\u0003\u0002\u0002\u0002AB\u0007",
-    "d\u0002\u0002BC\u0007\u0003\u0002\u0002C\t\u0003\u0002\u0002\u0002D",
-    "E\u0007e\u0002\u0002E\u000b\u0003\u0002\u0002\u0002FG\u0007\u0004\u0002",
-    "\u0002G\u00d2\u0005\u0018\r\u0002HI\u0007\u0005\u0002\u0002I\u00d2\u0005",
-    "\u0010\t\u0002JK\u0007\u0006\u0002\u0002K\u00d2\u0005\u0010\t\u0002",
-    "LM\u0007\u0007\u0002\u0002M\u00d2\u0005\u0018\r\u0002NO\u0007\b\u0002",
-    "\u0002O\u00d2\u0005\u0010\t\u0002PQ\u0007\t\u0002\u0002Q\u00d2\u0005",
-    "\u0018\r\u0002RS\u0007\n\u0002\u0002S\u00d2\u0005\u0018\r\u0002TU\u0007",
-    "\u000b\u0002\u0002U\u00d2\u0005\u0018\r\u0002VW\u0007\f\u0002\u0002",
-    "W\u00d2\u0005\u0018\r\u0002X\u00d2\u0007\r\u0002\u0002Y\u00d2\u0007",
-    "\u000e\u0002\u0002Z[\u0007\u000f\u0002\u0002[\u00d2\u0005\u0010\t\u0002",
-    "\\]\u0007\u0010\u0002\u0002]\u00d2\u0005\u0018\r\u0002^_\u0007\u0011",
-    "\u0002\u0002_\u00d2\u0005\u0018\r\u0002`a\u0007\u0012\u0002\u0002a\u00d2",
-    "\u0005\u0018\r\u0002bc\u0007\u0013\u0002\u0002c\u00d2\u0005\u0018\r",
-    "\u0002de\u0007\u0014\u0002\u0002e\u00d2\u0005\u0018\r\u0002fg\u0007",
+    "\u0003\u000e\u0003\u000e\u0003\u000e\u0003\u000e\u0005\u000e\u0104\n",
+    "\u000e\u0003\u000f\u0003\u000f\u0003\u000f\u0003\u000f\u0003\u000f\u0005",
+    "\u000f\u010b\n\u000f\u0003\u0010\u0003\u0010\u0003\u0010\u0003\u0010",
+    "\u0003\u0010\u0003\u0010\u0003\u0010\u0005\u0010\u0114\n\u0010\u0003",
+    "\u0011\u0003\u0011\u0003\u0012\u0003\u0012\u0003\u0013\u0003\u0013\u0003",
+    "\u0014\u0003\u0014\u0003\u0015\u0003\u0015\u0003\u0015\u0002\u0002\u0016",
+    "\u0002\u0004\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016\u0018\u001a\u001c",
+    "\u001e \"$&(\u0002\u0002\u016f\u0002.\u0003\u0002\u0002\u0002\u0004",
+    "5\u0003\u0002\u0002\u0002\u00068\u0003\u0002\u0002\u0002\bA\u0003\u0002",
+    "\u0002\u0002\nD\u0003\u0002\u0002\u0002\f\u00d1\u0003\u0002\u0002\u0002",
+    "\u000e\u00dc\u0003\u0002\u0002\u0002\u0010\u00de\u0003\u0002\u0002\u0002",
+    "\u0012\u00e0\u0003\u0002\u0002\u0002\u0014\u00e2\u0003\u0002\u0002\u0002",
+    "\u0016\u00e9\u0003\u0002\u0002\u0002\u0018\u00f4\u0003\u0002\u0002\u0002",
+    "\u001a\u0103\u0003\u0002\u0002\u0002\u001c\u010a\u0003\u0002\u0002\u0002",
+    "\u001e\u0113\u0003\u0002\u0002\u0002 \u0115\u0003\u0002\u0002\u0002",
+    "\"\u0117\u0003\u0002\u0002\u0002$\u0119\u0003\u0002\u0002\u0002&\u011b",
+    "\u0003\u0002\u0002\u0002(\u011d\u0003\u0002\u0002\u0002*,\u0005\u0004",
+    "\u0003\u0002+*\u0003\u0002\u0002\u0002+,\u0003\u0002\u0002\u0002,-\u0003",
+    "\u0002\u0002\u0002-/\u0007d\u0002\u0002.+\u0003\u0002\u0002\u0002/0",
+    "\u0003\u0002\u0002\u00020.\u0003\u0002\u0002\u000201\u0003\u0002\u0002",
+    "\u00021\u0003\u0003\u0002\u0002\u000226\u0005\n\u0006\u000236\u0005",
+    "\u0006\u0004\u000246\u0005\b\u0005\u000252\u0003\u0002\u0002\u00025",
+    "3\u0003\u0002\u0002\u000254\u0003\u0002\u0002\u00026\u0005\u0003\u0002",
+    "\u0002\u000279\u0005\b\u0005\u000287\u0003\u0002\u0002\u000289\u0003",
+    "\u0002\u0002\u00029<\u0003\u0002\u0002\u0002:=\u0005\f\u0007\u0002;",
+    "=\u0005\u000e\b\u0002<:\u0003\u0002\u0002\u0002<;\u0003\u0002\u0002",
+    "\u0002=?\u0003\u0002\u0002\u0002>@\u0005\n\u0006\u0002?>\u0003\u0002",
+    "\u0002\u0002?@\u0003\u0002\u0002\u0002@\u0007\u0003\u0002\u0002\u0002",
+    "AB\u0007e\u0002\u0002BC\u0007\u0003\u0002\u0002C\t\u0003\u0002\u0002",
+    "\u0002DE\u0007f\u0002\u0002E\u000b\u0003\u0002\u0002\u0002FG\u0007\u0004",
+    "\u0002\u0002G\u00d2\u0005\u0018\r\u0002HI\u0007\u0005\u0002\u0002I\u00d2",
+    "\u0005\u0010\t\u0002JK\u0007\u0006\u0002\u0002K\u00d2\u0005\u0010\t",
+    "\u0002LM\u0007\u0007\u0002\u0002M\u00d2\u0005\u0018\r\u0002NO\u0007",
+    "\b\u0002\u0002O\u00d2\u0005\u0010\t\u0002PQ\u0007\t\u0002\u0002Q\u00d2",
+    "\u0005\u0018\r\u0002RS\u0007\n\u0002\u0002S\u00d2\u0005\u0018\r\u0002",
+    "TU\u0007\u000b\u0002\u0002U\u00d2\u0005\u0018\r\u0002VW\u0007\f\u0002",
+    "\u0002W\u00d2\u0005\u0018\r\u0002X\u00d2\u0007\r\u0002\u0002Y\u00d2",
+    "\u0007\u000e\u0002\u0002Z[\u0007\u000f\u0002\u0002[\u00d2\u0005\u0010",
+    "\t\u0002\\]\u0007\u0010\u0002\u0002]\u00d2\u0005\u0018\r\u0002^_\u0007",
+    "\u0011\u0002\u0002_\u00d2\u0005\u0018\r\u0002`a\u0007\u0012\u0002\u0002",
+    "a\u00d2\u0005\u0018\r\u0002bc\u0007\u0013\u0002\u0002c\u00d2\u0005\u0018",
+    "\r\u0002de\u0007\u0014\u0002\u0002e\u00d2\u0005\u0018\r\u0002fg\u0007",
     "\u0015\u0002\u0002g\u00d2\u0005\u0018\r\u0002hi\u0007\u0016\u0002\u0002",
     "i\u00d2\u0005\u0018\r\u0002j\u00d2\u0007\u0017\u0002\u0002kl\u0007\u0018",
     "\u0002\u0002l\u00d2\u0005\u0010\t\u0002mn\u0007\u0019\u0002\u0002n\u00d2",
@@ -171,51 +171,52 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u00d1\u00c9\u0003\u0002\u0002\u0002\u00d1\u00cb\u0003\u0002\u0002",
     "\u0002\u00d1\u00cc\u0003\u0002\u0002\u0002\u00d1\u00ce\u0003\u0002\u0002",
     "\u0002\u00d1\u00d0\u0003\u0002\u0002\u0002\u00d2\r\u0003\u0002\u0002",
-    "\u0002\u00d3\u00d4\u0007R\u0002\u0002\u00d4\u00db\u0005\u0016\f\u0002",
-    "\u00d5\u00d6\u0007S\u0002\u0002\u00d6\u00db\u0005\u0018\r\u0002\u00d7",
-    "\u00d8\u0007d\u0002\u0002\u00d8\u00d9\u0007T\u0002\u0002\u00d9\u00db",
-    "\u0005\u0018\r\u0002\u00da\u00d3\u0003\u0002\u0002\u0002\u00da\u00d5",
-    "\u0003\u0002\u0002\u0002\u00da\u00d7\u0003\u0002\u0002\u0002\u00db\u000f",
-    "\u0003\u0002\u0002\u0002\u00dc\u00dd\u0007]\u0002\u0002\u00dd\u0011",
-    "\u0003\u0002\u0002\u0002\u00de\u00df\u0007d\u0002\u0002\u00df\u0013",
-    "\u0003\u0002\u0002\u0002\u00e0\u00e1\u0007U\u0002\u0002\u00e1\u0015",
-    "\u0003\u0002\u0002\u0002\u00e2\u00e3\u0005\u0018\r\u0002\u00e3\u00e4",
-    "\u0007.\u0002\u0002\u00e4\u00e5\u0005\u0016\f\u0002\u00e5\u00e8\u0003",
-    "\u0002\u0002\u0002\u00e6\u00e8\u0005\u0018\r\u0002\u00e7\u00e2\u0003",
-    "\u0002\u0002\u0002\u00e7\u00e6\u0003\u0002\u0002\u0002\u00e8\u0017\u0003",
-    "\u0002\u0002\u0002\u00e9\u00ea\u0005\u001a\u000e\u0002\u00ea\u00eb\u0007",
-    "V\u0002\u0002\u00eb\u00ec\u0005\u0018\r\u0002\u00ec\u00f3\u0003\u0002",
-    "\u0002\u0002\u00ed\u00ee\u0005\u001a\u000e\u0002\u00ee\u00ef\u0007W",
-    "\u0002\u0002\u00ef\u00f0\u0005\u0018\r\u0002\u00f0\u00f3\u0003\u0002",
-    "\u0002\u0002\u00f1\u00f3\u0005\u001a\u000e\u0002\u00f2\u00e9\u0003\u0002",
-    "\u0002\u0002\u00f2\u00ed\u0003\u0002\u0002\u0002\u00f2\u00f1\u0003\u0002",
-    "\u0002\u0002\u00f3\u0019\u0003\u0002\u0002\u0002\u00f4\u00f5\u0005\u001c",
-    "\u000f\u0002\u00f5\u00f6\u0007X\u0002\u0002\u00f6\u00f7\u0005\u0018",
-    "\r\u0002\u00f7\u0102\u0003\u0002\u0002\u0002\u00f8\u00f9\u0005\u001c",
-    "\u000f\u0002\u00f9\u00fa\u0007Y\u0002\u0002\u00fa\u00fb\u0005\u0018",
-    "\r\u0002\u00fb\u0102\u0003\u0002\u0002\u0002\u00fc\u00fd\u0005\u001c",
-    "\u000f\u0002\u00fd\u00fe\u0007Z\u0002\u0002\u00fe\u00ff\u0005\u0018",
-    "\r\u0002\u00ff\u0102\u0003\u0002\u0002\u0002\u0100\u0102\u0005\u001c",
-    "\u000f\u0002\u0101\u00f4\u0003\u0002\u0002\u0002\u0101\u00f8\u0003\u0002",
-    "\u0002\u0002\u0101\u00fc\u0003\u0002\u0002\u0002\u0101\u0100\u0003\u0002",
-    "\u0002\u0002\u0102\u001b\u0003\u0002\u0002\u0002\u0103\u0104\u0007[",
-    "\u0002\u0002\u0104\u0105\u0005\u0018\r\u0002\u0105\u0106\u0007\\\u0002",
-    "\u0002\u0106\u0109\u0003\u0002\u0002\u0002\u0107\u0109\u0005\u001e\u0010",
-    "\u0002\u0108\u0103\u0003\u0002\u0002\u0002\u0108\u0107\u0003\u0002\u0002",
-    "\u0002\u0109\u001d\u0003\u0002\u0002\u0002\u010a\u0112\u0005 \u0011",
-    "\u0002\u010b\u0112\u0005\"\u0012\u0002\u010c\u0112\u0005$\u0013\u0002",
-    "\u010d\u0112\u0005&\u0014\u0002\u010e\u0112\u0005(\u0015\u0002\u010f",
-    "\u0112\u0005\u0012\n\u0002\u0110\u0112\u0005\u0014\u000b\u0002\u0111",
-    "\u010a\u0003\u0002\u0002\u0002\u0111\u010b\u0003\u0002\u0002\u0002\u0111",
-    "\u010c\u0003\u0002\u0002\u0002\u0111\u010d\u0003\u0002\u0002\u0002\u0111",
-    "\u010e\u0003\u0002\u0002\u0002\u0111\u010f\u0003\u0002\u0002\u0002\u0111",
-    "\u0110\u0003\u0002\u0002\u0002\u0112\u001f\u0003\u0002\u0002\u0002\u0113",
-    "\u0114\u0007^\u0002\u0002\u0114!\u0003\u0002\u0002\u0002\u0115\u0116",
-    "\u0007_\u0002\u0002\u0116#\u0003\u0002\u0002\u0002\u0117\u0118\u0007",
-    "`\u0002\u0002\u0118%\u0003\u0002\u0002\u0002\u0119\u011a\u0007a\u0002",
-    "\u0002\u011a\'\u0003\u0002\u0002\u0002\u011b\u011c\u0007b\u0002\u0002",
-    "\u011c)\u0003\u0002\u0002\u0002\u000f+058<?\u00d1\u00da\u00e7\u00f2",
-    "\u0101\u0108\u0111"].join("");
+    "\u0002\u00d3\u00d4\u0007R\u0002\u0002\u00d4\u00dd\u0005\u0016\f\u0002",
+    "\u00d5\u00d6\u0007S\u0002\u0002\u00d6\u00dd\u0005\u0018\r\u0002\u00d7",
+    "\u00d8\u0007T\u0002\u0002\u00d8\u00dd\u0005\u0018\r\u0002\u00d9\u00da",
+    "\u0007e\u0002\u0002\u00da\u00db\u0007U\u0002\u0002\u00db\u00dd\u0005",
+    "\u0018\r\u0002\u00dc\u00d3\u0003\u0002\u0002\u0002\u00dc\u00d5\u0003",
+    "\u0002\u0002\u0002\u00dc\u00d7\u0003\u0002\u0002\u0002\u00dc\u00d9\u0003",
+    "\u0002\u0002\u0002\u00dd\u000f\u0003\u0002\u0002\u0002\u00de\u00df\u0007",
+    "^\u0002\u0002\u00df\u0011\u0003\u0002\u0002\u0002\u00e0\u00e1\u0007",
+    "e\u0002\u0002\u00e1\u0013\u0003\u0002\u0002\u0002\u00e2\u00e3\u0007",
+    "V\u0002\u0002\u00e3\u0015\u0003\u0002\u0002\u0002\u00e4\u00e5\u0005",
+    "\u0018\r\u0002\u00e5\u00e6\u0007.\u0002\u0002\u00e6\u00e7\u0005\u0016",
+    "\f\u0002\u00e7\u00ea\u0003\u0002\u0002\u0002\u00e8\u00ea\u0005\u0018",
+    "\r\u0002\u00e9\u00e4\u0003\u0002\u0002\u0002\u00e9\u00e8\u0003\u0002",
+    "\u0002\u0002\u00ea\u0017\u0003\u0002\u0002\u0002\u00eb\u00ec\u0005\u001a",
+    "\u000e\u0002\u00ec\u00ed\u0007W\u0002\u0002\u00ed\u00ee\u0005\u0018",
+    "\r\u0002\u00ee\u00f5\u0003\u0002\u0002\u0002\u00ef\u00f0\u0005\u001a",
+    "\u000e\u0002\u00f0\u00f1\u0007X\u0002\u0002\u00f1\u00f2\u0005\u0018",
+    "\r\u0002\u00f2\u00f5\u0003\u0002\u0002\u0002\u00f3\u00f5\u0005\u001a",
+    "\u000e\u0002\u00f4\u00eb\u0003\u0002\u0002\u0002\u00f4\u00ef\u0003\u0002",
+    "\u0002\u0002\u00f4\u00f3\u0003\u0002\u0002\u0002\u00f5\u0019\u0003\u0002",
+    "\u0002\u0002\u00f6\u00f7\u0005\u001c\u000f\u0002\u00f7\u00f8\u0007Y",
+    "\u0002\u0002\u00f8\u00f9\u0005\u0018\r\u0002\u00f9\u0104\u0003\u0002",
+    "\u0002\u0002\u00fa\u00fb\u0005\u001c\u000f\u0002\u00fb\u00fc\u0007Z",
+    "\u0002\u0002\u00fc\u00fd\u0005\u0018\r\u0002\u00fd\u0104\u0003\u0002",
+    "\u0002\u0002\u00fe\u00ff\u0005\u001c\u000f\u0002\u00ff\u0100\u0007[",
+    "\u0002\u0002\u0100\u0101\u0005\u0018\r\u0002\u0101\u0104\u0003\u0002",
+    "\u0002\u0002\u0102\u0104\u0005\u001c\u000f\u0002\u0103\u00f6\u0003\u0002",
+    "\u0002\u0002\u0103\u00fa\u0003\u0002\u0002\u0002\u0103\u00fe\u0003\u0002",
+    "\u0002\u0002\u0103\u0102\u0003\u0002\u0002\u0002\u0104\u001b\u0003\u0002",
+    "\u0002\u0002\u0105\u0106\u0007\\\u0002\u0002\u0106\u0107\u0005\u0018",
+    "\r\u0002\u0107\u0108\u0007]\u0002\u0002\u0108\u010b\u0003\u0002\u0002",
+    "\u0002\u0109\u010b\u0005\u001e\u0010\u0002\u010a\u0105\u0003\u0002\u0002",
+    "\u0002\u010a\u0109\u0003\u0002\u0002\u0002\u010b\u001d\u0003\u0002\u0002",
+    "\u0002\u010c\u0114\u0005 \u0011\u0002\u010d\u0114\u0005\"\u0012\u0002",
+    "\u010e\u0114\u0005$\u0013\u0002\u010f\u0114\u0005&\u0014\u0002\u0110",
+    "\u0114\u0005(\u0015\u0002\u0111\u0114\u0005\u0012\n\u0002\u0112\u0114",
+    "\u0005\u0014\u000b\u0002\u0113\u010c\u0003\u0002\u0002\u0002\u0113\u010d",
+    "\u0003\u0002\u0002\u0002\u0113\u010e\u0003\u0002\u0002\u0002\u0113\u010f",
+    "\u0003\u0002\u0002\u0002\u0113\u0110\u0003\u0002\u0002\u0002\u0113\u0111",
+    "\u0003\u0002\u0002\u0002\u0113\u0112\u0003\u0002\u0002\u0002\u0114\u001f",
+    "\u0003\u0002\u0002\u0002\u0115\u0116\u0007_\u0002\u0002\u0116!\u0003",
+    "\u0002\u0002\u0002\u0117\u0118\u0007`\u0002\u0002\u0118#\u0003\u0002",
+    "\u0002\u0002\u0119\u011a\u0007a\u0002\u0002\u011a%\u0003\u0002\u0002",
+    "\u0002\u011b\u011c\u0007b\u0002\u0002\u011c\'\u0003\u0002\u0002\u0002",
+    "\u011d\u011e\u0007c\u0002\u0002\u011e)\u0003\u0002\u0002\u0002\u000f",
+    "+058<?\u00d1\u00dc\u00e9\u00f4\u0103\u010a\u0113"].join("");
 
 
 var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
@@ -237,8 +238,8 @@ var literalNames = [ null, "':'", "'ACI'", "'ADC'", "'ADD'", "'ADI'", "'ANA'",
                      "'RNZ'", "'RP'", "'RPE'", "'RPO'", "'RRC'", "'RZ'", 
                      "'SBB'", "'SBI'", "'SHLD'", "'SIM'", "'SPHL'", "'STA'", 
                      "'STAX'", "'SUB'", "'SUI'", "'XCHG'", "'XRA'", "'XRI'", 
-                     "'XTHL'", "'DB'", "'DS'", "'SET'", "'$'", "'+'", "'-'", 
-                     "'*'", "'/'", "'MOD'", "'('", "')'" ];
+                     "'XTHL'", "'DB'", "'DS'", "'ORG'", "'SET'", "'$'", 
+                     "'+'", "'-'", "'*'", "'/'", "'MOD'", "'('", "')'" ];
 
 var symbolicNames = [ null, null, null, null, null, null, null, null, null, 
                       null, null, null, null, null, null, null, null, null, 
@@ -250,8 +251,8 @@ var symbolicNames = [ null, null, null, null, null, null, null, null, null,
                       null, null, null, null, null, null, null, null, null, 
                       null, null, null, null, null, null, null, null, null, 
                       null, null, null, null, null, null, null, null, null, 
-                      null, "REGISTER", "HEX", "OCT", "BIN", "DEC", "STR", 
-                      "EOL", "LABEL", "COMMENT", "WS" ];
+                      null, null, "REGISTER", "HEX", "OCT", "BIN", "DEC", 
+                      "STR", "EOL", "LABEL", "COMMENT", "WS" ];
 
 var ruleNames =  [ "prog", "line", "operation", "label", "comment", "instruction", 
                    "directive", "register", "labeloperand", "locationcounteroperand", 
@@ -367,16 +368,17 @@ asm8085Parser.T__86 = 87;
 asm8085Parser.T__87 = 88;
 asm8085Parser.T__88 = 89;
 asm8085Parser.T__89 = 90;
-asm8085Parser.REGISTER = 91;
-asm8085Parser.HEX = 92;
-asm8085Parser.OCT = 93;
-asm8085Parser.BIN = 94;
-asm8085Parser.DEC = 95;
-asm8085Parser.STR = 96;
-asm8085Parser.EOL = 97;
-asm8085Parser.LABEL = 98;
-asm8085Parser.COMMENT = 99;
-asm8085Parser.WS = 100;
+asm8085Parser.T__90 = 91;
+asm8085Parser.REGISTER = 92;
+asm8085Parser.HEX = 93;
+asm8085Parser.OCT = 94;
+asm8085Parser.BIN = 95;
+asm8085Parser.DEC = 96;
+asm8085Parser.STR = 97;
+asm8085Parser.EOL = 98;
+asm8085Parser.LABEL = 99;
+asm8085Parser.COMMENT = 100;
+asm8085Parser.WS = 101;
 
 asm8085Parser.RULE_prog = 0;
 asm8085Parser.RULE_line = 1;
@@ -468,7 +470,7 @@ asm8085Parser.prototype.prog = function() {
         do {
             this.state = 41;
             _la = this._input.LA(1);
-            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << asm8085Parser.T__1) | (1 << asm8085Parser.T__2) | (1 << asm8085Parser.T__3) | (1 << asm8085Parser.T__4) | (1 << asm8085Parser.T__5) | (1 << asm8085Parser.T__6) | (1 << asm8085Parser.T__7) | (1 << asm8085Parser.T__8) | (1 << asm8085Parser.T__9) | (1 << asm8085Parser.T__10) | (1 << asm8085Parser.T__11) | (1 << asm8085Parser.T__12) | (1 << asm8085Parser.T__13) | (1 << asm8085Parser.T__14) | (1 << asm8085Parser.T__15) | (1 << asm8085Parser.T__16) | (1 << asm8085Parser.T__17) | (1 << asm8085Parser.T__18) | (1 << asm8085Parser.T__19) | (1 << asm8085Parser.T__20) | (1 << asm8085Parser.T__21) | (1 << asm8085Parser.T__22) | (1 << asm8085Parser.T__23) | (1 << asm8085Parser.T__24) | (1 << asm8085Parser.T__25) | (1 << asm8085Parser.T__26) | (1 << asm8085Parser.T__27) | (1 << asm8085Parser.T__28) | (1 << asm8085Parser.T__29) | (1 << asm8085Parser.T__30))) !== 0) || ((((_la - 32)) & ~0x1f) == 0 && ((1 << (_la - 32)) & ((1 << (asm8085Parser.T__31 - 32)) | (1 << (asm8085Parser.T__32 - 32)) | (1 << (asm8085Parser.T__33 - 32)) | (1 << (asm8085Parser.T__34 - 32)) | (1 << (asm8085Parser.T__35 - 32)) | (1 << (asm8085Parser.T__36 - 32)) | (1 << (asm8085Parser.T__37 - 32)) | (1 << (asm8085Parser.T__38 - 32)) | (1 << (asm8085Parser.T__39 - 32)) | (1 << (asm8085Parser.T__40 - 32)) | (1 << (asm8085Parser.T__41 - 32)) | (1 << (asm8085Parser.T__42 - 32)) | (1 << (asm8085Parser.T__44 - 32)) | (1 << (asm8085Parser.T__45 - 32)) | (1 << (asm8085Parser.T__46 - 32)) | (1 << (asm8085Parser.T__47 - 32)) | (1 << (asm8085Parser.T__48 - 32)) | (1 << (asm8085Parser.T__49 - 32)) | (1 << (asm8085Parser.T__50 - 32)) | (1 << (asm8085Parser.T__51 - 32)) | (1 << (asm8085Parser.T__52 - 32)) | (1 << (asm8085Parser.T__53 - 32)) | (1 << (asm8085Parser.T__54 - 32)) | (1 << (asm8085Parser.T__55 - 32)) | (1 << (asm8085Parser.T__56 - 32)) | (1 << (asm8085Parser.T__57 - 32)) | (1 << (asm8085Parser.T__58 - 32)) | (1 << (asm8085Parser.T__59 - 32)) | (1 << (asm8085Parser.T__60 - 32)) | (1 << (asm8085Parser.T__61 - 32)) | (1 << (asm8085Parser.T__62 - 32)))) !== 0) || ((((_la - 64)) & ~0x1f) == 0 && ((1 << (_la - 64)) & ((1 << (asm8085Parser.T__63 - 64)) | (1 << (asm8085Parser.T__64 - 64)) | (1 << (asm8085Parser.T__65 - 64)) | (1 << (asm8085Parser.T__66 - 64)) | (1 << (asm8085Parser.T__67 - 64)) | (1 << (asm8085Parser.T__68 - 64)) | (1 << (asm8085Parser.T__69 - 64)) | (1 << (asm8085Parser.T__70 - 64)) | (1 << (asm8085Parser.T__71 - 64)) | (1 << (asm8085Parser.T__72 - 64)) | (1 << (asm8085Parser.T__73 - 64)) | (1 << (asm8085Parser.T__74 - 64)) | (1 << (asm8085Parser.T__75 - 64)) | (1 << (asm8085Parser.T__76 - 64)) | (1 << (asm8085Parser.T__77 - 64)) | (1 << (asm8085Parser.T__78 - 64)) | (1 << (asm8085Parser.T__79 - 64)) | (1 << (asm8085Parser.T__80 - 64)))) !== 0) || _la===asm8085Parser.LABEL || _la===asm8085Parser.COMMENT) {
+            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << asm8085Parser.T__1) | (1 << asm8085Parser.T__2) | (1 << asm8085Parser.T__3) | (1 << asm8085Parser.T__4) | (1 << asm8085Parser.T__5) | (1 << asm8085Parser.T__6) | (1 << asm8085Parser.T__7) | (1 << asm8085Parser.T__8) | (1 << asm8085Parser.T__9) | (1 << asm8085Parser.T__10) | (1 << asm8085Parser.T__11) | (1 << asm8085Parser.T__12) | (1 << asm8085Parser.T__13) | (1 << asm8085Parser.T__14) | (1 << asm8085Parser.T__15) | (1 << asm8085Parser.T__16) | (1 << asm8085Parser.T__17) | (1 << asm8085Parser.T__18) | (1 << asm8085Parser.T__19) | (1 << asm8085Parser.T__20) | (1 << asm8085Parser.T__21) | (1 << asm8085Parser.T__22) | (1 << asm8085Parser.T__23) | (1 << asm8085Parser.T__24) | (1 << asm8085Parser.T__25) | (1 << asm8085Parser.T__26) | (1 << asm8085Parser.T__27) | (1 << asm8085Parser.T__28) | (1 << asm8085Parser.T__29) | (1 << asm8085Parser.T__30))) !== 0) || ((((_la - 32)) & ~0x1f) == 0 && ((1 << (_la - 32)) & ((1 << (asm8085Parser.T__31 - 32)) | (1 << (asm8085Parser.T__32 - 32)) | (1 << (asm8085Parser.T__33 - 32)) | (1 << (asm8085Parser.T__34 - 32)) | (1 << (asm8085Parser.T__35 - 32)) | (1 << (asm8085Parser.T__36 - 32)) | (1 << (asm8085Parser.T__37 - 32)) | (1 << (asm8085Parser.T__38 - 32)) | (1 << (asm8085Parser.T__39 - 32)) | (1 << (asm8085Parser.T__40 - 32)) | (1 << (asm8085Parser.T__41 - 32)) | (1 << (asm8085Parser.T__42 - 32)) | (1 << (asm8085Parser.T__44 - 32)) | (1 << (asm8085Parser.T__45 - 32)) | (1 << (asm8085Parser.T__46 - 32)) | (1 << (asm8085Parser.T__47 - 32)) | (1 << (asm8085Parser.T__48 - 32)) | (1 << (asm8085Parser.T__49 - 32)) | (1 << (asm8085Parser.T__50 - 32)) | (1 << (asm8085Parser.T__51 - 32)) | (1 << (asm8085Parser.T__52 - 32)) | (1 << (asm8085Parser.T__53 - 32)) | (1 << (asm8085Parser.T__54 - 32)) | (1 << (asm8085Parser.T__55 - 32)) | (1 << (asm8085Parser.T__56 - 32)) | (1 << (asm8085Parser.T__57 - 32)) | (1 << (asm8085Parser.T__58 - 32)) | (1 << (asm8085Parser.T__59 - 32)) | (1 << (asm8085Parser.T__60 - 32)) | (1 << (asm8085Parser.T__61 - 32)) | (1 << (asm8085Parser.T__62 - 32)))) !== 0) || ((((_la - 64)) & ~0x1f) == 0 && ((1 << (_la - 64)) & ((1 << (asm8085Parser.T__63 - 64)) | (1 << (asm8085Parser.T__64 - 64)) | (1 << (asm8085Parser.T__65 - 64)) | (1 << (asm8085Parser.T__66 - 64)) | (1 << (asm8085Parser.T__67 - 64)) | (1 << (asm8085Parser.T__68 - 64)) | (1 << (asm8085Parser.T__69 - 64)) | (1 << (asm8085Parser.T__70 - 64)) | (1 << (asm8085Parser.T__71 - 64)) | (1 << (asm8085Parser.T__72 - 64)) | (1 << (asm8085Parser.T__73 - 64)) | (1 << (asm8085Parser.T__74 - 64)) | (1 << (asm8085Parser.T__75 - 64)) | (1 << (asm8085Parser.T__76 - 64)) | (1 << (asm8085Parser.T__77 - 64)) | (1 << (asm8085Parser.T__78 - 64)) | (1 << (asm8085Parser.T__79 - 64)) | (1 << (asm8085Parser.T__80 - 64)) | (1 << (asm8085Parser.T__81 - 64)))) !== 0) || _la===asm8085Parser.LABEL || _la===asm8085Parser.COMMENT) {
                 this.state = 40;
                 this.line();
             }
@@ -478,7 +480,7 @@ asm8085Parser.prototype.prog = function() {
             this.state = 46; 
             this._errHandler.sync(this);
             _la = this._input.LA(1);
-        } while((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << asm8085Parser.T__1) | (1 << asm8085Parser.T__2) | (1 << asm8085Parser.T__3) | (1 << asm8085Parser.T__4) | (1 << asm8085Parser.T__5) | (1 << asm8085Parser.T__6) | (1 << asm8085Parser.T__7) | (1 << asm8085Parser.T__8) | (1 << asm8085Parser.T__9) | (1 << asm8085Parser.T__10) | (1 << asm8085Parser.T__11) | (1 << asm8085Parser.T__12) | (1 << asm8085Parser.T__13) | (1 << asm8085Parser.T__14) | (1 << asm8085Parser.T__15) | (1 << asm8085Parser.T__16) | (1 << asm8085Parser.T__17) | (1 << asm8085Parser.T__18) | (1 << asm8085Parser.T__19) | (1 << asm8085Parser.T__20) | (1 << asm8085Parser.T__21) | (1 << asm8085Parser.T__22) | (1 << asm8085Parser.T__23) | (1 << asm8085Parser.T__24) | (1 << asm8085Parser.T__25) | (1 << asm8085Parser.T__26) | (1 << asm8085Parser.T__27) | (1 << asm8085Parser.T__28) | (1 << asm8085Parser.T__29) | (1 << asm8085Parser.T__30))) !== 0) || ((((_la - 32)) & ~0x1f) == 0 && ((1 << (_la - 32)) & ((1 << (asm8085Parser.T__31 - 32)) | (1 << (asm8085Parser.T__32 - 32)) | (1 << (asm8085Parser.T__33 - 32)) | (1 << (asm8085Parser.T__34 - 32)) | (1 << (asm8085Parser.T__35 - 32)) | (1 << (asm8085Parser.T__36 - 32)) | (1 << (asm8085Parser.T__37 - 32)) | (1 << (asm8085Parser.T__38 - 32)) | (1 << (asm8085Parser.T__39 - 32)) | (1 << (asm8085Parser.T__40 - 32)) | (1 << (asm8085Parser.T__41 - 32)) | (1 << (asm8085Parser.T__42 - 32)) | (1 << (asm8085Parser.T__44 - 32)) | (1 << (asm8085Parser.T__45 - 32)) | (1 << (asm8085Parser.T__46 - 32)) | (1 << (asm8085Parser.T__47 - 32)) | (1 << (asm8085Parser.T__48 - 32)) | (1 << (asm8085Parser.T__49 - 32)) | (1 << (asm8085Parser.T__50 - 32)) | (1 << (asm8085Parser.T__51 - 32)) | (1 << (asm8085Parser.T__52 - 32)) | (1 << (asm8085Parser.T__53 - 32)) | (1 << (asm8085Parser.T__54 - 32)) | (1 << (asm8085Parser.T__55 - 32)) | (1 << (asm8085Parser.T__56 - 32)) | (1 << (asm8085Parser.T__57 - 32)) | (1 << (asm8085Parser.T__58 - 32)) | (1 << (asm8085Parser.T__59 - 32)) | (1 << (asm8085Parser.T__60 - 32)) | (1 << (asm8085Parser.T__61 - 32)) | (1 << (asm8085Parser.T__62 - 32)))) !== 0) || ((((_la - 64)) & ~0x1f) == 0 && ((1 << (_la - 64)) & ((1 << (asm8085Parser.T__63 - 64)) | (1 << (asm8085Parser.T__64 - 64)) | (1 << (asm8085Parser.T__65 - 64)) | (1 << (asm8085Parser.T__66 - 64)) | (1 << (asm8085Parser.T__67 - 64)) | (1 << (asm8085Parser.T__68 - 64)) | (1 << (asm8085Parser.T__69 - 64)) | (1 << (asm8085Parser.T__70 - 64)) | (1 << (asm8085Parser.T__71 - 64)) | (1 << (asm8085Parser.T__72 - 64)) | (1 << (asm8085Parser.T__73 - 64)) | (1 << (asm8085Parser.T__74 - 64)) | (1 << (asm8085Parser.T__75 - 64)) | (1 << (asm8085Parser.T__76 - 64)) | (1 << (asm8085Parser.T__77 - 64)) | (1 << (asm8085Parser.T__78 - 64)) | (1 << (asm8085Parser.T__79 - 64)) | (1 << (asm8085Parser.T__80 - 64)))) !== 0) || ((((_la - 97)) & ~0x1f) == 0 && ((1 << (_la - 97)) & ((1 << (asm8085Parser.EOL - 97)) | (1 << (asm8085Parser.LABEL - 97)) | (1 << (asm8085Parser.COMMENT - 97)))) !== 0));
+        } while((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << asm8085Parser.T__1) | (1 << asm8085Parser.T__2) | (1 << asm8085Parser.T__3) | (1 << asm8085Parser.T__4) | (1 << asm8085Parser.T__5) | (1 << asm8085Parser.T__6) | (1 << asm8085Parser.T__7) | (1 << asm8085Parser.T__8) | (1 << asm8085Parser.T__9) | (1 << asm8085Parser.T__10) | (1 << asm8085Parser.T__11) | (1 << asm8085Parser.T__12) | (1 << asm8085Parser.T__13) | (1 << asm8085Parser.T__14) | (1 << asm8085Parser.T__15) | (1 << asm8085Parser.T__16) | (1 << asm8085Parser.T__17) | (1 << asm8085Parser.T__18) | (1 << asm8085Parser.T__19) | (1 << asm8085Parser.T__20) | (1 << asm8085Parser.T__21) | (1 << asm8085Parser.T__22) | (1 << asm8085Parser.T__23) | (1 << asm8085Parser.T__24) | (1 << asm8085Parser.T__25) | (1 << asm8085Parser.T__26) | (1 << asm8085Parser.T__27) | (1 << asm8085Parser.T__28) | (1 << asm8085Parser.T__29) | (1 << asm8085Parser.T__30))) !== 0) || ((((_la - 32)) & ~0x1f) == 0 && ((1 << (_la - 32)) & ((1 << (asm8085Parser.T__31 - 32)) | (1 << (asm8085Parser.T__32 - 32)) | (1 << (asm8085Parser.T__33 - 32)) | (1 << (asm8085Parser.T__34 - 32)) | (1 << (asm8085Parser.T__35 - 32)) | (1 << (asm8085Parser.T__36 - 32)) | (1 << (asm8085Parser.T__37 - 32)) | (1 << (asm8085Parser.T__38 - 32)) | (1 << (asm8085Parser.T__39 - 32)) | (1 << (asm8085Parser.T__40 - 32)) | (1 << (asm8085Parser.T__41 - 32)) | (1 << (asm8085Parser.T__42 - 32)) | (1 << (asm8085Parser.T__44 - 32)) | (1 << (asm8085Parser.T__45 - 32)) | (1 << (asm8085Parser.T__46 - 32)) | (1 << (asm8085Parser.T__47 - 32)) | (1 << (asm8085Parser.T__48 - 32)) | (1 << (asm8085Parser.T__49 - 32)) | (1 << (asm8085Parser.T__50 - 32)) | (1 << (asm8085Parser.T__51 - 32)) | (1 << (asm8085Parser.T__52 - 32)) | (1 << (asm8085Parser.T__53 - 32)) | (1 << (asm8085Parser.T__54 - 32)) | (1 << (asm8085Parser.T__55 - 32)) | (1 << (asm8085Parser.T__56 - 32)) | (1 << (asm8085Parser.T__57 - 32)) | (1 << (asm8085Parser.T__58 - 32)) | (1 << (asm8085Parser.T__59 - 32)) | (1 << (asm8085Parser.T__60 - 32)) | (1 << (asm8085Parser.T__61 - 32)) | (1 << (asm8085Parser.T__62 - 32)))) !== 0) || ((((_la - 64)) & ~0x1f) == 0 && ((1 << (_la - 64)) & ((1 << (asm8085Parser.T__63 - 64)) | (1 << (asm8085Parser.T__64 - 64)) | (1 << (asm8085Parser.T__65 - 64)) | (1 << (asm8085Parser.T__66 - 64)) | (1 << (asm8085Parser.T__67 - 64)) | (1 << (asm8085Parser.T__68 - 64)) | (1 << (asm8085Parser.T__69 - 64)) | (1 << (asm8085Parser.T__70 - 64)) | (1 << (asm8085Parser.T__71 - 64)) | (1 << (asm8085Parser.T__72 - 64)) | (1 << (asm8085Parser.T__73 - 64)) | (1 << (asm8085Parser.T__74 - 64)) | (1 << (asm8085Parser.T__75 - 64)) | (1 << (asm8085Parser.T__76 - 64)) | (1 << (asm8085Parser.T__77 - 64)) | (1 << (asm8085Parser.T__78 - 64)) | (1 << (asm8085Parser.T__79 - 64)) | (1 << (asm8085Parser.T__80 - 64)) | (1 << (asm8085Parser.T__81 - 64)))) !== 0) || ((((_la - 98)) & ~0x1f) == 0 && ((1 << (_la - 98)) & ((1 << (asm8085Parser.EOL - 98)) | (1 << (asm8085Parser.LABEL - 98)) | (1 << (asm8085Parser.COMMENT - 98)))) !== 0));
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
@@ -728,6 +730,7 @@ asm8085Parser.prototype.operation = function() {
             break;
         case asm8085Parser.T__79:
         case asm8085Parser.T__80:
+        case asm8085Parser.T__81:
         case asm8085Parser.LABEL:
             this.state = 57;
             this.directive();
@@ -1586,6 +1589,33 @@ SETContext.prototype.exitRule = function(listener) {
 };
 
 
+function ORGContext(parser, ctx) {
+	DirectiveContext.call(this, parser);
+    DirectiveContext.prototype.copyFrom.call(this, ctx);
+    return this;
+}
+
+ORGContext.prototype = Object.create(DirectiveContext.prototype);
+ORGContext.prototype.constructor = ORGContext;
+
+asm8085Parser.ORGContext = ORGContext;
+
+ORGContext.prototype.expression = function() {
+    return this.getTypedRuleContext(ExpressionContext,0);
+};
+ORGContext.prototype.enterRule = function(listener) {
+    if(listener instanceof asm8085Listener ) {
+        listener.enterORG(this);
+	}
+};
+
+ORGContext.prototype.exitRule = function(listener) {
+    if(listener instanceof asm8085Listener ) {
+        listener.exitORG(this);
+	}
+};
+
+
 function DBContext(parser, ctx) {
 	DirectiveContext.call(this, parser);
     DirectiveContext.prototype.copyFrom.call(this, ctx);
@@ -1648,7 +1678,7 @@ asm8085Parser.prototype.directive = function() {
     var localctx = new DirectiveContext(this, this._ctx, this.state);
     this.enterRule(localctx, 12, asm8085Parser.RULE_directive);
     try {
-        this.state = 216;
+        this.state = 218;
         switch(this._input.LA(1)) {
         case asm8085Parser.T__79:
             localctx = new DBContext(this, localctx);
@@ -1666,14 +1696,22 @@ asm8085Parser.prototype.directive = function() {
             this.state = 212;
             this.expression();
             break;
-        case asm8085Parser.LABEL:
-            localctx = new SETContext(this, localctx);
+        case asm8085Parser.T__81:
+            localctx = new ORGContext(this, localctx);
             this.enterOuterAlt(localctx, 3);
             this.state = 213;
-            this.match(asm8085Parser.LABEL);
-            this.state = 214;
             this.match(asm8085Parser.T__81);
+            this.state = 214;
+            this.expression();
+            break;
+        case asm8085Parser.LABEL:
+            localctx = new SETContext(this, localctx);
+            this.enterOuterAlt(localctx, 4);
             this.state = 215;
+            this.match(asm8085Parser.LABEL);
+            this.state = 216;
+            this.match(asm8085Parser.T__82);
+            this.state = 217;
             this.expression();
             break;
         default:
@@ -1736,7 +1774,7 @@ asm8085Parser.prototype.register = function() {
     this.enterRule(localctx, 14, asm8085Parser.RULE_register);
     try {
         this.enterOuterAlt(localctx, 1);
-        this.state = 218;
+        this.state = 220;
         this.match(asm8085Parser.REGISTER);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
@@ -1795,7 +1833,7 @@ asm8085Parser.prototype.labeloperand = function() {
     this.enterRule(localctx, 16, asm8085Parser.RULE_labeloperand);
     try {
         this.enterOuterAlt(localctx, 1);
-        this.state = 220;
+        this.state = 222;
         this.match(asm8085Parser.LABEL);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
@@ -1851,8 +1889,8 @@ asm8085Parser.prototype.locationcounteroperand = function() {
     this.enterRule(localctx, 18, asm8085Parser.RULE_locationcounteroperand);
     try {
         this.enterOuterAlt(localctx, 1);
-        this.state = 222;
-        this.match(asm8085Parser.T__82);
+        this.state = 224;
+        this.match(asm8085Parser.T__83);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
@@ -1913,23 +1951,23 @@ asm8085Parser.prototype.expressionlist = function() {
     var localctx = new ExpressionlistContext(this, this._ctx, this.state);
     this.enterRule(localctx, 20, asm8085Parser.RULE_expressionlist);
     try {
-        this.state = 229;
+        this.state = 231;
         this._errHandler.sync(this);
         var la_ = this._interp.adaptivePredict(this._input,8,this._ctx);
         switch(la_) {
         case 1:
             this.enterOuterAlt(localctx, 1);
-            this.state = 224;
-            this.expression();
-            this.state = 225;
-            this.match(asm8085Parser.T__43);
             this.state = 226;
+            this.expression();
+            this.state = 227;
+            this.match(asm8085Parser.T__43);
+            this.state = 228;
             this.expressionlist();
             break;
 
         case 2:
             this.enterOuterAlt(localctx, 2);
-            this.state = 228;
+            this.state = 230;
             this.expression();
             break;
 
@@ -2068,36 +2106,36 @@ asm8085Parser.prototype.expression = function() {
     var localctx = new ExpressionContext(this, this._ctx, this.state);
     this.enterRule(localctx, 22, asm8085Parser.RULE_expression);
     try {
-        this.state = 240;
+        this.state = 242;
         this._errHandler.sync(this);
         var la_ = this._interp.adaptivePredict(this._input,9,this._ctx);
         switch(la_) {
         case 1:
             localctx = new PlusContext(this, localctx);
             this.enterOuterAlt(localctx, 1);
-            this.state = 231;
-            this.multexpression();
-            this.state = 232;
-            this.match(asm8085Parser.T__83);
             this.state = 233;
+            this.multexpression();
+            this.state = 234;
+            this.match(asm8085Parser.T__84);
+            this.state = 235;
             this.expression();
             break;
 
         case 2:
             localctx = new MinusContext(this, localctx);
             this.enterOuterAlt(localctx, 2);
-            this.state = 235;
-            this.multexpression();
-            this.state = 236;
-            this.match(asm8085Parser.T__84);
             this.state = 237;
+            this.multexpression();
+            this.state = 238;
+            this.match(asm8085Parser.T__85);
+            this.state = 239;
             this.expression();
             break;
 
         case 3:
             localctx = new MultExpressionContext(this, localctx);
             this.enterOuterAlt(localctx, 3);
-            this.state = 239;
+            this.state = 241;
             this.multexpression();
             break;
 
@@ -2267,47 +2305,47 @@ asm8085Parser.prototype.multexpression = function() {
     var localctx = new MultexpressionContext(this, this._ctx, this.state);
     this.enterRule(localctx, 24, asm8085Parser.RULE_multexpression);
     try {
-        this.state = 255;
+        this.state = 257;
         this._errHandler.sync(this);
         var la_ = this._interp.adaptivePredict(this._input,10,this._ctx);
         switch(la_) {
         case 1:
             localctx = new MultContext(this, localctx);
             this.enterOuterAlt(localctx, 1);
-            this.state = 242;
-            this.parenexpression();
-            this.state = 243;
-            this.match(asm8085Parser.T__85);
             this.state = 244;
+            this.parenexpression();
+            this.state = 245;
+            this.match(asm8085Parser.T__86);
+            this.state = 246;
             this.expression();
             break;
 
         case 2:
             localctx = new DivContext(this, localctx);
             this.enterOuterAlt(localctx, 2);
-            this.state = 246;
-            this.parenexpression();
-            this.state = 247;
-            this.match(asm8085Parser.T__86);
             this.state = 248;
+            this.parenexpression();
+            this.state = 249;
+            this.match(asm8085Parser.T__87);
+            this.state = 250;
             this.expression();
             break;
 
         case 3:
             localctx = new ModContext(this, localctx);
             this.enterOuterAlt(localctx, 3);
-            this.state = 250;
-            this.parenexpression();
-            this.state = 251;
-            this.match(asm8085Parser.T__87);
             this.state = 252;
+            this.parenexpression();
+            this.state = 253;
+            this.match(asm8085Parser.T__88);
+            this.state = 254;
             this.expression();
             break;
 
         case 4:
             localctx = new ParenExpressionContext(this, localctx);
             this.enterOuterAlt(localctx, 4);
-            this.state = 254;
+            this.state = 256;
             this.parenexpression();
             break;
 
@@ -2372,18 +2410,18 @@ asm8085Parser.prototype.parenexpression = function() {
     var localctx = new ParenexpressionContext(this, this._ctx, this.state);
     this.enterRule(localctx, 26, asm8085Parser.RULE_parenexpression);
     try {
-        this.state = 262;
+        this.state = 264;
         switch(this._input.LA(1)) {
-        case asm8085Parser.T__88:
+        case asm8085Parser.T__89:
             this.enterOuterAlt(localctx, 1);
-            this.state = 257;
-            this.match(asm8085Parser.T__88);
-            this.state = 258;
-            this.expression();
             this.state = 259;
             this.match(asm8085Parser.T__89);
+            this.state = 260;
+            this.expression();
+            this.state = 261;
+            this.match(asm8085Parser.T__90);
             break;
-        case asm8085Parser.T__82:
+        case asm8085Parser.T__83:
         case asm8085Parser.HEX:
         case asm8085Parser.OCT:
         case asm8085Parser.BIN:
@@ -2391,7 +2429,7 @@ asm8085Parser.prototype.parenexpression = function() {
         case asm8085Parser.STR:
         case asm8085Parser.LABEL:
             this.enterOuterAlt(localctx, 2);
-            this.state = 261;
+            this.state = 263;
             this.immediate();
             break;
         default:
@@ -2477,41 +2515,41 @@ asm8085Parser.prototype.immediate = function() {
     var localctx = new ImmediateContext(this, this._ctx, this.state);
     this.enterRule(localctx, 28, asm8085Parser.RULE_immediate);
     try {
-        this.state = 271;
+        this.state = 273;
         switch(this._input.LA(1)) {
         case asm8085Parser.HEX:
             this.enterOuterAlt(localctx, 1);
-            this.state = 264;
+            this.state = 266;
             this.hex();
             break;
         case asm8085Parser.OCT:
             this.enterOuterAlt(localctx, 2);
-            this.state = 265;
+            this.state = 267;
             this.oct();
             break;
         case asm8085Parser.BIN:
             this.enterOuterAlt(localctx, 3);
-            this.state = 266;
+            this.state = 268;
             this.bin();
             break;
         case asm8085Parser.DEC:
             this.enterOuterAlt(localctx, 4);
-            this.state = 267;
+            this.state = 269;
             this.dec();
             break;
         case asm8085Parser.STR:
             this.enterOuterAlt(localctx, 5);
-            this.state = 268;
+            this.state = 270;
             this.str();
             break;
         case asm8085Parser.LABEL:
             this.enterOuterAlt(localctx, 6);
-            this.state = 269;
+            this.state = 271;
             this.labeloperand();
             break;
-        case asm8085Parser.T__82:
+        case asm8085Parser.T__83:
             this.enterOuterAlt(localctx, 7);
-            this.state = 270;
+            this.state = 272;
             this.locationcounteroperand();
             break;
         default:
@@ -2574,7 +2612,7 @@ asm8085Parser.prototype.hex = function() {
     this.enterRule(localctx, 30, asm8085Parser.RULE_hex);
     try {
         this.enterOuterAlt(localctx, 1);
-        this.state = 273;
+        this.state = 275;
         this.match(asm8085Parser.HEX);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
@@ -2633,7 +2671,7 @@ asm8085Parser.prototype.oct = function() {
     this.enterRule(localctx, 32, asm8085Parser.RULE_oct);
     try {
         this.enterOuterAlt(localctx, 1);
-        this.state = 275;
+        this.state = 277;
         this.match(asm8085Parser.OCT);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
@@ -2692,7 +2730,7 @@ asm8085Parser.prototype.bin = function() {
     this.enterRule(localctx, 34, asm8085Parser.RULE_bin);
     try {
         this.enterOuterAlt(localctx, 1);
-        this.state = 277;
+        this.state = 279;
         this.match(asm8085Parser.BIN);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
@@ -2751,7 +2789,7 @@ asm8085Parser.prototype.dec = function() {
     this.enterRule(localctx, 36, asm8085Parser.RULE_dec);
     try {
         this.enterOuterAlt(localctx, 1);
-        this.state = 279;
+        this.state = 281;
         this.match(asm8085Parser.DEC);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
@@ -2810,7 +2848,7 @@ asm8085Parser.prototype.str = function() {
     this.enterRule(localctx, 38, asm8085Parser.RULE_str);
     try {
         this.enterOuterAlt(localctx, 1);
-        this.state = 281;
+        this.state = 283;
         this.match(asm8085Parser.STR);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {

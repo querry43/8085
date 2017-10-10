@@ -88,6 +88,26 @@ class Directive extends Operation {
     this.bytes = bytes;
   }
 
+  toHex(symbolTable) {
+    if (this.bytes.length) {
+      var data = '';
+      this.bytes.forEach(function(byte, index) {
+        data = data + utils.formatHex(byte, 2, false);
+      });
+
+      return util.format(
+        ':%s%s%s%s%s\n',
+        utils.formatHex(this.length, 2, false), // bytecount
+        utils.formatHex(this.address, 4, false), // address
+        '00', // record type
+        data, // data
+        '00' // checksum
+      );
+    } else {
+      return '';
+    }
+  }
+
   toString(symbolTable) {
     if (this.bytes.length) {
       var str = util.format(
@@ -129,6 +149,23 @@ class Instruction extends Operation {
     super(file, line, address, label, length, text);
     this.opcode = opcode;
     this.operand = operand;
+  }
+
+  toHex(symbolTable) {
+    var data = utils.formatHex(this.opcode, 2, false);
+
+    for (var i = 0; i < this.length-1; i++) {
+      data = data + utils.formatHex(this.operand.toBytes(this.address, symbolTable)[i] || 0, 2, false);
+    }
+
+    return util.format(
+      ':%s%s%s%s%s\n',
+      utils.formatHex(this.length, 2, false), // bytecount
+      utils.formatHex(this.address, 4, false), // address
+      '00', // record type
+      data, // data
+      '00' // checksum
+    );
   }
 
   toString(symbolTable) {
