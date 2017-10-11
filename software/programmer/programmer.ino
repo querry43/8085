@@ -21,7 +21,7 @@ const uint8_t
  *  A8-A15 to PORTA (22-29)
  *  D0-D7 to PORTL (49-42)
  */
-#define PROGRAM blink_asm_h
+#define PROGRAM output_8155_asm_h
 #define MEM_SIZE 2048
 #define DEBUG false
 #define MEMTEST false
