@@ -1,260 +1,142 @@
-#include "noop.h"
-#include "light_on.h"
-#include "blink.h"
-#include "output_8155.h"
-#include "larson_scanner2.h"
+#define CMD_SIZE 128
+#define CMD_DELIMITER "|"
+#include <string.h>
 
-const uint8_t
-  HOLD_pin = 8,
-  RESET_pin = 9,
-  RD_pin = 10,
-  WR_pin = 11,
-  LATCH_EN_pin = 12,
-  DIAG_pin = 13;
-
-/* Hookup:
- *  A0-A7 to PORTC (37-30)
- *  A8-A15 to PORTA (22-29)
- *  D0-D7 to PORTL (49-42)
- */
-#define PROGRAM larson_scanner2_asm_h
-#define MEM_SIZE 2048
-#define DEBUG false
-#define MEMTEST false
-
+char receivedBytes[CMD_SIZE];
+//const char* CMD_DELIMITER = "|";
+int iterator = 0;
+int commandTerminator = 10;
+int targetDeviceMemSize;
+byte targetDeviceMemToRead;
+int debugMode = 0;
 
 void setup() {
-  Serial.begin(38400);
-
-  pinMode(DIAG_pin, INPUT);
-
-  hold_and_commandeer_bus();
-
-  // prepare for reset
-  digitalWrite(RESET_pin, HIGH);
-  pinMode(RESET_pin, OUTPUT);
-
-  if (MEMTEST) {
-    mem_test();
-  } else {
-    clear_mem();
-    write_program();
-  }
-
-  release_bus();
-
-  // reset cpu
-  digitalWrite(RESET_pin, LOW);
-  delay(100);
-  pinMode(RESET_pin, INPUT); // high impedance lets reset circuit take over
-
-  release_hold();
+  Serial.begin(9600);
+  _clearReceivedCommand();
 }
 
 void loop() {
-  if (digitalRead(DIAG_pin) == 0) {
-    Serial.println("\nDIAG");
-    hold_and_commandeer_bus();
-    dump_mem();
-    release_bus();
-    release_hold();
+  byte byteRead;
+  while (Serial.available()) {
 
-    delay(500); // cheap debounce
-    while (digitalRead(DIAG_pin) == 0);
+    byteRead = Serial.read();
+
+    if(byteRead == '\n' || byteRead == '\r'){
+      receivedBytes[iterator] = '\0';
+      handleReceivedCommand();
+      iterator = 0;
+    }else{
+      receivedBytes[iterator] = byteRead;
+      iterator++;
+    }
+
   }
 }
 
-void write_mem(const uint16_t addr, const uint8_t data) {
-  set_address(addr);
+void handleReceivedCommand() {
+  if (receivedBytes[0] == 0)
+    return;
 
-  digitalWrite(WR_pin, LOW);
-  set_data(data);
-  digitalWrite(WR_pin, HIGH);
-
-  if (DEBUG) {
-    Serial.print("writing ");
-    Serial.print(data, HEX);
-    Serial.print(" to ");
-    Serial.println(addr, HEX);
+  if(debugMode == 1){
+    Serial.print("DEBUG Handling this command: ");
+    Serial.println(receivedBytes);
   }
 
-  DDRC = 0;
-  DDRA = 0;
-  DDRL = 0;
+  // parse command and arg here
+
+  switch(receivedBytes[0]) {
+    case 'z':
+      clearTargetDeviceMemory();
+      Serial.println("OK");
+      break;
+    case 'm':
+      setTargetDeviceMemorySize(); // what if the size is < 0 or like crazy big?
+      Serial.println("OK");
+      break;
+    case 'r':
+      printTargetDeviceMemory();
+      Serial.println("OK");
+      break;
+    case 'd':
+      toggleDebugMode();
+      Serial.println("OK");
+      break;
+    case 'w':
+      writeDataToTargetDeviceMemory();
+      Serial.println("OK");
+      break;
+    default:
+      Serial.println("NOT OK");
+      break;
+  };
+
+  _clearReceivedCommand();
 }
 
-unsigned char read_mem(const uint16_t addr) {
-  set_address(addr);
+void _clearReceivedCommand() {
+  memset(&receivedBytes[0], 0, CMD_SIZE);
+}
 
-  digitalWrite(RD_pin, LOW);
-  uint8_t data = PINL;
-  digitalWrite(RD_pin, HIGH);
+void toggleDebugMode() {
+  Serial.println("DEBUG Toggling debug mode");
+  debugMode = ! debugMode;
+  pinMode(13, OUTPUT);
+  digitalWrite(13, debugMode);
+}
 
-  if (DEBUG) {
-    Serial.print("reading ");
-    Serial.print(data, BIN);
-    Serial.print(" from ");
-    Serial.println(addr, HEX);
+void printTargetDeviceMemory(){
+  if(debugMode == 1){
+    Serial.println("DEBUG Print contents of target device memory addr");
   }
+  const char* data_val = parseDataFromCommandString();
+  if(debugMode == 1){
+    Serial.print("DEBUG Parsed data: ");
+    Serial.println(data_val);
+  }
+}
 
-  DDRC = 0;
-  DDRA = 0;
-  DDRL = 0;
+void clearTargetDeviceMemory(){
+  if(debugMode == 1){
+    Serial.println("DEBUG Clear target device memory");
+  }
+  for(uint16_t i = 0; i < targetDeviceMemSize; i++){
+    _writeToMem(i, '\0');
+  }
+}
+
+void setTargetDeviceMemorySize(){
+  const char* deviceMemoryStr = parseDataFromCommandString();
+  targetDeviceMemSize = atoi(deviceMemoryStr);
+
+  if(debugMode == 1){
+    Serial.print("DEBUG Set target device memory size to: ");
+    Serial.println(targetDeviceMemSize);
+  }
+}
+
+void writeDataToTargetDeviceMemory(){
+  
+}
+
+void _writeToMem(const uint16_t addr, char data) {
+  // Do things
+  if(debugMode == 1){
+    Serial.print("DEBUG Write data to addr: ");
+    Serial.println(addr);
+  }
+}
+
+const char* parseDataFromCommandString(){
+  const char* data;
+  char* delim_char_ptr = strtok(receivedBytes, CMD_DELIMITER);
+
+  if(delim_char_ptr != NULL){
+    delim_char_ptr = strtok(NULL, CMD_DELIMITER);
+    data = delim_char_ptr;
+  }else{
+    data = "";
+  }
 
   return data;
 }
 
-void set_address(const uint16_t addr) {
-  DDRC = 0xff;
-  DDRA = 0xff;
-
-  PORTC = addr;
-  PORTA = addr >> 8;
-}
-
-void set_data(const uint8_t data) {
-  DDRL = 0xff;
-  PORTL = data;
-}
-
-void clear_mem() {
-  for (uint16_t i = 0; i < MEM_SIZE; i++)
-    write_mem(i, 0);
-}
-
-void mem_test() {
-  Serial.println("Writing test pattern to memory");
-
-  Serial.println();
-  Serial.println("Alternating Pattern");
-  write_alternative_pattern();
-  dump_mem();
-
-  Serial.println();
-  Serial.println("Incrementing Pattern");
-  write_incrementing_pattern();
-  dump_mem();
-}
-
-void write_alternative_pattern() {
-  for (uint16_t i = 0; i < MEM_SIZE; i++) {
-    if (i % 2 == 0)
-      write_mem(i, 0b10101010);
-    else
-      write_mem(i, 0b01010101);
-  }
-}
-
-void write_incrementing_pattern() {
-  for (uint16_t i = 0; i < MEM_SIZE/2; i++) {
-    uint8_t high = i >> 8;
-    uint8_t low = i;
-    write_mem(i*2, high);
-    write_mem((i*2)+1, low);
-  }
-}
-
-void dump_mem() {
-  char buf[64];
-  bool printed_ellipsis = false;
-
-  Serial.println("Memory:");
-  for (uint16_t i = 0; i < MEM_SIZE; i += 8) {
-    uint8_t mem[] = {
-      read_mem(i+0), read_mem(i+1), read_mem(i+2), read_mem(i+3),
-      read_mem(i+4), read_mem(i+5), read_mem(i+6), read_mem(i+7),
-    };
-
-    bool all_zero = true;
-    for (int i = 0; i < 8; i++)
-      all_zero = all_zero && mem[i] == 0;
-
-    if (!all_zero || i == 0 || i == MEM_SIZE-8) {
-      sprintf(
-        buf,
-        "%04x: %02x %02x %02x %02x    %02x %02x %02x %02x",
-        i,
-        mem[0], mem[1], mem[2], mem[3],
-        mem[4], mem[5], mem[6], mem[7]
-      );
-      printed_ellipsis = false;
-      Serial.println(buf);
-    } else {
-      if (!printed_ellipsis) {
-        Serial.println("...");
-        printed_ellipsis = true;
-      }
-    }
-  }
-}
-
-void write_program() {
-  Serial.print("Writing program length ");
-  Serial.println(program_length());
-  for (uint32_t i = 0; i < program_length(); i++) {
-    uint16_t address = PROGRAM[i*2];
-    uint16_t data = PROGRAM[i*2+1];
-
-    if (address >= MEM_SIZE) {
-      Serial.print("Attempting to write to beyond memory at address ");
-      Serial.println(address, HEX);
-      break;
-    }
-
-    write_mem(address, data);
-  }
-  dump_mem();
-  verify_program();
-}
-
-void verify_program() {
-  uint8_t prog_cksum = 0,
-    mem_cksum = 0;
-
-  for (uint16_t i = 0; i < program_length(); i++)
-    prog_cksum += PROGRAM[i*2+1];
-
-  for (uint16_t i = 0; i < MEM_SIZE; i++)
-    mem_cksum += read_mem(i);
-
-  if (prog_cksum != mem_cksum) {
-    Serial.println("PROGRAMMING FAILED, MISMATCHING CKSUM");
-    Serial.print("Got: ");
-    Serial.print(mem_cksum);
-    Serial.print(" Expected: ");
-    Serial.println(prog_cksum);
-  } else {
-    Serial.println("Programming OK");
-  }
-}
-
-uint32_t program_length() { return sizeof(PROGRAM) / 4; }
-
-void hold_and_commandeer_bus() {
-  digitalWrite(HOLD_pin, HIGH);
-  pinMode(HOLD_pin, OUTPUT);
-  delay(100);
-
-  pinMode(LATCH_EN_pin, OUTPUT);
-  pinMode(RD_pin, OUTPUT);
-  pinMode(WR_pin, OUTPUT);
-
-  digitalWrite(LATCH_EN_pin, HIGH);
-  digitalWrite(RD_pin, HIGH);
-  digitalWrite(WR_pin, HIGH);
-}
-
-void release_bus() {
-  pinMode(LATCH_EN_pin, INPUT);
-  pinMode(RD_pin, INPUT);
-  pinMode(WR_pin, INPUT);
-
-  PORTC = 0;
-  PORTA = 0;
-  PORTL = 0;
-}
-
-void release_hold() {
-  digitalWrite(HOLD_pin, LOW);
-  pinMode(HOLD_pin, INPUT);
-}
