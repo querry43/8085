@@ -10,7 +10,7 @@ antlr_jar = antlr-4.5.3-complete.jar
 ANTLR = java -jar java/${antlr_jar}
 NODEJS = node
 
-all:
+all: node_modules/antlr4/index.js
 
 grammar: ${GRAMMAR}
 

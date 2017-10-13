@@ -1,5 +1,7 @@
 #include "hardware_interface.h"
 
+#include <arduino.h>
+
 uint32_t program_length() { return sizeof(PROGRAM) / 4; }
 
 void set_address(const uint16_t addr) {
@@ -34,7 +36,7 @@ void write_mem(const uint16_t addr, const uint8_t data) {
   DDRL = 0;
 }
 
-unsigned char read_mem(const uint16_t addr) {
+uint8_t read_mem(const uint16_t addr) {
   set_address(addr);
 
   digitalWrite(RD_pin, LOW);
@@ -78,7 +80,7 @@ void write_incrementing_pattern() {
   }
 }
 
-void mem_test() {
+void test_mem() {
   Serial.println("Writing test pattern to memory");
 
   Serial.println();
@@ -126,25 +128,6 @@ void dump_mem() {
   }
 }
 
-void write_program() {
-  Serial.print("Writing program length ");
-  Serial.println(program_length());
-  for (uint32_t i = 0; i < program_length(); i++) {
-    uint16_t address = PROGRAM[i*2];
-    uint16_t data = PROGRAM[i*2+1];
-
-    if (address >= MEM_SIZE) {
-      Serial.print("Attempting to write to beyond memory at address ");
-      Serial.println(address, HEX);
-      break;
-    }
-
-    write_mem(address, data);
-  }
-  dump_mem();
-  verify_program();
-}
-
 void verify_program() {
   uint8_t prog_cksum = 0,
     mem_cksum = 0;
@@ -164,6 +147,25 @@ void verify_program() {
   } else {
     Serial.println("Programming OK");
   }
+}
+
+void write_program() {
+  Serial.print("Writing program length ");
+  Serial.println(program_length());
+  for (uint32_t i = 0; i < program_length(); i++) {
+    uint16_t address = PROGRAM[i*2];
+    uint16_t data = PROGRAM[i*2+1];
+
+    if (address >= MEM_SIZE) {
+      Serial.print("Attempting to write to beyond memory at address ");
+      Serial.println(address, HEX);
+      break;
+    }
+
+    write_mem(address, data);
+  }
+  dump_mem();
+  verify_program();
 }
 
 void hold_and_commandeer_bus() {

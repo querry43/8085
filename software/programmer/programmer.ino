@@ -15,7 +15,7 @@ void setup() {
   pinMode(RESET_pin, OUTPUT);
 
   if (MEMTEST) {
-    mem_test();
+    test_mem();
   } else {
     clear_mem();
     write_program();
