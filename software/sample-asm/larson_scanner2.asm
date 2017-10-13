@@ -1,8 +1,11 @@
 ; a larson scanner repeating a stored pattern
 ; for the 8155
 
-START:
+        LXI SP , 8191
+        JMP START
 
+        ORG 44H
+START:
         ; setup output
         LXI H,CSADDY
         MVI M,00000001B ; PA output

@@ -1,5 +1,9 @@
 ; for the 8155
 
+        LXI SP , 8191
+        JMP START
+
+        ORG 44H
 START:  LXI H,CSADDY
         MVI M,00000001B ; PA output
 

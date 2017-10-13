@@ -1,12 +1,8 @@
-#include "asm.h"
 #include "noop.h"
 #include "light_on.h"
 #include "blink.h"
-#include "output.h"
-#include "larson_scanner.h"
+#include "output_8155.h"
 #include "larson_scanner2.h"
-#include "multiplex_output.h"
-//#include "reversi.h"
 
 const uint8_t
   HOLD_pin = 8,
@@ -21,7 +17,7 @@ const uint8_t
  *  A8-A15 to PORTA (22-29)
  *  D0-D7 to PORTL (49-42)
  */
-#define PROGRAM output_8155_asm_h
+#define PROGRAM larson_scanner2_asm_h
 #define MEM_SIZE 2048
 #define DEBUG false
 #define MEMTEST false
