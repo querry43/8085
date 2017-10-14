@@ -33,7 +33,7 @@ class Assembler {
   }
 
   writeHexFile(file) {
-    fs.writeFileSync(file, this.listener.toHex());
+    fs.writeFileSync(file, this.listener.toHex() + ':00000001FF\n');
   }
 
   writeTextFile(file) {
