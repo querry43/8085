@@ -10,10 +10,10 @@ class Operand {
     var bytes = [ ];
     var value = this.toInt(programCounter, symbolTable);
 
-    while (value > 0) {
+    do {
       bytes.push((value & 0xff).toString(16));
       value = value >> 8;
-    }
+    } while (value > 0)
 
     return bytes;
   }
