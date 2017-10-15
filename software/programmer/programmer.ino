@@ -117,24 +117,72 @@ void writeDataToTargetDeviceMemory(const char cmd, char * data){
   if(debugMode == 1){
     Serial.println("DEBUG Write data to memory");
   }
-  int bytes[256];
-  int * addr;
-  int * num;
-  int * code;
-  int success = 5;
-  success = parseHexLine(data, bytes, addr, num, code);
+  
+  processHexLine(data);
 
   if(debugMode == 1){
-    Serial.print("DEBUG Results of parsing: ");
-    Serial.println(success);
+    Serial.print("DEBUG Done writing to memory");
   }
 }
 
-void _writeToMem(const uint16_t addr, char data) {
+void _writeToMem(uint16_t addr, uint8_t data) {
   // Do things
   if(debugMode == 1){
-    Serial.print("DEBUG Write data to addr: ");
+    Serial.print("DEBUG Write data ");
+    Serial.print(data);
+    Serial.print(" to addr ");
     Serial.println(addr);
+  }
+}
+
+void processHexLine(char * hex_line){
+  char record_length[3];
+  char start_addr[5];
+  char byte_to_write[3];
+  
+  int i = 0;
+  int len_iterator = 0;
+  int addr_iterator = 0;
+  int num_records = 0;
+  
+  uint16_t starting_addr;
+  
+  //Skip over the starting colon
+  hex_line++;
+  
+  for(i = 0; i < 6; i++){
+    if(i < 2){
+      record_length[len_iterator] = *hex_line;
+      len_iterator++;
+    }else{
+      start_addr[addr_iterator] = *hex_line;
+      addr_iterator++;
+    }
+    hex_line++;    
+  }
+  record_length[2] = '\0';
+  start_addr[4] = '\0';
+
+  num_records = atoi(record_length);
+
+  sscanf(start_addr, "%" SCNx16, &starting_addr);
+  int mod;
+  i = 0;
+  int counter = 0;
+  uint8_t data;
+  byte_to_write[2] = '\0';
+  while (i < num_records && *hex_line != '\0') { //Just a wee bit o' sanity checking
+    mod = counter % 2;
+    byte_to_write[mod] = *hex_line;
+
+    if(mod == 1){
+      sscanf(byte_to_write, "%" SCNx8, &data);
+      _writeToMem(starting_addr, data);
+      starting_addr++;
+      i++;
+    }
+    counter++;
+    hex_line++;
   }
 }
 
@@ -150,34 +198,4 @@ char* parseDataFromCommandString(){
   }
 
   return data;
-}
-
-int parseHexLine(char * hex_line, int bytes[], int * addr, int * num, int * code)
-{
-  int sum, len, chksum;
-  char *ptr;
-  
-  *num = 0;
-  if (hex_line[0] != ':') return 0;
-  if (strlen(hex_line) < 11) return 0;
-  ptr = hex_line+1;
-  if (!sscanf(ptr, "%02x", &len)) return 0;
-  ptr += 2;
-  if ( strlen(hex_line) < (11 + (len * 2)) ) return 0;
-  if (!sscanf(ptr, "%04x", addr)) return 0;
-  ptr += 4;
-    /* printf("Line: length=%d Addr=%d\n", len, *addr); */
-  if (!sscanf(ptr, "%02x", code)) return 0;
-  ptr += 2;
-  sum = (len & 255) + ((*addr >> 8) & 255) + (*addr & 255) + (*code & 255);
-  while(*num != len) {
-    if (!sscanf(ptr, "%02x", &bytes[*num])) return 0;
-    ptr += 2;
-    sum += bytes[*num] & 255;
-    (*num)++;
-    if (*num >= 256) return 0;
-  }
-  if (!sscanf(ptr, "%02x", &chksum)) return 0;
-  if ( ((sum & 255) + (chksum & 255)) & 255 ) return 0; /* checksum error */
-  return 1;
 }
