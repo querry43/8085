@@ -1,9 +1,12 @@
 #define CMD_SIZE 128
 #define CMD_DELIMITER "|"
+#define MOCK_HARDWARE
+#define BAUD 38400
+
 #include <string.h>
+#include "hardware_interface.h"
 
 char receivedBytes[CMD_SIZE];
-//const char* CMD_DELIMITER = "|";
 int iterator = 0;
 int commandTerminator = 10;
 int targetDeviceMemSize;
@@ -11,7 +14,7 @@ byte targetDeviceMemToRead;
 int debugMode = 0;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(BAUD);
   _clearReceivedCommand();
 }
 
@@ -33,6 +36,13 @@ void loop() {
   }
 }
 
+void doTheTest() {
+  write_mem(0, 0x3e);
+  write_mem(1, 0xc0);
+  write_mem(2, 0x30);
+  write_mem(3, 0x76);
+}
+
 void handleReceivedCommand() {
   if (receivedBytes[0] == 0)
     return;
@@ -45,6 +55,15 @@ void handleReceivedCommand() {
   // parse command and arg here
   const char cmd = receivedBytes[0];
   char* data = parseDataFromCommandString();
+
+  // z - zero
+  // m - set mem size
+  // r - read address
+  // w - write data to address
+  // d - tobble debugging
+  // h - hold bus
+  // l - release bus
+  // t - screwing around with testing, temporary
 
   switch(cmd) {
     case 'z':
@@ -65,6 +84,20 @@ void handleReceivedCommand() {
       break;
     case 'w':
       writeDataToTargetDeviceMemory(cmd, data);
+      Serial.println("OK");
+      break;
+    case 'h':
+      hold_and_commandeer_bus();
+      Serial.println("OK");
+      break;
+    case 'l':
+      release_bus();
+      reset_cpu();
+      release_hold();
+      Serial.println("OK");
+      break;
+    case 't':
+      doTheTest();
       Serial.println("OK");
       break;
     default:
@@ -126,13 +159,13 @@ void writeDataToTargetDeviceMemory(const char cmd, char * data){
 }
 
 void _writeToMem(uint16_t addr, uint8_t data) {
-  // Do things
   if(debugMode == 1){
     Serial.print("DEBUG Write data ");
     Serial.print(data);
     Serial.print(" to addr ");
     Serial.println(addr);
   }
+  write_mem(addr, data);
 }
 
 void processHexLine(char * hex_line){
