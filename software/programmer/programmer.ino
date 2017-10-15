@@ -36,6 +36,13 @@ void loop() {
   }
 }
 
+void doTheTest() {
+  write_mem(0, 0x3e);
+  write_mem(1, 0xc0);
+  write_mem(2, 0x30);
+  write_mem(3, 0x76);
+}
+
 void handleReceivedCommand() {
   if (receivedBytes[0] == 0)
     return;
@@ -56,6 +63,7 @@ void handleReceivedCommand() {
   // d - tobble debugging
   // h - hold bus
   // l - release bus
+  // t - screwing around with testing, temporary
 
   switch(cmd) {
     case 'z':
@@ -86,6 +94,10 @@ void handleReceivedCommand() {
       release_bus();
       reset_cpu();
       release_hold();
+      Serial.println("OK");
+      break;
+    case 't':
+      doTheTest();
       Serial.println("OK");
       break;
     default:
