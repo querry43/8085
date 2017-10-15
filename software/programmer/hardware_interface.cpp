@@ -7,10 +7,6 @@ void hold_and_commandeer_bus() { }
 void release_bus() { }
 void release_hold() { }
 
-void clear_mem() { }
-void test_mem() { }
-void dump_mem() { }
-
 void write_mem(const uint16_t addr, const uint8_t data) { }
 uint8_t read_mem(const uint16_t addr) { }
 
@@ -54,75 +50,6 @@ uint8_t read_mem(const uint16_t addr) {
 
   return data;
 }
-
-/*
-
-void write_alternative_pattern() {
-  for (uint16_t i = 0; i < MEM_SIZE; i++) {
-    if (i % 2 == 0)
-      write_mem(i, 0b10101010);
-    else
-      write_mem(i, 0b01010101);
-  }
-}
-
-void write_incrementing_pattern() {
-  for (uint16_t i = 0; i < MEM_SIZE/2; i++) {
-    uint8_t high = i >> 8;
-    uint8_t low = i;
-    write_mem(i*2, high);
-    write_mem((i*2)+1, low);
-  }
-}
-
-void test_mem() {
-  Serial.println("Writing test pattern to memory");
-
-  Serial.println();
-  Serial.println("Alternating Pattern");
-  write_alternative_pattern();
-  dump_mem();
-
-  Serial.println();
-  Serial.println("Incrementing Pattern");
-  write_incrementing_pattern();
-  dump_mem();
-}
-
-void dump_mem() {
-  char buf[64];
-  bool printed_ellipsis = false;
-
-  Serial.println("Memory:");
-  for (uint16_t i = 0; i < MEM_SIZE; i += 8) {
-    uint8_t mem[] = {
-      read_mem(i+0), read_mem(i+1), read_mem(i+2), read_mem(i+3),
-      read_mem(i+4), read_mem(i+5), read_mem(i+6), read_mem(i+7),
-    };
-
-    bool all_zero = true;
-    for (int i = 0; i < 8; i++)
-      all_zero = all_zero && mem[i] == 0;
-
-    if (!all_zero || i == 0 || i == MEM_SIZE-8) {
-      sprintf(
-        buf,
-        "%04x: %02x %02x %02x %02x    %02x %02x %02x %02x",
-        i,
-        mem[0], mem[1], mem[2], mem[3],
-        mem[4], mem[5], mem[6], mem[7]
-      );
-      printed_ellipsis = false;
-      Serial.println(buf);
-    } else {
-      if (!printed_ellipsis) {
-        Serial.println("...");
-        printed_ellipsis = true;
-      }
-    }
-  }
-}
-*/
 
 void hold_and_commandeer_bus() {
   digitalWrite(HOLD_pin, HIGH);

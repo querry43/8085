@@ -16,15 +16,11 @@ const uint8_t
   RESET_pin = 9,
   RD_pin = 10,
   WR_pin = 11,
-  LATCH_EN_pin = 12,
-  DIAG_pin = 13;
+  LATCH_EN_pin = 12;
 
 void hold_and_commandeer_bus();
 void release_bus();
 void release_hold();
-
-void test_mem();
-void dump_mem();
 
 void write_mem(const uint16_t addr, const uint8_t data);
 uint8_t read_mem(const uint16_t addr);
