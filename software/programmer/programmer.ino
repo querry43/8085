@@ -1,9 +1,11 @@
 #define CMD_SIZE 128
 #define CMD_DELIMITER "|"
+#define MOCK_HARDWARE
+
 #include <string.h>
+#include "hardware_interface.h"
 
 char receivedBytes[CMD_SIZE];
-//const char* CMD_DELIMITER = "|";
 int iterator = 0;
 int commandTerminator = 10;
 int targetDeviceMemSize;
@@ -131,11 +133,11 @@ void writeDataToTargetDeviceMemory(const char cmd, char * data){
 }
 
 void _writeToMem(const uint16_t addr, char data) {
-  // Do things
   if(debugMode == 1){
     Serial.print("DEBUG Write data to addr: ");
     Serial.println(addr);
   }
+  write_mem(addr, data);
 }
 
 char* parseDataFromCommandString(){

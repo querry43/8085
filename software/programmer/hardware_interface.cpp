@@ -1,8 +1,20 @@
+#include <arduino.h>
 #include "hardware_interface.h"
 
-#include <arduino.h>
+#ifdef MOCK_HARDWARE
 
-uint32_t program_length() { return sizeof(PROGRAM) / 4; }
+void hold_and_commandeer_bus() { }
+void release_bus() { }
+void release_hold() { }
+
+void clear_mem() { }
+void test_mem() { }
+void dump_mem() { }
+
+void write_mem(const uint16_t addr, const uint8_t data) { }
+uint8_t read_mem(const uint16_t addr) { }
+
+#else
 
 void set_address(const uint16_t addr) {
   DDRC = 0xff;
@@ -24,13 +36,6 @@ void write_mem(const uint16_t addr, const uint8_t data) {
   set_data(data);
   digitalWrite(WR_pin, HIGH);
 
-  if (DEBUG) {
-    Serial.print("writing ");
-    Serial.print(data, HEX);
-    Serial.print(" to ");
-    Serial.println(addr, HEX);
-  }
-
   DDRC = 0;
   DDRA = 0;
   DDRL = 0;
@@ -43,13 +48,6 @@ uint8_t read_mem(const uint16_t addr) {
   uint8_t data = PINL;
   digitalWrite(RD_pin, HIGH);
 
-  if (DEBUG) {
-    Serial.print("reading ");
-    Serial.print(data, BIN);
-    Serial.print(" from ");
-    Serial.println(addr, HEX);
-  }
-
   DDRC = 0;
   DDRA = 0;
   DDRL = 0;
@@ -57,10 +55,7 @@ uint8_t read_mem(const uint16_t addr) {
   return data;
 }
 
-void clear_mem() {
-  for (uint16_t i = 0; i < MEM_SIZE; i++)
-    write_mem(i, 0);
-}
+/*
 
 void write_alternative_pattern() {
   for (uint16_t i = 0; i < MEM_SIZE; i++) {
@@ -127,46 +122,7 @@ void dump_mem() {
     }
   }
 }
-
-void verify_program() {
-  uint8_t prog_cksum = 0,
-    mem_cksum = 0;
-
-  for (uint16_t i = 0; i < program_length(); i++)
-    prog_cksum += PROGRAM[i*2+1];
-
-  for (uint16_t i = 0; i < MEM_SIZE; i++)
-    mem_cksum += read_mem(i);
-
-  if (prog_cksum != mem_cksum) {
-    Serial.println("PROGRAMMING FAILED, MISMATCHING CKSUM");
-    Serial.print("Got: ");
-    Serial.print(mem_cksum);
-    Serial.print(" Expected: ");
-    Serial.println(prog_cksum);
-  } else {
-    Serial.println("Programming OK");
-  }
-}
-
-void write_program() {
-  Serial.print("Writing program length ");
-  Serial.println(program_length());
-  for (uint32_t i = 0; i < program_length(); i++) {
-    uint16_t address = PROGRAM[i*2];
-    uint16_t data = PROGRAM[i*2+1];
-
-    if (address >= MEM_SIZE) {
-      Serial.print("Attempting to write to beyond memory at address ");
-      Serial.println(address, HEX);
-      break;
-    }
-
-    write_mem(address, data);
-  }
-  dump_mem();
-  verify_program();
-}
+*/
 
 void hold_and_commandeer_bus() {
   digitalWrite(HOLD_pin, HIGH);
@@ -196,3 +152,5 @@ void release_hold() {
   digitalWrite(HOLD_pin, LOW);
   pinMode(HOLD_pin, INPUT);
 }
+
+#endif
