@@ -1,6 +1,6 @@
 #pragma once
 
-#define MOCK_HARDWARE
+//#define MOCK_HARDWARE
 
 
 /* Hookup:
@@ -21,6 +21,7 @@ const uint8_t
 void hold_and_commandeer_bus();
 void release_bus();
 void release_hold();
+void reset_cpu();
 
 void write_mem(const uint16_t addr, const uint8_t data);
 uint8_t read_mem(const uint16_t addr);

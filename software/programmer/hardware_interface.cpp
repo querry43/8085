@@ -6,6 +6,7 @@
 void hold_and_commandeer_bus() { }
 void release_bus() { }
 void release_hold() { }
+void reset_cpu() { }
 
 void write_mem(const uint16_t addr, const uint8_t data) { }
 uint8_t read_mem(const uint16_t addr) { }
@@ -63,6 +64,9 @@ void hold_and_commandeer_bus() {
   digitalWrite(LATCH_EN_pin, HIGH);
   digitalWrite(RD_pin, HIGH);
   digitalWrite(WR_pin, HIGH);
+
+  digitalWrite(RESET_pin, HIGH);
+  pinMode(RESET_pin, OUTPUT);
 }
 
 void release_bus() {
@@ -78,6 +82,12 @@ void release_bus() {
 void release_hold() {
   digitalWrite(HOLD_pin, LOW);
   pinMode(HOLD_pin, INPUT);
+}
+
+void reset_cpu() {
+  digitalWrite(RESET_pin, LOW);
+  delay(100);
+  pinMode(RESET_pin, INPUT); // high impedance lets reset circuit take over
 }
 
 #endif

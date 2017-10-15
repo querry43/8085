@@ -1,6 +1,7 @@
 #define CMD_SIZE 128
 #define CMD_DELIMITER "|"
 #define MOCK_HARDWARE
+#define BAUD 38400
 
 #include <string.h>
 #include "hardware_interface.h"
@@ -13,7 +14,7 @@ byte targetDeviceMemToRead;
 int debugMode = 0;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(BAUD);
   _clearReceivedCommand();
 }
 
@@ -48,6 +49,14 @@ void handleReceivedCommand() {
   const char cmd = receivedBytes[0];
   char* data = parseDataFromCommandString();
 
+  // z - zero
+  // m - set mem size
+  // r - read address
+  // w - write data to address
+  // d - tobble debugging
+  // h - hold bus
+  // l - release bus
+
   switch(cmd) {
     case 'z':
       clearTargetDeviceMemory();
@@ -67,6 +76,16 @@ void handleReceivedCommand() {
       break;
     case 'w':
       writeDataToTargetDeviceMemory(cmd, data);
+      Serial.println("OK");
+      break;
+    case 'h':
+      hold_and_commandeer_bus();
+      Serial.println("OK");
+      break;
+    case 'l':
+      release_bus();
+      reset_cpu();
+      release_hold();
       Serial.println("OK");
       break;
     default:
