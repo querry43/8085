@@ -154,7 +154,7 @@ void writeDataToTargetDeviceMemory(const char cmd, char * data){
   processHexLine(data);
 
   if(debugMode == 1){
-    Serial.print("DEBUG Done writing to memory");
+    Serial.println("DEBUG Done writing to memory");
   }
 }
 
@@ -186,7 +186,7 @@ void processHexLine(char * hex_line){
 
   int byte_offset = 9;
   while (num_bytes-- > 0) {
-    write_mem(start_addr, stringToInt(hex_line+byte_offset, 2));
+    _writeToMem(start_addr, stringToInt(hex_line+byte_offset, 2));
     byte_offset += 2;
     start_addr++;
   }
