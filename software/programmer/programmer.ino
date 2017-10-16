@@ -168,54 +168,32 @@ void _writeToMem(uint16_t addr, uint8_t data) {
   write_mem(addr, data);
 }
 
+uint16_t stringToInt(char * str, int len){
+  char buffer[8];
+  strncpy(buffer, str, len);
+  buffer[len] = '\n';
+  return atoi(buffer);
+}
+
 void processHexLine(char * hex_line){
-  char record_length[3];
-  char start_addr[5];
-  char byte_to_write[3];
-  
-  int i = 0;
-  int len_iterator = 0;
-  int addr_iterator = 0;
-  int num_records = 0;
-  
-  uint16_t starting_addr;
-  
-  //Skip over the starting colon
-  hex_line++;
-  
-  for(i = 0; i < 6; i++){
-    if(i < 2){
-      record_length[len_iterator] = *hex_line;
-      len_iterator++;
-    }else{
-      start_addr[addr_iterator] = *hex_line;
-      addr_iterator++;
-    }
-    hex_line++;    
-  }
-  record_length[2] = '\0';
-  start_addr[4] = '\0';
+  uint16_t num_bytes = stringToInt(hex_line+1, 2);
+  uint16_t start_addr = stringToInt(hex_line+3, 4);
+  uint16_t type = stringToInt(hex_line+7, 2);
 
-  num_records = atoi(record_length);
+  // ignore footers and junk
+  if (type != 0)
+    return;
 
-  sscanf(start_addr, "%" SCNx16, &starting_addr);
-  int mod;
-  i = 0;
-  int counter = 0;
-  uint8_t data;
-  byte_to_write[2] = '\0';
-  while (i < num_records && *hex_line != '\0') { //Just a wee bit o' sanity checking
-    mod = counter % 2;
-    byte_to_write[mod] = *hex_line;
+  int byte_offset = 9;
+  while (num_bytes-- > 0) {
+    char digits[3];
+    digits[2] = '\0';
+    strncpy(digits, hex_line+byte_offset, 2);
 
-    if(mod == 1){
-      sscanf(byte_to_write, "%" SCNx8, &data);
-      _writeToMem(starting_addr, data);
-      starting_addr++;
-      i++;
-    }
-    counter++;
-    hex_line++;
+    write_mem(start_addr, strtol(digits, NULL, 16));
+
+    byte_offset += 2;
+    start_addr++;
   }
 }
 
