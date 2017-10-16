@@ -1,5 +1,6 @@
 ASM = \
        blink.hex \
+       game.hex \
        larson_scanner.hex \
        larson_scanner2.hex \
        light_on.hex \
@@ -15,6 +16,7 @@ all: ${ASM}
 
 output-8155.hex: output-8155.asm libs/addresses.asm
 blink.hex: blink.asm libs/delay.asm
+game.hex: game.asm libs/delay.asm libs/addresses.asm
 larson_scanner.hex: larson_scanner.asm libs/delay.asm libs/addresses.asm
 larson_scanner2.hex: larson_scanner2.asm libs/delay.asm libs/addresses.asm
 reversi/reversi.hex: reversi/reversi.asm reversi/board.asm libs/addresses.asm
