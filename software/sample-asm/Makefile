@@ -26,7 +26,7 @@ reversi/test/test_3_load_workspace.asm.h: reversi/test/test_3_load_workspace.asm
 	${ASSEMBLE} --hex /dev/null --text $@ $^
 
 clean:
-	rm -f ${ASM}
+	rm -f *.h *.hex ${ASM}
 
 .PHONY: all clean
 

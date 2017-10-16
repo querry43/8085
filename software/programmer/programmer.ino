@@ -172,7 +172,7 @@ uint16_t stringToInt(char * str, int len){
   char buffer[8];
   strncpy(buffer, str, len);
   buffer[len] = '\n';
-  return atoi(buffer);
+  return strtol(buffer, NULL, 16);
 }
 
 void processHexLine(char * hex_line){
@@ -186,12 +186,7 @@ void processHexLine(char * hex_line){
 
   int byte_offset = 9;
   while (num_bytes-- > 0) {
-    char digits[3];
-    digits[2] = '\0';
-    strncpy(digits, hex_line+byte_offset, 2);
-
-    write_mem(start_addr, strtol(digits, NULL, 16));
-
+    write_mem(start_addr, stringToInt(hex_line+byte_offset, 2));
     byte_offset += 2;
     start_addr++;
   }
