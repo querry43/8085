@@ -8,7 +8,8 @@ ASM = \
        output-8155.hex \
        reversi/reversi.hex \
        reversi/test/test_1_board.hex \
-       reversi/test/test_2_eval.hex
+       reversi/test/test_2_eval.hex \
+       serial-control.hex
 
 ASSEMBLE = ../assembler/assemble
 
