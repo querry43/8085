@@ -5,7 +5,8 @@
 
 char receivedBytes[CMD_SIZE];
 int iterator = 0;
-int targetDeviceMemSize;
+int targetDeviceRomOffset;
+int targetDeviceRomSize;
 int debugMode = 0;
 
 void writeToMem(uint16_t addr, uint8_t data) {
@@ -30,29 +31,63 @@ void toggle_debug() {
 }
 
 void dump_memory_contents(const char cmd, char * data){
-  if(debugMode == 1){
-    Serial.println("DEBUG Print contents of target device memory addr");
-    Serial.print("DEBUG Parsed data: ");
-    Serial.println(data);
+  char buf[64];
+  bool printed_ellipsis = false;
+
+  Serial.println("Memory:");
+  for (uint16_t i = targetDeviceRomOffset; i < targetDeviceRomOffset+targetDeviceRomSize; i += 8) {
+    uint8_t mem[] = {
+      read_mem(i+0), read_mem(i+1), read_mem(i+2), read_mem(i+3),
+      read_mem(i+4), read_mem(i+5), read_mem(i+6), read_mem(i+7),
+    };
+
+    bool all_zero = true;
+    for (int i = 0; i < 8; i++)
+      all_zero = all_zero && mem[i] == 0;
+
+    if (!all_zero || i == targetDeviceRomOffset || i == targetDeviceRomOffset+targetDeviceRomSize-8) {
+      sprintf(
+        buf,
+        "%04x: %02x %02x %02x %02x    %02x %02x %02x %02x",
+        i,
+        mem[0], mem[1], mem[2], mem[3],
+        mem[4], mem[5], mem[6], mem[7]
+      );
+      printed_ellipsis = false;
+      Serial.println(buf);
+    } else {
+      if (!printed_ellipsis) {
+        Serial.println("...");
+        printed_ellipsis = true;
+      }
+    }
   }
-  //This doesn't do much yet...
 }
 
 void zero_rom(){
   if(debugMode == 1){
     Serial.println("DEBUG Clear target device memory");
   }
-  for(uint16_t i = 0; i < targetDeviceMemSize; i++){
+  for(uint16_t i = targetDeviceRomOffset; i < targetDeviceRomOffset+targetDeviceRomSize; i++){
     writeToMem(i, '\0');
   }
 }
 
+void set_rom_offset(const char cmd, char * data){
+  targetDeviceRomOffset = atol(data);
+
+  if(debugMode == 1){
+    Serial.print("DEBUG Set target device memory offset to: ");
+    Serial.println(targetDeviceRomOffset);
+  }
+}
+
 void set_rom_size(const char cmd, char * data){
-  targetDeviceMemSize = atol(data);
+  targetDeviceRomSize = atol(data);
 
   if(debugMode == 1){
     Serial.print("DEBUG Set target device memory size to: ");
-    Serial.println(targetDeviceMemSize);
+    Serial.println(targetDeviceRomSize);
   }
 }
 
@@ -108,7 +143,8 @@ void process_received_command() {
   // d - toggle debugging output
   // h - take a hold on the bus so the cpu doesn't get confused
   // l - release bus and reset the cpu
-  // m - set mem size
+  // m - set rom size
+  // o - set rom offset
   // p - ping
   // r - read address
   // w - write data to address
@@ -120,6 +156,10 @@ void process_received_command() {
       break;
     case 'z':
       zero_rom();
+      Serial.println("OK");
+      break;
+    case 'o':
+      set_rom_offset(cmd, data);
       Serial.println("OK");
       break;
     case 'm':
