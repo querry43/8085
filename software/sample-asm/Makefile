@@ -1,4 +1,5 @@
 ASM = \
+       bootloader.hex \
        blink.hex \
        game.hex \
        larson_scanner.hex \
@@ -14,6 +15,9 @@ ASM = \
 ASSEMBLE = ../assembler/assemble
 
 all: ${ASM}
+
+bootloader.hex symbols.asm: bootloader.asm
+	${ASSEMBLE} --hex bootloader.hex --symbol symbols.asm $^
 
 output-8155.hex: output-8155.asm libs/addresses.asm
 blink.hex: blink.asm libs/delay.asm
