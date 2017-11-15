@@ -8,7 +8,7 @@ var argv = require('minimist')(
   process.argv.slice(2),
   {
     'boolean': [ 'help' ],
-    'strings': [ 'hex', 'text', 'stack' ],
+    'strings': [ 'hex', 'text', 'symbol' ],
     'alias': {
       'help': [ 'h', '?' ],
     }
@@ -24,6 +24,7 @@ if (argv.help || !argv.hex || !argv.inputs) {
   console.error();
   console.error('  --hex          output hex file');
   console.error('  --text         output text file');
+  console.error('  --symbol       output symbol table as asm file');
   process.exit(1);
 }
 
@@ -34,5 +35,6 @@ var asm = new Assembler(new AsmListener());
 argv.inputs.forEach(function(file) { asm.readAsmFile(file); });
 asm.writeHexFile(argv.hex);
 if (argv.text) { asm.writeTextFile(argv.text); }
+if (argv.symbol) { asm.writeSymbolFile(argv.symbol); }
 
 // vim: ts=2 sw=2 et

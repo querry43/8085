@@ -43,6 +43,18 @@ class Assembler {
       '\nconst uint16_t ' + programName + '[] = {\n\n' + this.listener.toString() + '\n};\n\n'
     );
   }
+
+  writeSymbolFile(file) {
+    var output = '';
+    var self = this;
+
+    Object.keys(self.listener.symbolTable).sort().forEach(function(property) {
+      output = output
+        + property + ' SET ' + self.listener.symbolTable[property] + '\n';
+    });
+
+    fs.writeFileSync(file, output);
+  }
 }
 
 exports.Assembler = Assembler;
