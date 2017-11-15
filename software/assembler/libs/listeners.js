@@ -186,7 +186,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     this.symbolTable[this.label] = this.address;
   }
 
-  exitORG(ctx) { this.address = this.immediates[0].toInt(); }
+  exitORG(ctx) { this.address = this.immediates[0].toInt(this.address, this.symbolTable); }
 
   exitLocationcounteroperand(ctx) { this.immediates.push(new operands.LocationCounter()); }
 
