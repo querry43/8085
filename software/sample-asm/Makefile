@@ -21,6 +21,9 @@ bootloader.hex bootloader-symbols.asm: bootloader.asm
 game.hex: functions/delay.asm
 	${ASSEMBLE} --hex $@ bootloader.asm game.asm functions/delay.asm
 
+serial-control.hex: functions/delay.asm
+	${ASSEMBLE} --hex $@ bootloader.asm serial-control.asm
+
 
 larson_scanner.hex: functions/delay.asm bootloader-symbols.asm
 

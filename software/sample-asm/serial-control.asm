@@ -10,19 +10,11 @@
 ;  * re-test the io ports
 
 
-        LXI SP , 8191
-        JMP START
+        ORG PSTART
 
-        ORG 44H
-START:
-        ; A15 A14 A13 A12 A11
-        ;  1   1   1   1   1   X   X   X = F800 = Command
-        ;  1   1   1   1   0   X   X   X = F800 = Data
-        ; same address as the io ports for now
-        LXI H,F800H
+        LXI H,USARTCTL
 
         ; worst-case initialize
-        MVI M,00H
         MVI M,00H
         MVI M,00H
         MVI M,40H
@@ -44,11 +36,9 @@ START:
         ; 1 DTR (test)
         ; 1 transmit enable
         MVI M,00110011B
-        HLT
 
         ; just send some junk data a bunch
         LXI H,F000H
-LOOP:   MVI M,01010101B
-        JMP LOOP
+        MVI M,01010101B
 
         HLT
