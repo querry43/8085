@@ -1,16 +1,15 @@
 ASM = \
        bootloader.hex \
-       blink.hex \
        game.hex \
        larson_scanner.hex \
-       larson_scanner2.hex \
-       light_on.hex \
-       noop.hex \
-       output-8155.hex \
        reversi/reversi.hex \
        reversi/test/test_1_board.hex \
        reversi/test/test_2_eval.hex \
-       serial-control.hex
+       serial-control.hex \
+       test/8155-output.hex \
+       test/blink-sod.hex \
+       test/noop.hex \
+       test/sod-high.hex
 
 ASSEMBLE = ../assembler/assemble
 
@@ -19,15 +18,17 @@ all: ${ASM}
 bootloader.hex symbols.asm: bootloader.asm
 	${ASSEMBLE} --hex bootloader.hex --symbol symbols.asm $^
 
-output-8155.hex: output-8155.asm libs/addresses.asm
-blink.hex: blink.asm libs/delay.asm
-game.hex: game.asm libs/delay.asm libs/addresses.asm
-larson_scanner.hex: larson_scanner.asm libs/delay.asm libs/addresses.asm
-larson_scanner2.hex: larson_scanner2.asm libs/delay.asm libs/addresses.asm
-reversi/reversi.hex: reversi/reversi.asm reversi/board.asm libs/addresses.asm
-reversi/test/test_1_board.hex: reversi/test/test_1_board.asm reversi/board.asm
-reversi/test/test_2_eval.hex: reversi/test/test_2_eval.asm reversi/eval.asm reversi/board.asm
-reversi/test/test_3_load_workspace.hex: reversi/test/test_3_load_workspace.asm reversi/eval.asm reversi/board.asm
+game.hex: functions/delay.asm symbols.asm
+larson_scanner.hex: functions/delay.asm symbols.asm
+
+reversi/reversi.hex: reversi/board.asm symbols.asm
+reversi/test/test_1_board.hex: reversi/board.asm
+reversi/test/test_2_eval.hex: reversi/eval.asm reversi/board.asm
+reversi/test/test_3_load_workspace.hex: reversi/eval.asm reversi/board.asm
+
+test/8155-output.hex: symbols.asm
+test/blink-sod.hex: functions/delay.asm
+test/sod-high.hex: symbols.asm
 
 %.hex : %.asm
 	${ASSEMBLE} --hex $@ $^
@@ -35,6 +36,9 @@ reversi/test/test_3_load_workspace.hex: reversi/test/test_3_load_workspace.asm r
 clean:
 	rm -f *.h *.hex ${ASM}
 
-.PHONY: all clean
+distclean: clean
+	rm -f symbols.asm
+
+.PHONY: all clean distclean
 
 # vim: noet
