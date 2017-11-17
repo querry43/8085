@@ -1,11 +1,8 @@
 ; a larson scanner repeating a stored pattern
 ; for the 8155
 
-        LXI SP , 8191
-        JMP START
+        ORG PSTART
 
-        ORG 44H
-START:
         ; configure ports
         LXI H,CSADDY
         MVI M,00000011B
