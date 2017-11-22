@@ -1,3 +1,2 @@
 *.jar
 node_modules/
-tests/test-asm/all.hex

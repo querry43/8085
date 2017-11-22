@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cd $(dirname $0)
+
+ANTLR_JAR=antlr-4.5.3-complete.jar
+JAVA=java
+
+mkdir -p ../java
+wget --output-document ../java/$ANTLR_JAR http://www.antlr.org/download/$ANTLR_JAR
+
+$JAVA -jar ../java/$ANTLR_JAR -Dlanguage=JavaScript ../libs/grammar/asm8085.g4

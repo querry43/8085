@@ -20,34 +20,34 @@ class Operand {
 }
 
 class Hex extends Operand {
-  constructor(value) { super(parseInt(value.slice(0, -1), 16)); }
+  static parse(value) { return new Hex(parseInt(value.slice(0, -1), 16)); }
   toString() { return '0x' + this.value.toString(16); }
 }
 
 class Oct extends Operand {
-  constructor(value) { super(parseInt(value.slice(0, -1), 8)); }
+  static parse(value) { return new Oct(parseInt(value.slice(0, -1), 8)); }
   toString() { return '0' + this.value.toString(8); }
 }
 
 class Bin extends Operand {
-  constructor(value) { super(parseInt(value.slice(0, -1), 2)); }
+  static parse(value) { return new Bin(parseInt(value.slice(0, -1), 2)); }
   toString() { return '0b' + this.value.toString(2); }
 }
 
 class Dec extends Operand {
-  constructor(value) {
+  static parse(value) {
     if (value.slice(-1) == 'D') {
-      super(parseInt(value.slice(0, -1)));
+      return new Dec(parseInt(value.slice(0, -1)));
     } else {
-      super(parseInt(value));
+      return new Dec(parseInt(value));
     }
   }
 }
 
 class Str extends Operand {
-  constructor(value) { super(value.slice(1, -1)); }
+  static parse(value) { return new Str(value.slice(1, -1)); }
 
-  toInt(programCounter, symbolTable) { return this.value.charCodeAt(1); }
+  toInt(programCounter, symbolTable) { return this.value.charCodeAt(0); }
 
   // bytes[0] = first character
   toBytes(programCounter, symbolTable) {
@@ -118,9 +118,6 @@ class Mod extends Expression {
     return this.left.toInt(programCounter, symbolTable) % this.right.toInt(programCounter, symbolTable);
   }
 }
-
-exports.Operand = Operand;
-exports.Expression = Expression;
 
 exports.Add = Add;
 exports.Bin = Bin;

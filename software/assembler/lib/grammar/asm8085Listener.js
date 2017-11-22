@@ -1,4 +1,4 @@
-// Generated from libs/grammar/asm8085.g4 by ANTLR 4.5.3
+// Generated from ../libs/grammar/asm8085.g4 by ANTLR 4.5.3
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 

@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
-const Assembler = require('./libs/assembler').Assembler;
-const AsmListener = require('./libs/listeners').AsmListener;
+const Assembler = require('../');
 
 var argv = require('minimist')(
   process.argv.slice(2),
@@ -23,18 +22,12 @@ if (argv.help || !argv.hex || !argv.inputs) {
   console.error('  --help -h      Show this help dialog');
   console.error();
   console.error('  --hex          output hex file');
-  console.error('  --text         output text file');
-  console.error('  --symbol       output symbol table as asm file');
   process.exit(1);
 }
 
-console.log('Assembling ' + argv.inputs.join(', ') + ' into ' + argv.hex);
+var asm = new Assembler();
 
-var asm = new Assembler(new AsmListener());
-
-argv.inputs.forEach(function(file) { asm.readAsmFile(file); });
+argv.inputs.forEach(function(file) { asm.readObjFile(file); });
 asm.writeHexFile(argv.hex);
-if (argv.text) { asm.writeTextFile(argv.text); }
-if (argv.symbol) { asm.writeSymbolFile(argv.symbol); }
 
 // vim: ts=2 sw=2 et

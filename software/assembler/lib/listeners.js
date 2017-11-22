@@ -4,7 +4,23 @@ const antlr4 = require('antlr4/index');
 const asm8085Listener = require('./grammar/asm8085Listener');
 const operands = require('./operands');
 const operations = require('./operations');
+const serialijse = require("serialijse");
 const utils = require('./utils');
+
+serialijse.declarePersistable(operations.Directive);
+serialijse.declarePersistable(operations.Instruction);
+serialijse.declarePersistable(operands.Add);
+serialijse.declarePersistable(operands.Bin);
+serialijse.declarePersistable(operands.Dec);
+serialijse.declarePersistable(operands.Div);
+serialijse.declarePersistable(operands.Hex);
+serialijse.declarePersistable(operands.Label);
+serialijse.declarePersistable(operands.LocationCounter);
+serialijse.declarePersistable(operands.Mod);
+serialijse.declarePersistable(operands.Mult);
+serialijse.declarePersistable(operands.Oct);
+serialijse.declarePersistable(operands.Str);
+serialijse.declarePersistable(operands.Sub);
 
 class AsmListener extends asm8085Listener.asm8085Listener {
   constructor() {
@@ -46,7 +62,20 @@ class AsmListener extends asm8085Listener.asm8085Listener {
   }
 
   toJSON() {
-    return JSON.stringify(this.instructions, null, 2);
+    return serialijse.serialize({
+      instructions: this.instructions,
+      address: this.address,
+      symbolTable: this.symbolTable,
+      file: this.file
+    });
+  }
+
+  fromJSON(data) {
+    var obj = serialijse.deserialize(data);
+    this.instructions = obj.instructions;
+    this.address = obj.address;
+    this.symbolTable = obj.symbolTable;
+    this.file = obj.file;
   }
 
   enterOperation(ctx) {
@@ -171,11 +200,11 @@ class AsmListener extends asm8085Listener.asm8085Listener {
 
   exitRegister(ctx) { this.op.push(ctx.getText()); }
 
-  exitHex(ctx) { this.immediates.push(new operands.Hex(ctx.getText())); }
-  exitOct(ctx) { this.immediates.push(new operands.Oct(ctx.getText())); }
-  exitBin(ctx) { this.immediates.push(new operands.Bin(ctx.getText())); }
-  exitDec(ctx) { this.immediates.push(new operands.Dec(ctx.getText())); }
-  exitStr(ctx) { this.immediates.push(new operands.Str(ctx.getText())); }
+  exitHex(ctx) { this.immediates.push(operands.Hex.parse(ctx.getText())); }
+  exitOct(ctx) { this.immediates.push(operands.Oct.parse(ctx.getText())); }
+  exitBin(ctx) { this.immediates.push(operands.Bin.parse(ctx.getText())); }
+  exitDec(ctx) { this.immediates.push(operands.Dec.parse(ctx.getText())); }
+  exitStr(ctx) { this.immediates.push(operands.Str.parse(ctx.getText())); }
 
   exitLabel(ctx) {
     this.label = ctx.getChild(0).getText();

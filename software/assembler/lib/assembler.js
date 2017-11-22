@@ -8,10 +8,11 @@ const path = require('path');
 const asm8085Lexer = require('./grammar/asm8085Lexer').asm8085Lexer;
 const asm8085Parser = require('./grammar/asm8085Parser').asm8085Parser;
 const DieOnErrorListener = require('./listeners').DieOnErrorListener;
+const AsmListener = require('./listeners').AsmListener;
 
 class Assembler {
-  constructor(listener) {
-    this.listener = listener;
+  constructor() {
+    this.listener = new AsmListener();
   }
 
   readAsmFile(file) {
@@ -32,29 +33,22 @@ class Assembler {
     ParseTreeWalker.DEFAULT.walk(this.listener, tree);
   }
 
+  readObjFile(file) {
+    var data = fs.readFileSync(file, 'utf8');
+    this.listener.file = file;
+    this.listener.fromJSON(data);
+  }
+
+  writeObjFile(file) {
+    fs.writeFileSync(file, this.listener.toJSON());
+  }
+
   writeHexFile(file) {
     fs.writeFileSync(file, this.listener.toHex() + ':00000001FF\n');
   }
 
-  writeTextFile(file) {
-    var programName = path.basename(file).replace(/[\.-]/g, '_');
-    fs.writeFileSync(
-      file,
-      '\nconst uint16_t ' + programName + '[] = {\n\n' + this.listener.toString() + '\n};\n\n'
-    );
-  }
-
-  writeSymbolFile(file) {
-    var output = '';
-    var self = this;
-
-    Object.keys(self.listener.symbolTable).sort().forEach(function(property) {
-      output = output
-        + property + ' SET ' + self.listener.symbolTable[property] + '\n';
-    });
-
-    fs.writeFileSync(file, output);
-  }
+  instructions() { return this.listener.instructions; }
+  instruction(i) { return this.listener.instructions[i]; }
 }
 
 exports.Assembler = Assembler;
