@@ -1,4 +1,4 @@
-// Generated from ../libs/grammar/asm8085.g4 by ANTLR 4.5.3
+// Generated from ../lib/grammar/asm8085.g4 by ANTLR 4.5.3
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -98,6 +98,33 @@ asm8085Listener.prototype.enterSET = function(ctx) {
 
 // Exit a parse tree produced by asm8085Parser#SET.
 asm8085Listener.prototype.exitSET = function(ctx) {
+};
+
+
+// Enter a parse tree produced by asm8085Parser#ASEG.
+asm8085Listener.prototype.enterASEG = function(ctx) {
+};
+
+// Exit a parse tree produced by asm8085Parser#ASEG.
+asm8085Listener.prototype.exitASEG = function(ctx) {
+};
+
+
+// Enter a parse tree produced by asm8085Parser#CSEG.
+asm8085Listener.prototype.enterCSEG = function(ctx) {
+};
+
+// Exit a parse tree produced by asm8085Parser#CSEG.
+asm8085Listener.prototype.exitCSEG = function(ctx) {
+};
+
+
+// Enter a parse tree produced by asm8085Parser#DSEG.
+asm8085Listener.prototype.enterDSEG = function(ctx) {
+};
+
+// Exit a parse tree produced by asm8085Parser#DSEG.
+asm8085Listener.prototype.exitDSEG = function(ctx) {
 };
 
 

@@ -4,78 +4,36 @@ const antlr4 = require('antlr4/index');
 const asm8085Listener = require('./grammar/asm8085Listener');
 const operands = require('./operands');
 const operations = require('./operations');
-const serialijse = require("serialijse");
+const segments = require('./segments');
+const serialijse = require('serialijse');
 const utils = require('./utils');
-
-serialijse.declarePersistable(operations.Directive);
-serialijse.declarePersistable(operations.Instruction);
-serialijse.declarePersistable(operands.Add);
-serialijse.declarePersistable(operands.Bin);
-serialijse.declarePersistable(operands.Dec);
-serialijse.declarePersistable(operands.Div);
-serialijse.declarePersistable(operands.Hex);
-serialijse.declarePersistable(operands.Label);
-serialijse.declarePersistable(operands.LocationCounter);
-serialijse.declarePersistable(operands.Mod);
-serialijse.declarePersistable(operands.Mult);
-serialijse.declarePersistable(operands.Oct);
-serialijse.declarePersistable(operands.Str);
-serialijse.declarePersistable(operands.Sub);
+require('./serialize');
 
 class AsmListener extends asm8085Listener.asm8085Listener {
   constructor() {
     super();
     this.instructions = [];
-    this.address = 0;
+    this.addresses = {
+      absolute: new segments.AbsoluteSegment(),
+      code: new segments.CodeSegment(),
+      data: new segments.DataSegment(),
+    };
+    this.segment = 'absolute';
     this.symbolTable = {};
     this.file = null;
-  }
-
-  toHex() {
-    var output = '';
-    var self = this;
-
-    self.instructions.forEach(function(instruction) {
-      output = output + instruction.toHex(self.symbolTable);
-    });
-
-    return output;
-  }
-
-  toString() {
-    var output = '';
-    var self = this;
-
-    output = output + '// Symbol Table:\n';
-    Object.keys(self.symbolTable).sort().forEach(function(property) {
-      output = output
-        + '//   ' + utils.formatLabel(property) + ' ' + utils.formatHex(self.symbolTable[property], 4) + '\n';
-    });
-
-    output = output + '\n\n';
-
-    self.instructions.forEach(function(instruction) {
-      output = output + instruction.toString(self.symbolTable) + '\n';
-    });
-
-    return output;
   }
 
   toJSON() {
     return serialijse.serialize({
       instructions: this.instructions,
-      address: this.address,
       symbolTable: this.symbolTable,
-      file: this.file
     });
   }
 
   fromJSON(data) {
     var obj = serialijse.deserialize(data);
     this.instructions = obj.instructions;
-    this.address = obj.address;
     this.symbolTable = obj.symbolTable;
-    this.file = obj.file;
   }
 
   enterOperation(ctx) {
@@ -99,7 +57,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
       var instruction = new operations.Instruction(
         this.file,
         ctx.start.line,
-        this.address,
+        this.addresses[this.segment].clone(),
         this.label,
         opEntry[1],
         this.text,
@@ -109,7 +67,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
 
       this.instructions.push(instruction);
 
-      this.address = this.address + instruction.length;
+      this.addresses[this.segment].increment(instruction.length);
     } else {
       console.error('failed to parse instruction ' + this.text + ' line ' + ctx.start.line);
       process.exit(1);
@@ -124,7 +82,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     var directive = new operations.Directive(
       this.file,
       ctx.start.line,
-      this.address,
+      this.addresses[this.segment].clone(),
       this.label,
       this.immediates[0].toInt(),
       this.text,
@@ -132,7 +90,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     );
 
     this.instructions.push(directive);
-    this.address = this.address + directive.length;
+		this.addresses[this.segment].increment(instruction.length);
   }
 
   exitDB(ctx) {
@@ -153,7 +111,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     var directive = new operations.Directive(
       this.file,
       ctx.start.line,
-      this.address,
+      this.addresses[this.segment].clone(),
       this.label,
       bytes.length,
       this.text,
@@ -161,12 +119,17 @@ class AsmListener extends asm8085Listener.asm8085Listener {
     );
 
     this.instructions.push(directive);
-    this.address = this.address + directive.length;
+		this.addresses[this.segment].increment(instruction.length);
   }
 
-  exitSET(ctx) {
-    this.symbolTable[ctx.getChild(0).getText()] = this.immediates.pop().toInt(this.address, this.symbolTable);
-  }
+	// XXX: fix me
+  // exitSET(ctx) {
+  //   this.symbolTable[ctx.getChild(0).getText()] = this.immediates.pop().toInt(this.address, this.symbolTable);
+  // }
+
+  exitASEG(ctx) { this.segment = 'absolute'; }
+  exitCSEG(ctx) { this.segment = 'code'; }
+  exitDSEG(ctx) { this.segment = 'data'; }
 
   exitPlus(ctx) {
     var right = this.immediates.pop();
@@ -212,7 +175,7 @@ class AsmListener extends asm8085Listener.asm8085Listener {
       console.error('redefinition of label ' + this.label);
       process.exit(1);
     }
-    this.symbolTable[this.label] = this.address;
+    this.symbolTable[this.label] = this.addresses[this.segment].clone();
   }
 
   exitORG(ctx) { this.address = this.immediates[0].toInt(this.address, this.symbolTable); }
@@ -231,6 +194,19 @@ class DieOnErrorListener extends antlr4.error.ErrorListener {
   syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
     console.error('Syntax error in ' + this.file + ':' + line + ':\n' + msg);
     process.exit(1);
+  }
+}
+
+class AddressSegment {
+  constructor() { this.address = 0; }
+  increment(n) { this.address = this.address + n }
+
+  clone() {
+    var obj = Object.create(this);
+    for (var attr in this) {
+      obj[attr] = this[attr];
+    }
+    return obj;
   }
 }
 

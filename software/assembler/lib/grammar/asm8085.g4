@@ -110,6 +110,9 @@ directive
    | ('DS'   expression) # DS
    | ('ORG'  expression) # ORG
    | (LABEL 'SET' expression) # SET
+   | 'ASEG' # ASEG 
+   | 'CSEG' # CSEG
+   | 'DSEG' # DSEG
    ;
 
 register

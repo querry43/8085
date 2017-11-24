@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 "use strict";
 
-const Assembler = require('../');
+//const Assembler = require('../');
+const Linker = require('../lib/linker').Linker;
 
 var argv = require('minimist')(
   process.argv.slice(2),
@@ -25,9 +26,15 @@ if (argv.help || !argv.hex || !argv.inputs) {
   process.exit(1);
 }
 
-var asm = new Assembler();
+var linker = new Linker();
 
-argv.inputs.forEach(function(file) { asm.readObjFile(file); });
-asm.writeHexFile(argv.hex);
+argv.inputs.forEach(function(file) { linker.readObjFile(file); });
+
+console.log(linker);
+
+// var asm = new Assembler();
+// 
+// argv.inputs.forEach(function(file) { asm.readObjFile(file); });
+// asm.writeHexFile(argv.hex);
 
 // vim: ts=2 sw=2 et

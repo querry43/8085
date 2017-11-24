@@ -5,7 +5,9 @@ cd $(dirname $0)
 ANTLR_JAR=antlr-4.5.3-complete.jar
 JAVA=java
 
-mkdir -p ../java
-wget --output-document ../java/$ANTLR_JAR http://www.antlr.org/download/$ANTLR_JAR
+if [ ! -e ../java/$ANTLR_JAR ]; then
+    mkdir -p ../java
+    wget --output-document ../java/$ANTLR_JAR http://www.antlr.org/download/$ANTLR_JAR
+fi
 
-$JAVA -jar ../java/$ANTLR_JAR -Dlanguage=JavaScript ../libs/grammar/asm8085.g4
+$JAVA -jar ../java/$ANTLR_JAR -Dlanguage=JavaScript ../lib/grammar/asm8085.g4
