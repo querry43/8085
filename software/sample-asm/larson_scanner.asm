@@ -4,7 +4,6 @@
         LXI SP , 8191
         JMP START
 
-        ORG 44H
 START:
         ; configure ports
         LXI H,CSADDY
