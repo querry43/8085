@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import sys, getopt, serial, time, os
+import sys, getopt, time, os
+from serial import Serial
 
 class Programmer:
     def __init__(self, port, baudrate, timeout):
@@ -32,19 +33,19 @@ class Programmer:
         self.__execute_command('l')
 
     def __open_serial(self, port, baudrate, timeout):
-        self.serial_obj = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+        self.serial_obj = Serial(port=port, baudrate=baudrate, timeout=timeout)
         print("Connecting to device: " + self.serial_obj.name + " (" + str(baudrate) + ")")
         time.sleep(timeout)
         self.__execute_command('p')
 
     def __execute_command(self, command_str):
         print("executing command: " + command_str)
-        self.serial_obj.write(command_str + '\n')
+        self.serial_obj.write((command_str + '\n').encode('ascii'))
         got_ok = False
         while True:
             line = self.serial_obj.readline().rstrip()
             print(line)
-            if (line[:2] == "OK"):
+            if (line[:2] == b'OK'):
                 got_ok = True
                 break
             if (not line):
