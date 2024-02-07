@@ -38,6 +38,7 @@ See thread https://gitlab.com/DavidGriffith/minipro/-/issues/131 for more detail
 
 * [SBC-85](https://bitsofthegoldenage.org/)
 * [SDK-85](https://github.com/BitsOfTheGoldenAge/SDK-85)
+* [Sim8085](https://www.sim8085.com/)
 
 ### Components
 
