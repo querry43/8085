@@ -32,7 +32,7 @@ See thread https://gitlab.com/DavidGriffith/minipro/-/issues/131 for more detail
 * [8080/8085 Assembly Language Programming](https://github.com/querry43/8085/blob/main/documentation/assembly/Intel%208080-8085%20Assembly%20Language%20Programming%201977%20Intel.pdf)
 * [Assembly Language Conventions](https://github.com/querry43/8085/blob/main/documentation/assembly/asmguide.pdf)
 * [CP/M Memory Map](https://obsolescence.wixsite.com/obsolescence/cpm-internals)
-* [Assembler](https://shop-pdp.net/ashtml/asxdoc.htm)
+* [Assembler](https://shop-pdp.net/ashtml/asxxxx.php)
 * [Programmer](https://gitlab.com/DavidGriffith/minipro)
 
 ## Similar Projects
