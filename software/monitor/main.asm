@@ -14,8 +14,20 @@
     .area constants
 prompt:
     .asciz "> "
+unknowncommand:
+    .asciz "unknown command\n"
+invalidaddr:
+    .asciz "invalid address\n"
+gotaddr:
+    .asciz "should read address\n"
 
 
+
+; this version of the program should
+;   1. echo all bytes on serial
+;   2. echo a message if 'd' is detected
+;   3. complain if any character after 'd' is < '0'
+;   4. comaplain if the command is not 'd'
 
 
 ; D XXXX YYYY	Dump memory from XXXX to YYYY
@@ -29,18 +41,61 @@ prompt:
 main:
     call serial.setup
 
-    lda prompt
+
+main.loop:                          ; do {
+    lxi h,prompt                    ;   print prompt
     call serial.writestring
 
-main.loop:
     call serial.readbyte.syncecho
 
-    lda serial.buffer       ;   print(serial.buffer)
-    cpi "d"
-    jz main.dump
+    lda serial.buffer
 
-    jmp main.loop
+    cpi "d"                         ;   if (buffer == 'd') {
+    jz dump                         ;     read dump command
+    jmp main.loop                   ;     continue
+                                    ;   }
+
+    lxi h,unknowncommand            ;   else {
+    call serial.writestring         ;       unknown command
+                                    ;   }
+
+    jmp main.loop                   ; }
 
 
-main.dump:
-    call serial.readbyte.syncecho
+; Display memory between two addresses
+dump:
+    push psw
+    push h
+
+    lxi h,gotaddr
+    call serial.writestring
+
+                                    ; read the "from" address
+ dump.fromloop:                     ; do {
+    call serial.readbyte.syncecho   ;   read serial byte
+    lda serial.buffer
+ 
+    cpi "0"-1                       ;   if (byte < '0') {
+    jz dump.invalid                 ;       address is invalid
+    jc dump.invalid
+                                    ;   }
+
+    jmp dump.fromloop               ; } while (true)
+ 
+ dump.invalid:
+    call invalidaddr
+
+    pop h
+    pop psw
+
+
+;invalidaddr:
+;    push psw
+;    push h
+;
+;    lxi h,invalidaddr
+;    call serial.writestring
+;
+;    pop h
+;    pop psw
+;    ret

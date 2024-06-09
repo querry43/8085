@@ -2,6 +2,10 @@
     .sbttl  Receive bytes from SID and echo them to SOD at 9600 baud half duplex
     .8085
 
+    ; ftdi serial instructions:
+    ; screen /dev/cu.usbserial-A104VAZR 9600
+    ; picocom -b 9600 --imap crcrlf /dev/cu.usbserial-A104VAZR
+
     .globl stack
 
     lxi sp,stack
@@ -21,8 +25,18 @@ main:
     sim
     call serial.setup
 
+;main.test_byte:
+;    mvi b,#0x61
+;    call serial.writebyte
+;    jmp main.test_byte
+
+;main.test_string:
+;    lxi h,teststring
+;    call serial.writestring
+;    jmp main.test_string
+
 main.loop:                  ; do {
-    hlt
+    hlt                     ;  select
 
     lda serial.buffer.len   ;   if (serial.buffer.len == 0) {
     ori #0x00               ;     continue
@@ -53,7 +67,7 @@ main.loop:                  ; do {
 serial.setup:
     push psw
 
-    mvi a,sodhigh
+    mvi a,sodlow
     sim
 
     mvi a,#0x00
@@ -64,6 +78,8 @@ serial.setup:
 
 
 ; Write the byte in B out SID lsb first.
+;
+; Serial is active high, bytes are inverted.
 ;
 ; Register usage:
 ;   b - initial byte and temp
@@ -77,10 +93,11 @@ serial.writebyte:
     push d
 
     mvi c,#0x09+stopbits            ; c = num bits to write
+    stc                             ;   carry = 1
 
 serial.writebyte.loop:              ; do {
     mvi a,#0x80                     ;   a = 1000 0000
-    rar                             ;   a = 0100 0000 + carry
+    rar                             ;   a = (carry) 100 0000
     sim
 
     mvi d,writedelay
@@ -91,6 +108,7 @@ serial.writebyte.delayloop:         ; do {
     mov a,b                         ;   a = b
     stc                             ;   carry = 1
     rar                             ;   a >> 1, msb is carry (1), carry is lsb
+    cmc                             ;   carry = !carry
     mov b,a                         ;   b = a
 
     dcr c                           ;   c--
@@ -137,8 +155,7 @@ serial.writestring.end:
 ; Read a byte from serial and write it to memory.
 ;
 ; This is intended to be run as an interrupt.  The resulting byte is stored in
-; serial.buffer and serial.buffer.len is set.
-; to 1.
+; serial.buffer and serial.buffer.len is set to 1.
 ;
 ; Register usage:
 ;   b - result buffer
@@ -178,6 +195,7 @@ serial.readbyte.delay:              ;   do {
     jnz serial.readbyte.loop        ; } while (c > 0)
 
     mov a,b                         ; serial.buffer = received byte
+    xri #0xff                       ; a = ~a
     sta serial.buffer
     mvi a,#0x01                     ; serial.buffer.len = 1
     sta serial.buffer.len
