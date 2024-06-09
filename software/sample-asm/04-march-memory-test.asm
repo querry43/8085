@@ -26,7 +26,9 @@
     ; pass
 
     ; test ram from memstart to memend-1, be sure not to overlap with code or stack
-    ; data area must be in writable ram
+    ; data area must be in writable ram.
+
+    ; blink SOD once when starting each test, then hold SOD high on success.
 
     ; assemble with as8085 -o 04-march-memory-test.asm
     ; link with aslink -i -g stack=0xffff -g memstart=0x850 -g memend=0xff00 -a data=0x800 -a code=0x40 04-march-memory-test.rel
@@ -49,19 +51,29 @@ mem.length:
 main:
     call mem.calclength ; mem.length = memend - memstart
 
+    call serial.blink
+
     call mem.zero       ; walk memory writing 0x00
+
+    call serial.blink
 
     mvi b,0x00
     mvi c,0xff
     call mem.testinc    ; walk memory ascending expecting 0x00 and writing 0xff
 
+    call serial.blink
+
     mvi b,0xff
     mvi c,0x00
     call mem.testinc    ; walk memory ascending expecting 0xff and writing 0x00
 
+    call serial.blink
+
     mvi b,0x00
     mvi c,0xff
     call mem.testdec    ; walk memory descending expecting 0x00 and writing 0xff
+
+    call serial.blink
 
     mvi b,0xff
     mvi c,0x00
@@ -224,4 +236,36 @@ math.sub16:
     
     pop d
     pop psw
+    ret
+
+; Description: Blink SOD
+;
+; Register usage:
+;   bc - delay counter
+;
+serial.blink:
+    push psw
+    push b
+
+    mvi a,#0xc0 ; sod on
+    sim
+    call serial.blink.delay
+
+    mvi a,#0x40 ; sod off
+    sim
+    call serial.blink.delay
+
+    pop b
+    pop psw
+
+    ret
+
+serial.blink.delay:
+    lxi b,#0x5fff
+
+serial.blink.delay.loop:
+    dcx b       ; decrement b register pair
+    mov a,b
+    ora c
+    jnz serial.blink.delay.loop
     ret
