@@ -17,16 +17,6 @@ Assembling is done with Alan Baldwin's suite of assemblers.  [Read more](https:/
 
 Programming is done with [minipro](https://gitlab.com/DavidGriffith/minipro).
 
-I am using an XGecu T48 programmer which has a firmware incompatibility.  It
-may be possible to fix this by updating firmware, but I made a small buffer
-size change and recompiled minipro to work around the issue.
-
-```
-IO error: bulk_transfer: LIBUSB_ERROR_OVERFLOW
-```
-
-See thread https://gitlab.com/DavidGriffith/minipro/-/issues/131 for more details.
-
 ## Documentation
 
 * [8080/8085 Assembly Language Programming](https://github.com/querry43/8085/blob/main/documentation/assembly/Intel%208080-8085%20Assembly%20Language%20Programming%201977%20Intel.pdf)

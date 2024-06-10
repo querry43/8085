@@ -238,6 +238,11 @@ math.sub16:
     pop psw
     ret
 
+
+    sodhigh .equ #0xc0
+    sodlow .equ #0x40
+    blinkdelay .equ #0x5fff
+
 ; Description: Blink SOD
 ;
 ; Register usage:
@@ -247,11 +252,11 @@ serial.blink:
     push psw
     push b
 
-    mvi a,#0xc0 ; sod on
+    mvi a,sodhigh
     sim
     call serial.blink.delay
 
-    mvi a,#0x40 ; sod off
+    mvi a,sodlow
     sim
     call serial.blink.delay
 
@@ -261,7 +266,7 @@ serial.blink:
     ret
 
 serial.blink.delay:
-    lxi b,#0x5fff
+    lxi b,blinkdelay
 
 serial.blink.delay.loop:
     dcx b       ; decrement b register pair
