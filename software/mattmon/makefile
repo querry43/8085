@@ -1,16 +1,19 @@
 #!vim noet
 
-targets = monitor.hex
+targets = mattmon.hex
 
 all: $(targets)
 
 clean:
-	rm -f *.hex *.rel
-
-.phony: clean
+	rm -f *.hex *.rel *.map
 
 %.rel: %.asm
 	as8085 -o $<
 
-monitor.hex: main.rel serial.rel
-	aslink -n -i -g stack=0xffff -a code=0x40 -a interrupt5=0x2c -a data=0x800 $?
+mattmon.hex: mattmon.rel
+	aslink -n -i -m -w -g stack=0xffff -a interrupt5=0x2c -a code=0x40 -a data=0x800 -a bios=0x700 $?
+
+program:
+	minipro -p M48Z02 -w mattmon.hex -s --format ihex
+
+.phony: clean program

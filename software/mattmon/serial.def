@@ -1,7 +1,0 @@
-    .globl serial.setup
-    .globl serial.writebyte
-    .globl serial.writestring
-    .globl serial.readbyte.syncecho
-    .globl serial.readbyte.async
-    .globl serial.buffer
-    .globl serial.buffer.len

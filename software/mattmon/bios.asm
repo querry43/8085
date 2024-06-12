@@ -1,8 +1,5 @@
-    .title  Software Serial
-    .sbttl  Receive bytes from SID and echo them to SOD at 9600 baud half duplex
+    .title 8085 bios
     .8085
-
-    .include "serial.def"
 
     sodhigh .equ #0xc0
     sodlow .equ #0x40
@@ -11,6 +8,7 @@
     stopbits .equ #0x01
     unmask .equ #0x08
 
+    .area bios
 
 ; Setup serial data and interrupts
 serial.setup:
@@ -39,7 +37,7 @@ serial.setup:
 ;   a - byte to write
 ;   b - temp
 ;   c - byte counter
-serial.writebyte:
+serial.writebyte::
     push psw
     push b
 
@@ -75,7 +73,7 @@ serial.writebyte.delayloop:         ; do {
 ;
 ; Register usage:
 ;   hl - address of zero terminated string
-serial.writestring:
+serial.writestring::
     push psw
     push h
 
@@ -156,7 +154,7 @@ serial.readbyte.delay:              ;   do {
 
 
     .area data
-serial.byte:
+serial.byte::
     .ds 1    ; stores a read serial byte
-serial.byte.ready:
+serial.byte.ready::
     .ds 1    ; 1 if a byte is ready, 0 otherwise
