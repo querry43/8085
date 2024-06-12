@@ -12,41 +12,36 @@
     jmp main
 
     .area interrupt5
-    jmp serial.readbyte
+    jmp serial.readbyte.interrupt
 
     .area constants
-teststring:
-    .asciz "hello world\r\n"
+ready:
+    .asciz "READY\r\n"
 
     .area code
 main:
-    ei
-    mvi a,#0x08
-    sim
     call serial.setup
 
-;main.test_byte:
-;    mvi b,#0x61
-;    call serial.writebyte
-;    jmp main.test_byte
-
-;main.test_string:
-;    lxi h,teststring
-;    call serial.writestring
-;    jmp main.test_string
+    lxi h,ready
+    call serial.writestring
 
 main.loop:                  ; do {
-    hlt                     ;  select
 
-    lda serial.buffer.len   ;   if (serial.buffer.len == 0) {
+    ; there are two options for getting a character:
+    ; * wait for an interrupt to fire
+    ; * check for serial.byte.ready
+    ; this code will do both but only one is necessary
+
+    hlt                     ;   select
+
+    lda serial.byte.ready   ;   if (serial.byte.ready == 0) {
     ori #0x00               ;     continue
     jz main.loop            ;   }
 
-    mvi a,#0x01             ;   serial.buffer.len = 0
-    sta serial.buffer.len
+    mvi a,#0x00             ;   serial.byte.ready = 0
+    sta serial.byte.ready
 
-    lda serial.buffer       ;   print(serial.buffer)
-    mov b,a
+    lda serial.byte         ;   print(serial.byte)
     call serial.writebyte
 
     jmp main.loop           ; } while (true)
@@ -57,13 +52,11 @@ main.loop:                  ; do {
     sodlow .equ #0x40
     readdelay .equ #0x0b
     writedelay .equ #0x0a
-    stopbits .equ #0x05
+    stopbits .equ #0x01
+    unmask .equ #0x08
 
 
-; Setup serial by setting SOD high
-;
-; Register usage:
-;   a - value for sim
+; Setup serial data and interrupts
 serial.setup:
     push psw
 
@@ -71,7 +64,12 @@ serial.setup:
     sim
 
     mvi a,#0x00
-    sta serial.buffer
+    sta serial.byte.ready
+
+    mvi a,unmask
+    sim
+
+    ei
 
     pop psw
     ret
@@ -82,43 +80,37 @@ serial.setup:
 ; Serial is active high, bytes are inverted.
 ;
 ; Register usage:
-;   b - initial byte and temp
+;   a - byte to write
+;   b - temp
 ;   c - byte counter
-;   d - delay counter
 serial.writebyte:
-    di                              ; disable interrupts, since reading is
-                                    ; interrupt based
     push psw
     push b
-    push d
 
     mvi c,#0x09+stopbits            ; c = num bits to write
     stc                             ;   carry = 1
 
 serial.writebyte.loop:              ; do {
+    mov b,a
     mvi a,#0x80                     ;   a = 1000 0000
     rar                             ;   a = (carry) 100 0000
     sim
+    mov a,b
 
-    mvi d,writedelay
+    mvi b,writedelay
 serial.writebyte.delayloop:         ; do {
-    dcr d                           ;   d--
+    dcr b                           ;   d--
     jnz serial.writebyte.delayloop  ; } while (d > 0)
 
-    mov a,b                         ;   a = b
     stc                             ;   carry = 1
     rar                             ;   a >> 1, msb is carry (1), carry is lsb
     cmc                             ;   carry = !carry
-    mov b,a                         ;   b = a
 
     dcr c                           ;   c--
     jnz serial.writebyte.loop       ; } while (c != 0)
 
-    pop d
     pop b
     pop psw
-
-    ei                              ; enable interrupts
 
     ret
 
@@ -131,18 +123,16 @@ serial.writestring:
     push psw
     push h
 
-serial.writestring.loop:        ; do {
-    mov a,m                     ;   a = byte at hl
+serial.writestring.loop:            ; do {
+    mov a,m                         ;   a = byte at hl
 
-    ora a                       ;   if (a == 0) {
-    jz serial.writestring.end   ;     break
-                                ;   }
+    ora a                           ;   if (a == 0)
+    jz serial.writestring.end       ;     break
 
-    mov b,a                     ;   writebyte
-    call serial.writebyte
+    call serial.writebyte           ;   print(a)
 
-    inx h                       ;   hl++
-    jmp serial.writestring.loop ; }
+    inx h                           ;   hl++
+    jmp serial.writestring.loop     ; }
 
 serial.writestring.end:
 
@@ -155,13 +145,14 @@ serial.writestring.end:
 ; Read a byte from serial and write it to memory.
 ;
 ; This is intended to be run as an interrupt.  The resulting byte is stored in
-; serial.buffer and serial.buffer.len is set to 1.
+; serial.byte and serial.byte.ready is set to 1.
 ;
 ; Register usage:
 ;   b - result buffer
 ;   c - bit counter
 ;   d - delay counter
-serial.readbyte:
+serial.readbyte.interrupt:
+    di                              ; disable interrupts, this is time sensitive
     push psw
     push b
     push d
@@ -194,11 +185,11 @@ serial.readbyte.delay:              ;   do {
     dcr c                           ;   c--
     jnz serial.readbyte.loop        ; } while (c > 0)
 
-    mov a,b                         ; serial.buffer = received byte
+    mov a,b                         ; serial.byte = received byte
     xri #0xff                       ; a = ~a
-    sta serial.buffer
-    mvi a,#0x01                     ; serial.buffer.len = 1
-    sta serial.buffer.len
+    sta serial.byte
+    mvi a,#1                        ; serial.byte.ready = 1
+    sta serial.byte.ready
 
     pop d
     pop b
@@ -209,7 +200,7 @@ serial.readbyte.delay:              ;   do {
 
 
     .area data
-serial.buffer:
+serial.byte:
     .ds 1    ; stores a read serial byte
-serial.buffer.len:
-    .ds 1    ; the number of bytes in the serial buffer
+serial.byte.ready:
+    .ds 1    ; 1 if a byte is ready, 0 otherwise
