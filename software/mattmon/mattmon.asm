@@ -16,6 +16,7 @@
 
     .include "bios.asm"
 
+    mode.initial .equ #0xff
     mode.readstart .equ #0x00
     mode.readend .equ #0x01
 
@@ -28,22 +29,15 @@ address.mode:
     .ds 1
 
 
-
-; ascii
-; 0x30-0x39     0-9
-; 0x61-0x66     a-f
-; 0x3a          :
-; 0x20          ' '
-; 0x2e          .
-; 0x72          r
-; 0xa0          nl
-; 0x0d          cr
-
     .area code
 ready:
     .asciz "READY\r\n"
 cr:
     .asciz "\r\n"
+colon:
+    .asciz ":"
+space:
+    .asciz " "
 
 
     .area code
@@ -62,7 +56,7 @@ main.loop:                  ; while (true) {
     call serial.writebyte   ;     echo byte
 
 main.parseend:
-    cpi #0x0d               ;   if (a == '\n')
+    cpi #"\r"               ;   if (a == '\r')
     jz main.runcommand      ;     run command
 
 main.parsemode:
@@ -103,10 +97,87 @@ main.writenothex:
     call reset
     jmp main.loop
 
-; This does very little so far, but will eventually do a thing...
+
+; If there is something to run, debug.  eventually run it...
 main.runcommand:
-    call debug
+    lda address.mode
+
+    cpi mode.readend        ; if (address.mode <= mode.readend)
+    jc main.printmem
+    jz main.printmem        ;   printmem
+
+    jmp main.runcommand.end ; else
+                            ;   return
+
+main.printmem:
+    lhld address.start      ; align start address to 8-byte boundary for easy display
+    mov a,l                 ; [address.start] = [address.start] & 0xfff0
+    ani #0xf0               ; ex:
+    mov l,a                 ;   0x0000 => 0x0000, 0x0009 => 0x0000, 0xffff => 0xfff0
+    shld address.start
+
+    ; should this align to the beginning as well?, wonder what's more convenient...
+    lhld address.end        ; align end address to 8-byte boundary for easy display
+    mov a,l                 ; [address.end] = [address.end] | 0x000f
+    ori #0x0f               ; ex:
+    mov l,a                 ;   0x0000 => 0x000f, 0x0009 => 0x000f, 0xffff => 0xffff
+    mvi d,#0
+    mvi e,#1
+    dad d
+    shld address.end
+
+    lhld address.start      ; d = address.start
+    xchg
+
+    lxi h,cr
+    call serial.writestring
+
+
+main.printrow:              ; print the start address and 16 bytes from that address
+                            ; ex  "0100: ff ff 01 00 ..."
+
+    mov a,d                 ; print the row start address
+    call printbyte
+    mov a,e
+    call printbyte
+
+    lxi h,colon             ; print(":")
+    call serial.writestring
+
+    mvi b,#0                ; b = 0
+
+main.printrow.loop:         ; print 16 mem values, proceeded each by " "
+    mov a,b                 ; while (b < 16) {
+    cpi #0x10
+    jz main.printrow.end
+
+    inr b                   ;   b++
+
+    lxi h,space             ;   print " "
+    call serial.writestring
+
+    ldax d                  ;   print [de]
+    call printbyte
+
+    inx d                   ;   de++
+    jmp main.printrow.loop  ; }
+
+main.printrow.end:
+    lxi h,cr                ; print "\r\n"
+    call serial.writestring
+
+    lhld address.end        ; if (current == end )
+    mov a,d                 ;   end
+    cmp h
+    jnz main.printrow
+    mov a,e
+    cmp l
+    jnz main.printrow
+
+main.runcommand.end:
+    call reset
     jmp main.loop
+
 
 ; Set mode to read end byte
 main.setmodeend:
@@ -115,33 +186,47 @@ main.setmodeend:
     jmp main.loop
 
 
-; Reset all local state
+; Reset all memory state
+;
+; Register usage:
+;   a - temp
+;   hl - data buffer
 reset:
     push psw
-    pop psw
+    push h
 
     mvi l,#0
     mvi h,#0
     shld address.start
-    shld address.end
-    shld address.mode
 
+    mvi l,#0xff
+    mvi h,#0xff
+    shld address.end
+
+    mvi a,mode.initial
+    sta address.mode
+
+    pop h
+    pop psw
     ret
 
+
 ; Display some monitor state.
+;
+; Register usage:
+;   a - nibble to store
+;   hl - data buffer
 startval:
     .asciz "start = "
 endval:
     .asciz "end   = "
 modeval:
     .asciz "mode  = "
+stackval:
+    .asciz "stack = "
 debug:
     push psw
-    push b
-    push d
-
-    lxi h,cr
-    call serial.writestring
+    push h
 
     lxi h,startval
     call serial.writestring
@@ -168,13 +253,24 @@ debug:
     lxi h,cr
     call serial.writestring
 
-    pop d
-    pop b
+    lxi h,stackval
+    call serial.writestring
+    mvi h,#0
+    mvi l,#0
+    dad sp
+    mov a,h
+    call printbyte
+    mov a,l
+    call printbyte
+    lxi h,cr
+    call serial.writestring
+
+    pop h
     pop psw
     ret
     
 
-; Store the nibble to the stored address, shifting existing nibbles left.
+; Store the nibble to memory identified by address.mode, shifting existing nibbles left.
 ;
 ; Register usage:
 ;   a - nibble to store
@@ -188,13 +284,30 @@ storenibble:
     lda address.mode
     cpi mode.readend
 
-    jz storenibble.readend  ; if (mode == mode.readend)
-    lhld address.start      ;   hl = [address.start]
-    jmp storenibble.readboth; else
-storenibble.readend:
-    lhld address.end        ;   hl = [address.end]
+    jz storenibble.readend
+    jmp storenibble.readstart
 
-storenibble.readboth:
+storenibble.readstart:      ; if (address.mode != mode.readend)
+    mvi a,mode.readstart    ;   address.mode = mode.readstart
+    sta address.mode
+
+    lhld address.start      ;   hl = [address.start]
+    call storenibble.shftnib;   shift b into hl
+    shld address.start      ;   [address.start] = hl
+    jmp storenibble.end     ; }
+
+storenibble.readend:        ; if (address.mode == mode.readend)
+    lhld address.end        ;   hl = [address.end]
+    call storenibble.shftnib;   shift b into hl
+    shld address.end        ;   [address.end] = hl
+    jmp storenibble.end     ; }
+
+storenibble.end:
+    pop b
+    pop psw
+    ret
+
+storenibble.shftnib:        ; shift lower 4 bytes from b into hl
     dad h                   ; hl << 4
     dad h
     dad h
@@ -204,31 +317,19 @@ storenibble.readboth:
     ora l                   ; l = l | a
     mov l,a
 
-    lda address.mode
-    cpi mode.readend
-
-    jz storenibble.writeend ; if (mode == mode.readend)
-    shld address.start      ;   [address.start] = hl
-    jmp storenibble.end     ; else
-storenibble.writeend:
-    shld address.end        ;   [address.end] = hl
-
-storenibble.end:
-    pop b
-    pop psw
     ret
 
 
 ; Write the lower nibble of A to serial as hex.
 ;
 ; Register usage:
-;   a - nibble to write
+;   a - nibble to display
 ;
 ; Example:
-;   mvi a,15
+;   mvi a,#15
 ;   call printnibble ; prints "5"
 ;
-;   mvi a,2b
+;   mvi a,#2b
 ;   call printnibble ; prints "b"
 printnibble:
     push psw
@@ -248,7 +349,17 @@ printnibble.both:
     pop psw
     ret
 
-; Prints the high nibble and the low nibble of accumulator.
+; Write the high nibble and the low nibble of accumulator to serial as hex.
+;
+; Register usage:
+;   a - byte to write
+;
+; Example:
+;   mvi a,#15
+;   call printnibble ; prints "15"
+;
+;   mvi a,#2b
+;   call printnibble ; prints "2b"
 printbyte:
     push psw
     rar

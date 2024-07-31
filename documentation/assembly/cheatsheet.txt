@@ -1,0 +1,103 @@
+The mnemonics assigned to the instructions are designed to indicate the function of the instruction. The Instructions fall into the following functional categories:
+
+Data Transfer Group. The data transfer instructions move data between registers or between memory and registers.
+MOV     Move Immediate
+MVI     Move Immediate
+LDA     Load Accumulator Directly from Memory
+STA     Store Accumulator Directly in Memory
+LHLD    Load Hand L Registers Directly from Memory
+SHLD    Store Hand L Registers Directly in Memory
+
+An 'X' In the name of a data transfer instruction implies that it deals with a register pair:
+LXI     Load Register Pair with Immediate data
+LDAX    Load Accumulator from Address in Register Pair
+STAX    Store Accumulator in Address in Register Pair
+XCHG    Exchange H and L with D and E
+XTHL    Exchange Top of Stack with H and L
+
+Arithmetic Group. The arithmetic instructions add, subtract, increment, or decrement data in registers or memory.
+ADD     Add to Accumulator
+ADI     Add Immediate Data to Accumulator
+ADC     Add to Accumulator Using Carry Flag
+ACI     Add Immediate Data to Accumulator Using Carry Flag
+SUB     Subtract from Accumulator
+SUI     Subtract Immediate Data from Accumulator
+SBB     Subtract from Accumulator Using Borrow (Carry) Flag
+SBI     Subtract Immediate from Accumulator Using Borrow
+INR     Increment Specified Byte by One
+DCR     Decrement Specified Byte by One
+INX     Increment Register Pair by One
+DCX     Decrement Register Pair by One
+DAD     Double Register Add: Add Contents of Register Pair to Hand L Register Pair
+
+Logical Group. This group performs logical (Boolean) operations on data in registers and memory and on condition flags.
+The logical, AND, OR, and Exclusive OR instructions enable you to set specific bits in the accumulator ON or OFF.
+ANA     Logical AND with Accumulator
+ANI     Logical AND with Accumulator Using Immediate Data
+ORA     Logical OR with Accumulator
+ORI     Logical OR with Accumulator Using Immediate Data
+XRA     Exclusive Logical OR with Accumulator
+XRI     Exclusive OR Using Immediate Data
+
+The compare instructions compare the contents of an 8·blt value with the contents of the accumulator:
+CMP     Compare
+CPI     Compare Using Immediate Data
+
+The rotate instructions shift the contents of the accumulator one bit position to the left or right:
+RLC     Rotate Accumulator Left
+RRC     Rotate Accumulator Right
+RAL     Rotate Left Through Carry
+RAR     Rotate Right Through Carry
+
+Complement ald carry flag instructions:
+CMA     Complement Accumulator
+CMC     Complement Carry Flag
+STC     Set Carry Flag
+
+Branch Group. The branching instructions alter normal sequential program flow. either unconditionally or
+conditionallY. fhe unconditional branching instructions are as follows:
+JMP     Jump
+CALL    Call
+RET     Return
+
+Conditional bnnching Instructions examine the status of one of four condition flags to determine whether the
+specified brant h IS to be executed. The conditions that may be specified are as follows:
+NZ      NotZero(Z=0)
+Z       Zero(Z=1)
+NC      NoCarry(C=0)
+C       Carry (C = 1)
+PO      Parity Odd (P =0)
+PE      Parity Even (P = 1)
+P       Plus (5 = 0)
+M       Minus (5 1)
+
+Jumps   Calls   Returns
+JC      CC      RC      (Carry)
+JNC     CNC     RNC     (No Carry)
+JZ      CZ      RZ      (Zero)
+JNZ     CNZ     RNZ     (Not Zero)
+JP      CP      RP      (Plus)
+JM      CM      RM      (Minus)
+JPE     CPE     RPE     (Parity Even)
+JPO     CPO     RPO     (Parity Odd)
+
+
+Two other instructions can effect a branch by replacing the contents of the program counter:
+PCHL    Move Hand L to Program Counter
+RST     Special Restart Instruction Used with Interrupts 
+
+Stack, //0, and Machine Contra/Instructions. The following instructions affect the stack and/or stack pOinter'
+PUSH    Push Two Bytes of Data onto the Stack
+POP     Pop Two Bytes of Data off the Stack
+XTHL    Exchange Top of Stack with Hand L
+SPHL    Move contents of Hand L to Stack Pointer
+
+The I/O instructions are as follows:
+IN      Initiate Input Operation
+OUT     Initiate Output Operation
+
+The machine control Instructions are as follows:
+EI      Enable Interrupt System
+DI      Disable Interrupt System
+HLT     Halt
+NOP     No Operation
