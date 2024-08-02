@@ -83,7 +83,7 @@ JPO     CPO     RPO     (Parity Odd)
 
 
 Two other instructions can effect a branch by replacing the contents of the program counter:
-PCHL    Move Hand L to Program Counter
+PCHL    Move H and L to Program Counter
 RST     Special Restart Instruction Used with Interrupts 
 
 Stack, //0, and Machine Contra/Instructions. The following instructions affect the stack and/or stack pOinter'

@@ -19,7 +19,9 @@
     mode.initial .equ #0xff
     mode.readstart .equ #0x00
     mode.readend .equ #0x01
-    mode.write .equ #0x02
+    mode.writehigh .equ #0x02
+    mode.writelow .equ #0x03
+    mode.run .equ #0x04
 
     .area data
 address.start:
@@ -58,15 +60,15 @@ main.loop:                  ; while (true) {
 
     call serial.writebyte   ;     echo byte
 
-main.parseend:
+main.parsemode:
     cpi #"\r"               ;   if (a == '\r')
     jz main.runcommand      ;     run command
-
-main.parsemode:
     cpi #"."                ;   if (a == '.')
     jz main.setmodeend      ;     start parsing end byte
     cpi #":"                ;   if (a == ':')
     jz main.setmodewrite    ;     start parsing writes
+    cpi #"r"                ;   if (a == 'r')
+    jz main.setmoderun      ;     set run mode
 
 main.parsespace:
     cpi #" "                ;   if (a == ' ')
@@ -115,13 +117,22 @@ main.setmodeend:
 
 ; Set mode to write
 main.setmodewrite:
-    mvi a,mode.write
+    mvi a,mode.writehigh
+    sta address.mode
+    jmp main.loop
+
+; Set mode to run
+main.setmoderun:
+    mvi a,mode.run
     sta address.mode
     jmp main.loop
 
 
 ; Run a command if we are no longer in the initial state
 main.runcommand:
+    lxi h,cr                ; print "\r\n"
+    call serial.writestring
+
     lda address.mode
 
     cpi mode.readstart      ; if (address.mode == mode.readstart)
@@ -130,8 +141,8 @@ main.runcommand:
     cpi mode.readend        ; if (address.mode == mode.readend)
     jz main.printmemrange   ;   do printmemrange
 
-    cpi mode.write          ; if (address.mode == mode.write)
-    jz main.write           ;   do write
+    cpi mode.run            ; if (address.mode == mode.run)
+    jz main.run             ;   do run/jump
 
     jmp main.runcommand.end ; else
                             ;   return
@@ -139,9 +150,6 @@ main.runcommand:
 main.printmem:              ; if (address.mode == mode.readstart)
     lhld address.start      ; d = address.start
     xchg
-
-    lxi h,cr
-    call serial.writestring
 
     mov a,d                 ; print the row start address
     call printbyte
@@ -179,10 +187,6 @@ main.printmemrange:         ; if (address.mode == mode.readend)
 
     lhld address.start      ; d = address.start
     xchg
-
-    lxi h,cr
-    call serial.writestring
-
 
 main.printrow:              ; print the start address and 16 bytes from that address
                             ; ex  "0100: ff ff 01 00 ..."
@@ -226,14 +230,10 @@ main.printrow.end:
     jnz main.printrow
     jmp main.runcommand.end
 
-main.write:
-    lxi h,cr                ; print "\r\n"
-    call serial.writestring
-    lda address.write
-    lhld address.start
-    xchg
-    stax d
-    jmp main.runcommand.end
+main.run:                   ; run the given address, does not return
+    lxi sp,stack            ; reset the stack
+    lhld address.start      ; jump to [address.start]
+    pchl
 
 main.runcommand.end:
     call reset
@@ -352,8 +352,11 @@ storenibble:
     cpi mode.readstart
     jz storenibble.readstart
 
-    cpi mode.write
-    jz storenibble.write
+    cpi mode.writehigh
+    jz storenibble.writehigh
+
+    cpi mode.writelow
+    jz storenibble.writelow
 
     jmp storenibble.readend
 
@@ -372,14 +375,35 @@ storenibble.readend:        ; if (address.mode == mode.readend) {
     shld address.end        ;   [address.end] = hl
     jmp storenibble.end     ; }
 
-storenibble.write:          ; if (address.mode == mode.write) {
-    lda address.write       ;
+storenibble.writehigh:      ; if (address.mode == mode.writehigh) {
+    mov a,b                 ;   [address.write] = b
+    sta address.write
+    mvi a,mode.writelow     ;   [address.mode] = mode.writelow
+    sta address.mode
+    jmp storenibble.end     ; }
+
+storenibble.writelow:       ; if (address.mode == mode.writelow) {
+    lda address.write       ;   a = [address.write] << 4 | b
     rlc
     rlc
     rlc
     rlc
     ora b
+
+    lhld address.start      ;   [address.start] = a
+    xchg
+    stax d
+    xchg
+
+    mvi a,mode.writehigh    ;   [address.mode] = mode.writehigh
+    sta address.mode
+
+    mvi a,#0                ;   address.write = 0
     sta address.write
+
+    inx h                   ;   address.start++
+    shld address.start
+
     jmp storenibble.end     ; }
 
 storenibble.end:
