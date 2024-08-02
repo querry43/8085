@@ -1,5 +1,5 @@
-    .title  Software Serial
-    .sbttl  Receive bytes from SID and echo them to SOD at 9600 baud half duplex
+    .title  Mattmon
+    .sbttl  Read and write to mem, usage similar to wozmon
     .8085
 
     ; ftdi serial instructions:
