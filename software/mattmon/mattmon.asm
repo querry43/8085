@@ -3,8 +3,7 @@
     .8085
 
     ; ftdi serial instructions:
-    ; screen /dev/cu.usbserial-A104VAZR 9600
-    ; picocom -b 9600 /dev/cu.usbserial-A104VAZR
+    ; picocom -b 9600 --send-cmd ./sendfile.py /dev/cu.usbserial-A104VAZR
 
     .globl stack
 
@@ -39,10 +38,6 @@ ready:
     .asciz "READY\r\n"
 cr:
     .asciz "\r\n"
-colon:
-    .asciz ":"
-space:
-    .asciz " "
 
 
     .area code
@@ -73,6 +68,8 @@ main.parsemode:
 main.parsespace:
     cpi #" "                ;   if (a == ' ')
     jz main.loop            ;     next
+    cpi #"\n"                ;   if (a == '\n')
+    jz main.loop            ;     next
 
 main.parsenibble:
     cpi #"0"                ;   if (a < '0')
@@ -101,9 +98,12 @@ main.parsealphanibble:
                             ; }
 
 ; Display an error and clear state
-nothex: .asciz "\r\nnot hex\r\n"
+nothex: .asciz "\r\nnot hex: "
 main.writenothex:
     lxi h,nothex
+    call serial.writestring
+    call printbyte
+    lxi h,cr
     call serial.writestring
     call reset
     jmp main.loop
