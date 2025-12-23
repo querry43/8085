@@ -8,5 +8,6 @@
         ; dump with minipro -p M48Z02 -r - | hexdump -C
 
 START:  MVI A,#0xC0     ; 00111110 11000000, 3e c0
+                        ; A = [sod, sde, xxx, r7.5, mse, m6.5, m6.5, m5.5]
         SIM             ; 00110000, 30
         HLT             ; 01110110, 76

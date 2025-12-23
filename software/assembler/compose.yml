@@ -1,0 +1,5 @@
+services:
+  as8085:
+    image: asxxxx:latest
+    build: .
+    platform: linux/amd64
